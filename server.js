@@ -10,11 +10,11 @@ const db = require("./app/models");
 const app = express();
 
 var corsOptions = {
-	origin: "http://mirandinha-portal.doxotech.com.br:3003",
-	optionsSuccessStatus: 200
+    origin: "http://mirandinha-portal.doxotech.com.br:3003",
+    optionsSuccessStatus: 200
 };
 
-app.use(cors({origin: '*'}));
+app.use(cors({ origin: '*' }));
 
 //request methods
 app.use(function (req, res, next) {
@@ -58,6 +58,9 @@ require("./app/routes/api/v1/address_users.routes")(app);
 require("./app/routes/api/v1/dataUser.routes")(app);
 require("./app/routes/api/v1/auth.routes")(app);
 require("./app/routes/api/v1/products.routes")(app);
+require("./app/routes/api/v1/grupo.routes")(app);
+require("./app/routes/api/v1/fpagto.routes")(app);
+require("./app/routes/api/v1/cpagto.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;

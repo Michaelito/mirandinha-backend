@@ -24,5 +24,8 @@ db.users = require("./user.model.js")(sequelize, Sequelize);
 db.address_users = require("./address_users.model.js")(sequelize, Sequelize);
 db.data_users = require("./data_user.model.js")(sequelize, Sequelize);
 db.product = require("./product.model")(sequelize, Sequelize);
+db.grupo = require("./grupo.model")(sequelize, Sequelize);
+db.fpagto = require("./fpagto.model")(sequelize, Sequelize);
+db.cpagto = require("./cpagto.model")(sequelize, Sequelize);
 
 module.exports = db;
