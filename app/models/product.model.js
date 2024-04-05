@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     id: {
       type: DataTypes.STRING,
       primaryKey: true
-      
+
     },
     nome: {
       type: DataTypes.STRING,
@@ -71,15 +71,15 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     }
   },
-  {
-    // Other model options go here
-    timestamps: false,
+    {
+      // Other model options go here
+      timestamps: false,
 
-    createdAt: false,
+      createdAt: false,
 
-    updatedAt: false,
+      updatedAt: false,
 
-  });
+    });
 
   return products;
 };
