@@ -3,6 +3,28 @@ const Grupo = db.grupo;
 const Op = db.Sequelize.Op;
 const { uuid } = require('uuidv4');
 
+
+exports.findAll = (req, res) => {
+
+    Grupo.findAll()
+        .then(data => {
+            res.send({
+                status: true,
+                message: "The request has succeeded",
+                data: {
+                    tutorial: data
+                }
+            }).status(200);
+        })
+        .catch(err => {
+            res.send({
+                status: false,
+                message: "The request has not succeeded",
+                data: null
+            }).status(500);
+        });
+};
+
 // Find a single Grupo with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
