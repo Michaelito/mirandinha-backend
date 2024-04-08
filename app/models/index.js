@@ -27,5 +27,6 @@ db.product = require("./product.model")(sequelize, Sequelize);
 db.grupo = require("./grupo.model")(sequelize, Sequelize);
 db.fpagto = require("./fpagto.model")(sequelize, Sequelize);
 db.cpagto = require("./cpagto.model")(sequelize, Sequelize);
+db.clientes = require("./clientes.model")(sequelize, Sequelize);
 
 module.exports = db;
