@@ -3,30 +3,42 @@ const Products = db.product;
 const Op = db.Sequelize.Op;
 
 exports.findAll = (req, res) => {
-    const nome = req.query.nome;
-    var condition = nome ? {
-        title: {
-            [Op.nome]: `%${nome}%`
-        }
-    } : null;
+    const { page = 1, pageSize = 10 } = req.params; // Default page = 1, pageSize = 10
 
-    Products.findAll({ where: condition })
-        .then(data => {
-            res.send({
-                status: true,
-                message: "The request has succeeded",
-                data: {
-                    products: data
-                }
-            }).status(200);
-        })
-        .catch(err => {
-            res.send({
-                status: false,
-                message: "The request has not succeeded",
-                data: null
-            }).status(500);
+    // Calculate offset based on page number and page size
+    const offset = (page - 1) * pageSize;
+
+    Products.findAll({
+       
+        limit: pageSize,
+        offset: offset
+    })
+    .then(data => {
+        const { count, rows } = data;
+
+        // Calculate total pages based on total count and page size
+        const totalPages = Math.ceil(count / pageSize);
+
+        res.status(200).json({
+            status: true,
+            message: "Request succeeded",
+            data: {
+                products: data,
+                currentPage: parseInt(page),
+                pageSize: parseInt(pageSize),
+                totalCount: count,
+                totalPages: totalPages
+            }
         });
+    })
+    .catch(err => {
+        console.error("Error retrieving products:", err);
+        res.status(500).json({
+            status: false,
+            message: "Request failed",
+            error: err.message || "An error occurred while retrieving products"
+        });
+    });
 };
 
 // Find a single Tutorial with an id
