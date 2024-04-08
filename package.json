@@ -1,7 +1,7 @@
 {
-    "name": "starbem-api",
+    "name": "mirandinha-api",
     "version": "1.0.0",
-    "description": "API Node.js Rest Apis with Express, Sequelize & MySQL",
+    "description": "API Mirandinha",
     "main": "server.js",
     "scripts": {
         "build": "npx tsc",
@@ -17,7 +17,7 @@
         "sequelize",
         "mysql"
     ],
-    "author": "Gok-Digital",
+    "author": "DoxoTech",
     "license": "ISC",
     "dependencies": {
         "axios": "^1.6.7",

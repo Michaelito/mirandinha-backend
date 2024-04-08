@@ -43,19 +43,18 @@ async function login(req, res,) {
         }
     })
     
-    const datauser = await DataUsers.findOne({
-        where: { user_id: user.id}
-    })
-    
-
-    if (user != null) {
+    if (user) {
         const id = user.id;
-        console.log(id);
+        
         const token = jwt.sign({ id }, process.env.JWT, {
             expiresIn: 300 // expires in 5min
-
         });
+
         await user.update({ token: token });
+
+        const datauser = await DataUsers.findOne({
+            where: { user_id: id}
+        })
 
         return res.json({
             id: id,
@@ -63,7 +62,7 @@ async function login(req, res,) {
             login: user.login,
             fullname: datauser.fullname,
             token: user.token,
-            refresh_token: token,
+            refresh_token: user.refresh_token,
             profile: user.profile,
             status: user.status,
             createdAt: user.createdAt,

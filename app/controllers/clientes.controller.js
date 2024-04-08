@@ -1,22 +1,25 @@
 const db = require("../models");
-const Products = db.product;
+const Clientes = db.clientes;
+const Tutorial = db.tutorials;
 const Op = db.Sequelize.Op;
 
+
+// Retrieve all Tutorials from the database.
 exports.findAll = (req, res) => {
     const nome = req.query.nome;
     var condition = nome ? {
-        title: {
-            [Op.nome]: `%${nome}%`
+        nome: {
+            [Op.like]: `%${nome}%`
         }
     } : null;
 
-    Products.findAll({ where: condition })
+    Clientes.findAll({ where: condition })
         .then(data => {
             res.send({
                 status: true,
                 message: "The request has succeeded",
                 data: {
-                    products: data
+                    clientes: data
                 }
             }).status(200);
         })
@@ -33,7 +36,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    Products.findByPk(id)
+    Clientes.findByPk(id)
         .then(data => {
             res.send(data);
         })
@@ -43,4 +46,3 @@ exports.findOne = (req, res) => {
             });
         });
 };
-
