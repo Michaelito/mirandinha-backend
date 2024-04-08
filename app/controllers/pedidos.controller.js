@@ -5,28 +5,17 @@ const { uuid } = require('uuidv4');
 const Op = db.Sequelize.Op;
 
 
-// Create and Save a new Tutorial
-
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
 
+    const id = req.query.id;
+    var condition = id ? {
+        id: {
+            [Op.like]: `%${id}%`
+        }
+    } : null;
 
-    pedidos.hasMany(pedidosItens, {
-        foreignKey: 'id_pedido'
-    });
-    // pedidosItens.belongsTo(pedidos, {
-    //     foreignKey: 'id_pedido'
-    // });
-
-    pedidos.findAll({
-        include: [
-            {
-                model: pedidosItens,
-                required: false,
-                attributes: ['id', 'produto', 'preco', 'qtde', 'total', 'peso']
-            },
-        ]
-    })
+    pedidos.findAll({ where: condition })
         .then(data => {
             res.send({
                 status: true,
@@ -45,47 +34,37 @@ exports.findAll = (req, res) => {
         });
 };
 
-// // Find a single Tutorial with an id
-// exports.findOne = (req, res) => {
-//     const id = req.params.id;
+// Find a single Data with an id
+exports.findOne = (req, res) => {
+    const id = req.params.id;
 
-//     users.hasMany(datausers, {
-//         foreignKey: 'user_id'
-//     });
+    pedidos.hasMany(pedidosItens, {
+        foreignKey: 'pedido_id'
+    });
 
-//     users.hasMany(address_users, {
-//         foreignKey: 'user_id'
-//     });
-
-//     users.findByPk(id, {
-//         attributes: { exclude: ['password', 'token', 'refresh_token'] },
-//         include: [
-//             {
-//                 model: datausers,
-//                 required: false,
-//                 attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-//             },
-//             {
-//                 model: address_users,
-//                 required: false,
-//                 attributes: ['id', 'cep', 'logradouro', 'numero', 'complemento', 'cidade', 'bairro', 'estado', 'ativo', 'createdAt']
-//             }
-//         ]
-//     })
-//         .then(data => {
-//             res.send(data);
-//         })
-//         .catch(err => {
-//             res.status(500).send({
-//                 message: "Error retrieving Data with id=" + id
-//             });
-//         });
-// };
+    pedidos.findByPk(id, {
+        //attributes: { exclude: ['password', 'token', 'refresh_token'] },
+        include: [
+            {
+                model: pedidosItens,
+                required: false
+                //attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
+            }
+        ]
+    })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error retrieving Data with id=" + id
+            });
+        });
+};
 
 // Create and Save a new User
-exports.create = (req, res) => {
+exports.create =  (req, res) => {
     const payload = {
-        id: req.body.id,
         cnpjf: req.body.cnpjf,
         nome: req.body.nome,
         cep: req.body.cep,
@@ -116,6 +95,58 @@ exports.create = (req, res) => {
     // Save Tutorial in the database
     pedidos.create(payload)
         .then(data => {
+
+            const pedido_id = data.id;
+            
+            console.log(pedido_id)
+           
+            // const pedido_itens = {
+            //     id_produto: req.body.pedido_itens.id_produto,
+            //     id_pedido: pedido_id,
+            //     produto: req.body.produto,
+            //     preco: req.body.preco,
+            //     qtde: req.body.qtde,
+            //     total: req.body.total,
+            //     peso: req.body.peso
+            // };
+            
+            const itensArray = req.body.pedido_itens
+
+
+            // Use map() to iterate over itensArray and create promises for each item insertion
+            itensArray.forEach(pedido_item => {
+                // Create a promise for each item insertion
+                let insertionPromise = pedidosItens.create({
+                    ...pedido_item,  // Spread the properties of pedido_item
+                    pedido_id: pedido_id  // Assign the pedido_id to the item
+                });
+
+                // Push the promise into the array
+                itensArray.push(insertionPromise);
+            });
+
+
+
+
+            // Use map to create an array of promises for each item insertion
+            // const insertionPromises = itensArray.map(itemData  => create(itemData));
+
+        // Execute all insertion promises concurrently using Promise.all
+        
+
+            // let insertionPromise = itensArray.create({
+            //     ...insertionPromise,  // Spread the properties of pedido_item
+            //     pedido_id: pedido_id  // Assign the pedido_id to the item
+            // });
+
+            // // Push the promise into the array
+            // insertionPromises.push(insertionPromise);
+
+            // pedido_itens.forEach(pedido_item => {
+            //     const itens = pedidosItens.create(pedido_item);
+            //     itens.push
+            // });
+
             res.send(data);
         })
 

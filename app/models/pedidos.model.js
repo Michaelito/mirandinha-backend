@@ -3,7 +3,8 @@ module.exports = (sequelize, DataTypes) => {
   const pedidos = sequelize.define('pedidos', {
     id: {
       type: DataTypes.INTEGER,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true,
     },
     cnpjf: { type: DataTypes.STRING },
     nome: { type: DataTypes.STRING },

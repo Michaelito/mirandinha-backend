@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             foreignKey: true
         },
-        id_pedido: {
+        pedido_id: {
             type: DataTypes.INTEGER,
             foreignKey: true
         },
