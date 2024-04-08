@@ -38,7 +38,7 @@ const { Console } = require('console');
 
 db.sequelize.sync();
 // // drop the table if it already exists
-// db.sequelize.sync({ force: true }).then(() => {
+// db.sequelize.sync().then(() => {
 //     console.log("Drop and re-sync db.");
 // });
 
@@ -61,6 +61,8 @@ require("./app/routes/api/v1/products.routes")(app);
 require("./app/routes/api/v1/grupo.routes")(app);
 require("./app/routes/api/v1/fpagto.routes")(app);
 require("./app/routes/api/v1/cpagto.routes")(app);
+require("./app/routes/api/v1/pedidos.routes")(app);
+require("./app/routes/api/v1/pedidos_itens.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
