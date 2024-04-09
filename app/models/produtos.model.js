@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
 
-  const products = sequelize.define('produtos', {
+  const produtos = sequelize.define('produtos', {
     nsu: {
       type: DataTypes.STRING,
       allowNull: true
@@ -81,7 +81,7 @@ module.exports = (sequelize, DataTypes) => {
 
     });
 
-  return products;
+  return produtos;
 };
 
 
