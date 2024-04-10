@@ -31,5 +31,6 @@ db.product = require("./product.model")(sequelize, Sequelize);
 db.clientes = require("./clientes.model")(sequelize, Sequelize);
 db.pedidos = require("./pedidos.model.js")(sequelize, Sequelize);
 db.pedidos_itens = require("./pedidos_itens.model.js")(sequelize, Sequelize);
+db.estoque = require("./estoque.model.js")(sequelize, Sequelize);
 
 module.exports = db;

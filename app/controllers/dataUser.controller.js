@@ -8,24 +8,25 @@ const user = require("../models/user.model");
 
 
 
-exports.findAll = async (req, res) => {
+exports.findAll = (req, res) => {
+  try {
+    const data = DataUser.findAll({
+      includes: { model: user, as: "dataUsers" },
+    });
 
-    try {
-        const data = await DataUser.findAll({ includes: { model: user, as: 'dataUsers' } })
-
-        return res.send({
-            status: true,
-            message: "The request has succeeded",
-            data: {
-                dataUsers: data
-            }
-        }).status(200);
-    }
-    catch (e) {
-        console.log(e.message);
-        res.status(500).json({ message: 'Ocorreu um erro' });
-
-    }
+    return res
+      .send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          dataUsers: data,
+        },
+      })
+      .status(200);
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: "Ocorreu um erro" });
+  }
 };
 // Create and Save a new DataUser
 exports.create = (req, res) => {

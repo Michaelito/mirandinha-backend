@@ -63,164 +63,91 @@ exports.findOne = (req, res) => {
 };
 
 // Create and Save a new User
-exports.create =  (req, res) => {
-    const payload = {
-        cnpjf: req.body.cnpjf,
-        nome: req.body.nome,
-        cep: req.body.cep,
-        endnum: req.body.endnum,
-        endcpl: req.body.endcpl,
-        bairro: req.body.bairro,
-        id_cidade: req.body.id_cidade,
-        cidade: req.body.cidade,
-        uf: req.body.uf,
-        email: req.body.email,
-        ddd1: req.body.ddd1,
-        fone1: req.body.fone1,
-        dh_mov: req.body.dh_mov,
-        id_fpagto: req.body.id_fpagto,
-        id_pagto: req.body.id_pagto,
-        id_vended1: req.body.id_vended1,
-        id_transp: req.body.id_transp,
-        id_frete: req.body.id_frete,
-        prazo: req.body.prazo,
-        peso_bru: req.body.peso_bru,
-        peso_liq: req.body.peso_liq,
-        total: req.body.total,
-        frete: req.body.frete,
-        desconto: req.body.desconto,
-        total_geral: req.body.total_geral
-    };
+exports.create = (req, res) => {
+  const payload = {
+    cnpjf: req.body.cnpjf,
+    nome: req.body.nome,
+    cep: req.body.cep,
+    endnum: req.body.endnum,
+    endcpl: req.body.endcpl,
+    bairro: req.body.bairro,
+    id_cidade: req.body.id_cidade,
+    cidade: req.body.cidade,
+    uf: req.body.uf,
+    email: req.body.email,
+    ddd1: req.body.ddd1,
+    fone1: req.body.fone1,
+    dh_mov: req.body.dh_mov,
+    id_fpagto: req.body.id_fpagto,
+    id_pagto: req.body.id_pagto,
+    id_vended1: req.body.id_vended1,
+    id_transp: req.body.id_transp,
+    id_frete: req.body.id_frete,
+    prazo: req.body.prazo,
+    peso_bru: req.body.peso_bru,
+    peso_liq: req.body.peso_liq,
+    total: req.body.total,
+    frete: req.body.frete,
+    desconto: req.body.desconto,
+    total_geral: req.body.total_geral,
+  };
 
-    // Save Tutorial in the database
-    pedidos.create(payload)
-        .then(data => {
+  // Save Tutorial in the database
+  pedidos
+    .create(payload)
+    .then((data) => {
+      const pedido_id = data.id;
 
-            const pedido_id = data.id;
-            
-            console.log(pedido_id)
-           
-            // const pedido_itens = {
-            //     id_produto: req.body.pedido_itens.id_produto,
-            //     id_pedido: pedido_id,
-            //     produto: req.body.produto,
-            //     preco: req.body.preco,
-            //     qtde: req.body.qtde,
-            //     total: req.body.total,
-            //     peso: req.body.peso
-            // };
-            
-            const itensArray = req.body.pedido_itens
+      console.log(pedido_id);
 
+      // const pedido_itens = {
+      //     id_produto: req.body.pedido_itens.id_produto,
+      //     id_pedido: pedido_id,
+      //     produto: req.body.produto,
+      //     preco: req.body.preco,
+      //     qtde: req.body.qtde,
+      //     total: req.body.total,
+      //     peso: req.body.peso
+      // };
 
-            // Use map() to iterate over itensArray and create promises for each item insertion
-            itensArray.forEach(pedido_item => {
-                // Create a promise for each item insertion
-                let insertionPromise = pedidosItens.create({
-                    ...pedido_item,  // Spread the properties of pedido_item
-                    pedido_id: pedido_id  // Assign the pedido_id to the item
-                });
+      const itensArray = req.body.pedido_itens;
 
-                // Push the promise into the array
-                itensArray.push(insertionPromise);
-            });
-
-
-
-
-            // Use map to create an array of promises for each item insertion
-            // const insertionPromises = itensArray.map(itemData  => create(itemData));
-
-        // Execute all insertion promises concurrently using Promise.all
-        
-
-            // let insertionPromise = itensArray.create({
-            //     ...insertionPromise,  // Spread the properties of pedido_item
-            //     pedido_id: pedido_id  // Assign the pedido_id to the item
-            // });
-
-            // // Push the promise into the array
-            // insertionPromises.push(insertionPromise);
-
-            // pedido_itens.forEach(pedido_item => {
-            //     const itens = pedidosItens.create(pedido_item);
-            //     itens.push
-            // });
-
-            res.send(data);
-        })
-
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating data."
-            });
+      // Use map() to iterate over itensArray and create promises for each item insertion
+      itensArray.forEach((pedido_item) => {
+        // Create a promise for each item insertion
+        let insertionPromise = pedidosItens.create({
+          ...pedido_item, // Spread the properties of pedido_item
+          pedido_id: pedido_id, // Assign the pedido_id to the item
         });
+
+        // Push the promise into the array
+        itensArray.push(insertionPromise);
+      });
+
+      // Use map to create an array of promises for each item insertion
+      // const insertionPromises = itensArray.map(itemData  => create(itemData));
+
+      // Execute all insertion promises concurrently using Promise.all
+
+      // let insertionPromise = itensArray.create({
+      //     ...insertionPromise,  // Spread the properties of pedido_item
+      //     pedido_id: pedido_id  // Assign the pedido_id to the item
+      // });
+
+      // // Push the promise into the array
+      // insertionPromises.push(insertionPromise);
+
+      // pedido_itens.forEach(pedido_item => {
+      //     const itens = pedidosItens.create(pedido_item);
+      //     itens.push
+      // });
+
+      res.send(data);
+    })
+
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating data.",
+      });
+    });
 };
-// // Update User in database
-// exports.update = async (req, res) => {
-//     const id = req.params.id;
-
-//     try {
-
-//         await users.update(req.body, {
-//             where: { id: id }
-//         });
-
-//         // Update records with a specific condition
-//         await datausers.update(
-//             // Set the values you want to update
-//             {
-//                 fullname: req.body.data_user.fullname,
-//                 birthdate: req.body.data_user.birthdate,
-//                 rg_ie: req.body.data_user.rg_ie
-//             },
-//             // Define the condition for the update operation
-//             { where: { user_id: id } }
-//         )
-
-//         res.send({
-//             message: "Data was updated successfully."
-//         });
-
-//         // if (num == 1) {
-//         //     res.send({
-//         //         message: "Data was updated successfully."
-//         //     });
-//         // } else {
-//         //     res.send({
-//         //         message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`
-//         //     });
-//         // }
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).send({
-//             message: "Error updating category with id=" + id
-//         });
-//     }
-// };
-
-// exports.delete = async (req, res) => {
-
-//     const id = req.params.id;
-//     try {
-
-//         const num = await users.destroy({
-//             where: { id: id }
-//         })
-
-//         if (num == 1) {
-//             res.send({
-//                 message: "Data was deleted successfully!"
-//             });
-//         } else {
-//             res.send({
-//                 message: `Cannot delete Data with id=${id}. Maybe Data was not found!`
-//             });
-//         }
-
-//     } catch (err) {
-//         return res.status(500).send({
-//             message: "Could not delete Data with id=" + id
-//         });
-//     };
-// };

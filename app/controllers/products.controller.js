@@ -3,56 +3,44 @@ const Products = db.product;
 const Op = db.Sequelize.Op;
 
 exports.findAll = (req, res) => {
-    const { page = 1, pageSize = 10 } = req.params; // Default page = 1, pageSize = 10
+  const grupo = req.body.grupo;
 
-    // Calculate offset based on page number and page size
-    const offset = (page - 1) * pageSize;
-
-    Products.findAll({
-       
-        limit: pageSize,
-        offset: offset
+  // Example raw SQL query to retrieve all rows from 'estoque' table
+  db.sequelize
+    .query(
+      "SELECT g.id, g.nome, p.* FROM produtos p LEFT JOIN grupos g ON g.id = p.id_grupo1 WHERE g.nome = '" +
+        grupo +
+        "'",
+      {
+        type: db.Sequelize.QueryTypes.SELECT,
+      }
+    )
+    .then((data) => {
+      res.status(200).send({
+        status: true,
+        products: data,
+      });
     })
-    .then(data => {
-        const { count, rows } = data;
-
-        // Calculate total pages based on total count and page size
-        const totalPages = Math.ceil(count / pageSize);
-
-        res.status(200).json({
-            status: true,
-            message: "Request succeeded",
-            data: {
-                products: data,
-                currentPage: parseInt(page),
-                pageSize: parseInt(pageSize),
-                totalCount: count,
-                totalPages: totalPages
-            }
-        });
-    })
-    .catch(err => {
-        console.error("Error retrieving products:", err);
-        res.status(500).json({
-            status: false,
-            message: "Request failed",
-            error: err.message || "An error occurred while retrieving products"
-        });
+    .catch((error) => {
+      res.status(500).send({
+        message: "Error retrieving Data with id=" + id,
+      });
     });
 };
 
 // Find a single Tutorial with an id
 exports.findOne = (req, res) => {
-    const id = req.params.id;
+  const id = req.params.id;
 
-    Products.findByPk(id)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving Data with id=" + id
-            });
-        });
+  Products.findByPk(id)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error retrieving Data with id=" + id,
+      });
+    });
 };
+
 
