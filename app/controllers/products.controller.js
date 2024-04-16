@@ -3,30 +3,38 @@ const Products = db.product;
 const Op = db.Sequelize.Op;
 
 exports.findAll = (req, res) => {
-  const grupo = req.body.grupo;
-
-  // Example raw SQL query to retrieve all rows from 'estoque' table
-  db.sequelize
-    .query(
-      "SELECT g.id, g.nome, p.* FROM produtos p LEFT JOIN grupos g ON g.id = p.id_grupo1 WHERE g.nome = '" +
-        grupo +
-        "'",
-      {
-        type: db.Sequelize.QueryTypes.SELECT,
+  const nome = req.query.nome;
+  var condition = nome
+    ? {
+        nome: {
+          [Op.like]: `%${nome}%`,
+        },
       }
-    )
+    : null;
+
+  Products.findAll({ where: condition })
     .then((data) => {
-      res.status(200).send({
-        status: true,
-        products: data,
-      });
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            products: data,
+          },
+        })
+        .status(200);
     })
-    .catch((error) => {
-      res.status(500).send({
-        message: "Error retrieving Data with id=" + id,
-      });
+    .catch((err) => {
+      res
+        .send({
+          status: false,
+          message: "The request has not succeeded",
+          data: null,
+        })
+        .status(500);
     });
 };
+
 
 // Find a single Tutorial with an id
 exports.findOne = (req, res) => {
