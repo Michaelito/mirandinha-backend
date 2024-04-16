@@ -42,7 +42,13 @@ exports.findAllGroup = (req, res) => {
 
   Products.findAll({ where: { id_grupo1: id } })
     .then((data) => {
-      res.send(data);
+       res.send({
+         status: true,
+         message: "The request has succeeded",
+         data: {
+           products: data,
+         },
+       });
     })
     .catch((err) => {
       res.status(500).send({
