@@ -1,5 +1,4 @@
-module.exports = app => {
-
+module.exports = (app) => {
   //controllers
 
   const controller = require("../../../controllers/products.controller.js");
@@ -9,10 +8,11 @@ module.exports = app => {
   // Retrieve all controller
   router.get("/", controller.findAll);
 
+  // Retrieve all controller
+  router.get("/group/:id", controller.findAllGroup);
+
   // Retrieve a single Tutorial with id
   router.get("/:id", controller.findOne);
-    
-  app.use('/api/v1/products', router);
 
-
+  app.use("/api/v1/products", router);
 };

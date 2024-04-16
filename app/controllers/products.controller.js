@@ -35,6 +35,22 @@ exports.findAll = (req, res) => {
     });
 };
 
+exports.findAllGroup = (req, res) => {
+  const id = req.params.id;
+
+  console.log(id);
+
+  Products.findAll({ where: { id_grupo1: id } })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials.",
+      });
+    });
+};
 
 // Find a single Tutorial with an id
 exports.findOne = (req, res) => {
@@ -42,7 +58,13 @@ exports.findOne = (req, res) => {
 
   Products.findByPk(id)
     .then((data) => {
-      res.send(data);
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          product: data,
+        },
+      });
     })
     .catch((err) => {
       res.status(500).send({
