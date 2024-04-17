@@ -3,34 +3,6 @@ const Clientes = db.clientes;
 const Op = db.Sequelize.Op;
 
 
-// Retrieve all Tutorials from the database.
-// exports.findAll = (req, res) => {
-//     const nome = req.query.nome;
-//     var condition = nome ? {
-//         nome: {
-//             [Op.like]: `%${nome}%`
-//         }
-//     } : null;
-
-//     Clientes.findAll({ where: condition })
-//         .then(data => {
-//             res.send({
-//                 status: true,
-//                 message: "The request has succeeded",
-//                 data: {
-//                     clientes: data
-//                 }
-//             }).status(200);
-//         })
-//         .catch(err => {
-//             res.send({
-//                 status: false,
-//                 message: "The request has not succeeded",
-//                 data: null
-//             }).status(500);
-//         });
-// };
-
 exports.findAll = async (req, res) => {
     const nome = req.query.nome;
     var condition = nome ? {
@@ -46,21 +18,28 @@ exports.findAll = async (req, res) => {
         page = pageAsNumber;
     }
 
-    let size = 10;
-    if (!Number.isNaN(sizeAsNumber) && !(sizeAsNumber > 50) && !(sizeAsNumber < 1)) {
-        size = sizeAsNumber;
+    let size = 20;
+    if (
+      !Number.isNaN(sizeAsNumber) &&
+      !(sizeAsNumber > 50) &&
+      !(sizeAsNumber < 1)
+    ) {
+      size = sizeAsNumber;
     }
     const clientWithCount = await Clientes.findAndCountAll({
-        where: condition,
-        limit: size,
-        offset: page * size
+      where: condition,
+      limit: size,
+      offset: page * size,
     });
     res.send({
-        content: clientWithCount.rows,
-        limit: size,
-        page: page,
-        totalPages: Math.ceil(clientWithCount.count / Number.parseInt(size))
-
+      status: true,
+      message: "The request has succeeded",
+      limit: size,
+      page: page,
+      totalPages: Math.ceil(clientWithCount.count / Number.parseInt(size)),
+      data: {
+        products: clientWithCount.rows,
+      },
     });
 }
 
