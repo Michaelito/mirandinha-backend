@@ -1,11 +1,11 @@
 module.exports = {
-    HOST: "grupomirandinha.doxotech.com.br",
-    //HOST: "localhost",
+    //HOST: "grupomirandinha.doxotech.com.br",
+    HOST: "localhost",
     PORT: 3306,
-    USER: "mirandinha",
-    //USER: "root",
-    PASSWORD: "YFBHSqKRmV6E",
-    //PASSWORD: "",
+    //USER: "mirandinha",
+    USER: "root",
+    //PASSWORD: "YFBHSqKRmV6E",
+    PASSWORD: "",
     DB: "mirandinhadb",
     dialect: "mysql",
     pool: {
