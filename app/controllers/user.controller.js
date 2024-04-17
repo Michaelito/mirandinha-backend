@@ -10,90 +10,146 @@ const { uuid } = require('uuidv4');
 
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
-    const name = req.query.name;
-    var condition = name ? {
+  const name = req.query.name;
+  var condition = name
+    ? {
         name: {
-            [Op.like]: `%${name}%`
-        }
-    } : null;
+          [Op.like]: `%${name}%`,
+        },
+      }
+    : null;
 
-    users.hasOne(datausers, {
-        foreignKey: 'user_id'
-    });
+  users.hasOne(datausers, {
+    foreignKey: "user_id",
+  });
 
-    users.hasOne(address_users, {
-        foreignKey: 'user_id'
-    });
+  users.hasOne(address_users, {
+    foreignKey: "user_id",
+  });
 
-    users.findAll({
-        where: condition,
-        attributes: { exclude: ['password', 'token', 'refresh_token'] },
-        include: [
-            {
-                model: datausers,
-                required: false,
-                attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-            },
-            {
-                model: address_users,
-                required: false,
-                attributes: ['id', 'cep', 'logradouro', 'numero', 'complemento', 'cidade', 'bairro', 'estado', 'ativo', 'createdAt']
-            }
-        ]
+  users
+    .findAll({
+      where: condition,
+      attributes: { exclude: ["password", "token", "refresh_token"] },
+      include: [
+        {
+          model: datausers,
+          required: false,
+          attributes: [
+            "fullname",
+            "document",
+            "type",
+            "rg_ie",
+            "birthdate",
+            "createdAt",
+          ],
+        },
+        {
+          model: address_users,
+          required: false,
+          attributes: [
+            "id",
+            "cep",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "estado",
+            "ativo",
+            "createdAt",
+          ],
+        },
+      ],
     })
-        .then(data => {
-            res.send({
-                status: true,
-                message: "The request has succeeded",
-                data: {
-                    users: data
-                }
-            }).status(200);
+    .then((data) => {
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            users: data,
+          },
         })
-        .catch(err => {
-            res.send({
-                status: false,
-                message: "The request has not succeeded",
-                data: null
-            }).status(500);
-        });
+        .status(200);
+    })
+    .catch((err) => {
+      res
+        .send({
+          status: false,
+          message: "The request has not succeeded",
+          data: null,
+        })
+        .status(500);
+    });
 };
 
 // Find a single Tutorial with an id
 exports.findOne = (req, res) => {
-    const id = req.params.id;
+  const id = req.params.id;
 
-    users.hasMany(datausers, {
-        foreignKey: 'user_id'
-    });
+  const datauser = datausers.findOne({
+    where: { user_id: id },
+  });
 
-    users.hasMany(address_users, {
-        foreignKey: 'user_id'
-    });
+  users.hasMany(datausers, {
+    foreignKey: "user_id",
+  });
 
-    users.findByPk(id, {
-        attributes: { exclude: ['password', 'token', 'refresh_token'] },
-        include: [
-            {
-                model: datausers,
-                required: false,
-                attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-            },
-            {
-                model: address_users,
-                required: false,
-                attributes: ['id', 'cep', 'logradouro', 'numero', 'complemento', 'cidade', 'bairro', 'estado', 'ativo', 'createdAt']
-            }
-        ]
+  users.hasMany(address_users, {
+    foreignKey: "user_id",
+  });
+
+  users
+    .findByPk(id, {
+      attributes: { exclude: ["password", "token", "refresh_token"] },
+      include: [
+        {
+          model: datausers,
+          required: false,
+          attributes: [
+            "fullname",
+            "document",
+            "type",
+            "rg_ie",
+            "birthdate",
+            "createdAt",
+          ],
+        },
+        {
+          model: address_users,
+          required: false,
+          attributes: [
+            "id",
+            "cep",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "estado",
+            "ativo",
+            "createdAt",
+          ],
+        },
+      ],
     })
-        .then(data => {
-            res.send(data);
+    .then((data) => {
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            user: data,
+          },
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving Data with id=" + id
-            });
-        });
+        .status(200);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error retrieving Data with id=" + id,
+      });
+    });
 };
 
 // Create and Save a new User
