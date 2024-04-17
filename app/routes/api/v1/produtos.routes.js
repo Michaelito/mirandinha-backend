@@ -1,5 +1,4 @@
-module.exports = app => {
-
+module.exports = (app) => {
   //controllers
 
   const controller = require("../../../controllers/produtos.controller.js");
@@ -12,7 +11,5 @@ module.exports = app => {
   // Retrieve a single Tutorial with id
   router.get("/:id", controller.findOne);
 
-  app.use('/api/v1/produtos', router);
-
-
+  app.use("/api/v1/produtos", router);
 };

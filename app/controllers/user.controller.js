@@ -147,70 +147,66 @@ exports.create = (req, res) => {
         });
 };
 // Update User in database
-exports.update = async (req, res) => {
-    const id = req.params.id;
+exports.update = (req, res) => {
+  const id = req.params.id;
 
-    try {
+  try {
+    users.update(req.body, {
+      where: { id: id },
+    });
 
-        await users.update(req.body, {
-            where: { id: id }
-        });
+    // Update records with a specific condition
+    datausers.update(
+      // Set the values you want to update
+      {
+        fullname: req.body.data_user.fullname,
+        birthdate: req.body.data_user.birthdate,
+        rg_ie: req.body.data_user.rg_ie,
+      },
+      // Define the condition for the update operation
+      { where: { user_id: id } }
+    );
 
-        // Update records with a specific condition
-        await datausers.update(
-        // Set the values you want to update
-            {
-                fullname: req.body.data_user.fullname,
-                birthdate: req.body.data_user.birthdate,
-                rg_ie: req.body.data_user.rg_ie
-            },
-        // Define the condition for the update operation
-            { where: { user_id: id }}
-        )
+    res.send({
+      message: "Data was updated successfully.",
+    });
 
-        res.send({
-            message: "Data was updated successfully."
-        });
-
-        // if (num == 1) {
-        //     res.send({
-        //         message: "Data was updated successfully."
-        //     });
-        // } else {
-        //     res.send({
-        //         message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`
-        //     });
-        // }
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({
-            message: "Error updating category with id=" + id
-        });
-    }
+    // if (num == 1) {
+    //     res.send({
+    //         message: "Data was updated successfully."
+    //     });
+    // } else {
+    //     res.send({
+    //         message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`
+    //     });
+    // }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Error updating category with id=" + id,
+    });
+  }
 };
 
-exports.delete = async (req, res) => {
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  try {
+    const num = users.destroy({
+      where: { id: id },
+    });
 
-    const id = req.params.id;
-    try {
-
-        const num = await users.destroy({
-            where: { id: id }
-        })
-
-        if (num == 1) {
-            res.send({
-                message: "Data was deleted successfully!"
-            });
-        } else {
-            res.send({
-                message: `Cannot delete Data with id=${id}. Maybe Data was not found!`
-            });
-        }
-
-    } catch (err) {
-        return res.status(500).send({
-            message: "Could not delete Data with id=" + id
-        });
-    };
+    if (num == 1) {
+      res.send({
+        message: "Data was deleted successfully!",
+      });
+    } else {
+      res.send({
+        message: `Cannot delete Data with id=${id}. Maybe Data was not found!`,
+      });
+    }
+  } catch (err) {
+    return res.status(500).send({
+      message: "Could not delete Data with id=" + id,
+    });
+  }
 };
