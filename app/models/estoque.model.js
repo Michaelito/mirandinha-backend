@@ -1,5 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
-    const estoque = sequelize.define('estoque', {
+const estoque = sequelize.define('estoque', {
        id: {
             type: DataTypes.STRING,
             primaryKey: true,
@@ -32,3 +31,4 @@ module.exports = (sequelize, DataTypes) => {
     );
     return estoque;
 };
+
