@@ -9,7 +9,7 @@ module.exports = app => {
     var router = require("express").Router();
 
     // Retrieve all controller
-    router.get("/", controller.findAll);
+    router.get("/:id", controller.findAll);
 
     router.post("/", controller.create);
 

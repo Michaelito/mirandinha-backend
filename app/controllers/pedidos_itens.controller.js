@@ -27,22 +27,23 @@ exports.create = (req, res) => {
         });
 };
 exports.findAll = (req, res) => {
+  const id = req.params.id;
 
-    pedidosItens.findAll()
-        .then(data => {
-            res.send({
-                status: true,
-                message: "The request has succeeded",
-                data: {
-                    pedidos_itens: data
-                }
-            }).status(200);
-        })
-        .catch(err => {
-            res.send({
-                status: false,
-                message: "The request has not succeeded",
-                data: null
-            }).status(500);
-        });
+  pedidosItens
+    .findAll({ where: { pedido_id: id } })
+    .then((data) => {
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          pedidos_itens: data,
+        },
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: false,
+        message: err.message || "Some error occurred while retrieving Data.",
+      });
+    });
 };
