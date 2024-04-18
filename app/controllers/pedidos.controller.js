@@ -85,6 +85,7 @@ exports.create = (req, res) => {
     user_id: req.body.user_id,
     nome: req.body.nome,
     cep: req.body.cep,
+    endereco: req.body.endereco,
     endnum: req.body.endnum,
     endcpl: req.body.endcpl,
     bairro: req.body.bairro,
