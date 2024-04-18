@@ -7,59 +7,75 @@ const Op = db.Sequelize.Op;
 
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
-
-    const id = req.query.id;
-    var condition = id ? {
+  const id = req.query.id;
+  var condition = id
+    ? {
         id: {
-            [Op.like]: `%${id}%`
-        }
-    } : null;
+          [Op.like]: `%${id}%`,
+        },
+      }
+    : null;
 
-    pedidos.findAll({ where: condition })
-        .then(data => {
-            res.send({
-                status: true,
-                message: "The request has succeeded",
-                data: {
-                    Pedidos: data
-                }
-            }).status(200);
+  pedidos
+    .findAll({ where: condition })
+    .then((data) => {
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            pedidos: data,
+          },
         })
-        .catch(err => {
-            res.send({
-                status: false,
-                message: err + "The request has not succeeded",
-                data: null
-            }).status(500);
-        });
+        .status(200);
+    })
+    .catch((err) => {
+      res
+        .send({
+          status: false,
+          message: err + "The request has not succeeded",
+          data: null,
+        })
+        .status(500);
+    });
 };
 
 // Find a single Data with an id
 exports.findOne = (req, res) => {
-    const id = req.params.id;
+  const id = req.params.id;
 
-    pedidos.hasMany(pedidosItens, {
-        foreignKey: 'pedido_id'
-    });
+  pedidos.hasMany(pedidosItens, {
+    foreignKey: "pedido_id",
+  });
 
-    pedidos.findByPk(id, {
-        //attributes: { exclude: ['password', 'token', 'refresh_token'] },
-        include: [
-            {
-                model: pedidosItens,
-                required: false
-                //attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-            }
-        ]
+  pedidos
+    .findByPk(id, {
+      //attributes: { exclude: ['password', 'token', 'refresh_token'] },
+      include: [
+        {
+          model: pedidosItens,
+          required: false,
+          //attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
+        },
+      ],
     })
-        .then(data => {
-            res.send(data);
+    .then((data) => {
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            pedido: data,
+          },
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving Data with id=" + id
-            });
-        });
+        .status(200);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: false,
+        message: "Error retrieving Data with id=" + id,
+      });
+    });
 };
 
 // Create and Save a new User
