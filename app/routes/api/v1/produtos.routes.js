@@ -9,7 +9,7 @@ module.exports = (app) => {
   router.get("/", controller.findAll);
 
   // Retrieve all controller
-  router.get("/group/:id", controller.findAll);
+  router.get("/group/:id", controller.findAllGroup);
 
   // Retrieve a single Tutorial with id
   router.get("/:id", controller.findOne);

@@ -131,30 +131,34 @@ exports.create = (req, res) => {
         itensArray.push(insertionPromise);
       });
 
-      // Use map to create an array of promises for each item insertion
-      // const insertionPromises = itensArray.map(itemData  => create(itemData));
-
-      // Execute all insertion promises concurrently using Promise.all
-
-      // let insertionPromise = itensArray.create({
-      //     ...insertionPromise,  // Spread the properties of pedido_item
-      //     pedido_id: pedido_id  // Assign the pedido_id to the item
-      // });
-
-      // // Push the promise into the array
-      // insertionPromises.push(insertionPromise);
-
-      // pedido_itens.forEach(pedido_item => {
-      //     const itens = pedidosItens.create(pedido_item);
-      //     itens.push
-      // });
-
       res.send(data);
     })
 
     .catch((err) => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating data.",
+      });
+    });
+};
+
+exports.findAllUser = (req, res) => {
+  const id = req.params.id;
+
+  pedidos
+    .findAll({ where: { user_id: id } })
+    .then((data) => {
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          pedidos: data,
+        },
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: false,
+        message: err.message || "Some error occurred while retrieving Data.",
       });
     });
 };

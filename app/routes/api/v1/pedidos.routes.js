@@ -1,22 +1,22 @@
 require("dotenv-safe").config();
 
 
-module.exports = app => {
+module.exports = (app) => {
+  //controllers
+  const controller = require("../../../controllers/pedidos.controller.js");
 
-    //controllers
-    const controller = require("../../../controllers/pedidos.controller.js");
+  var router = require("express").Router();
 
-    var router = require("express").Router();
+  // Retrieve all controller
+  router.get("/", controller.findAll);
 
-    // Retrieve all controller
-    router.get("/", controller.findAll);
+  // Retrieve all controller
+  router.get("/user/:id", controller.findAllUser);
 
-    // Retrieve a single Tutorial with id
-    router.get("/:id", controller.findOne);
+  // Retrieve a single Tutorial with id
+  router.get("/:id", controller.findOne);
 
-    router.post("/", controller.create);
+  router.post("/", controller.create);
 
-    app.use('/api/v1/pedidos', router);
-
-
+  app.use("/api/v1/pedidos", router);
 };
