@@ -10,90 +10,146 @@ const { uuid } = require('uuidv4');
 
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
-    const name = req.query.name;
-    var condition = name ? {
+  const name = req.query.name;
+  var condition = name
+    ? {
         name: {
-            [Op.like]: `%${name}%`
-        }
-    } : null;
+          [Op.like]: `%${name}%`,
+        },
+      }
+    : null;
 
-    users.hasOne(datausers, {
-        foreignKey: 'user_id'
-    });
+  users.hasOne(datausers, {
+    foreignKey: "user_id",
+  });
 
-    users.hasOne(address_users, {
-        foreignKey: 'user_id'
-    });
+  users.hasOne(address_users, {
+    foreignKey: "user_id",
+  });
 
-    users.findAll({
-        where: condition,
-        attributes: { exclude: ['password', 'token', 'refresh_token'] },
-        include: [
-            {
-                model: datausers,
-                required: false,
-                attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-            },
-            {
-                model: address_users,
-                required: false,
-                attributes: ['id', 'cep', 'logradouro', 'numero', 'complemento', 'cidade', 'bairro', 'estado', 'ativo', 'createdAt']
-            }
-        ]
+  users
+    .findAll({
+      where: condition,
+      attributes: { exclude: ["password", "token", "refresh_token"] },
+      include: [
+        {
+          model: datausers,
+          required: false,
+          attributes: [
+            "fullname",
+            "document",
+            "type",
+            "rg_ie",
+            "birthdate",
+            "createdAt",
+          ],
+        },
+        {
+          model: address_users,
+          required: false,
+          attributes: [
+            "id",
+            "cep",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "estado",
+            "ativo",
+            "createdAt",
+          ],
+        },
+      ],
     })
-        .then(data => {
-            res.send({
-                status: true,
-                message: "The request has succeeded",
-                data: {
-                    users: data
-                }
-            }).status(200);
+    .then((data) => {
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            users: data,
+          },
         })
-        .catch(err => {
-            res.send({
-                status: false,
-                message: "The request has not succeeded",
-                data: null
-            }).status(500);
-        });
+        .status(200);
+    })
+    .catch((err) => {
+      res
+        .send({
+          status: false,
+          message: "The request has not succeeded",
+          data: null,
+        })
+        .status(500);
+    });
 };
 
 // Find a single Tutorial with an id
 exports.findOne = (req, res) => {
-    const id = req.params.id;
+  const id = req.params.id;
 
-    users.hasMany(datausers, {
-        foreignKey: 'user_id'
-    });
+  const datauser = datausers.findOne({
+    where: { user_id: id },
+  });
 
-    users.hasMany(address_users, {
-        foreignKey: 'user_id'
-    });
+  users.hasMany(datausers, {
+    foreignKey: "user_id",
+  });
 
-    users.findByPk(id, {
-        attributes: { exclude: ['password', 'token', 'refresh_token'] },
-        include: [
-            {
-                model: datausers,
-                required: false,
-                attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-            },
-            {
-                model: address_users,
-                required: false,
-                attributes: ['id', 'cep', 'logradouro', 'numero', 'complemento', 'cidade', 'bairro', 'estado', 'ativo', 'createdAt']
-            }
-        ]
+  users.hasMany(address_users, {
+    foreignKey: "user_id",
+  });
+
+  users
+    .findByPk(id, {
+      attributes: { exclude: ["password", "token", "refresh_token"] },
+      include: [
+        {
+          model: datausers,
+          required: false,
+          attributes: [
+            "fullname",
+            "document",
+            "type",
+            "rg_ie",
+            "birthdate",
+            "createdAt",
+          ],
+        },
+        {
+          model: address_users,
+          required: false,
+          attributes: [
+            "id",
+            "cep",
+            "logradouro",
+            "numero",
+            "complemento",
+            "cidade",
+            "bairro",
+            "estado",
+            "ativo",
+            "createdAt",
+          ],
+        },
+      ],
     })
-        .then(data => {
-            res.send(data);
+    .then((data) => {
+      res
+        .send({
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            user: data,
+          },
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving Data with id=" + id
-            });
-        });
+        .status(200);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error retrieving Data with id=" + id,
+      });
+    });
 };
 
 // Create and Save a new User
@@ -147,70 +203,66 @@ exports.create = (req, res) => {
         });
 };
 // Update User in database
-exports.update = async (req, res) => {
-    const id = req.params.id;
+exports.update = (req, res) => {
+  const id = req.params.id;
 
-    try {
+  try {
+    users.update(req.body, {
+      where: { id: id },
+    });
 
-        await users.update(req.body, {
-            where: { id: id }
-        });
+    // Update records with a specific condition
+    datausers.update(
+      // Set the values you want to update
+      {
+        fullname: req.body.data_user.fullname,
+        birthdate: req.body.data_user.birthdate,
+        rg_ie: req.body.data_user.rg_ie,
+      },
+      // Define the condition for the update operation
+      { where: { user_id: id } }
+    );
 
-        // Update records with a specific condition
-        await datausers.update(
-        // Set the values you want to update
-            {
-                fullname: req.body.data_user.fullname,
-                birthdate: req.body.data_user.birthdate,
-                rg_ie: req.body.data_user.rg_ie
-            },
-        // Define the condition for the update operation
-            { where: { user_id: id }}
-        )
+    res.send({
+      message: "Data was updated successfully.",
+    });
 
-        res.send({
-            message: "Data was updated successfully."
-        });
-
-        // if (num == 1) {
-        //     res.send({
-        //         message: "Data was updated successfully."
-        //     });
-        // } else {
-        //     res.send({
-        //         message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`
-        //     });
-        // }
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({
-            message: "Error updating category with id=" + id
-        });
-    }
+    // if (num == 1) {
+    //     res.send({
+    //         message: "Data was updated successfully."
+    //     });
+    // } else {
+    //     res.send({
+    //         message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`
+    //     });
+    // }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Error updating category with id=" + id,
+    });
+  }
 };
 
-exports.delete = async (req, res) => {
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  try {
+    const num = users.destroy({
+      where: { id: id },
+    });
 
-    const id = req.params.id;
-    try {
-
-        const num = await users.destroy({
-            where: { id: id }
-        })
-
-        if (num == 1) {
-            res.send({
-                message: "Data was deleted successfully!"
-            });
-        } else {
-            res.send({
-                message: `Cannot delete Data with id=${id}. Maybe Data was not found!`
-            });
-        }
-
-    } catch (err) {
-        return res.status(500).send({
-            message: "Could not delete Data with id=" + id
-        });
-    };
+    if (num == 1) {
+      res.send({
+        message: "Data was deleted successfully!",
+      });
+    } else {
+      res.send({
+        message: `Cannot delete Data with id=${id}. Maybe Data was not found!`,
+      });
+    }
+  } catch (err) {
+    return res.status(500).send({
+      message: "Could not delete Data with id=" + id,
+    });
+  }
 };

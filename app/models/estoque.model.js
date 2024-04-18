@@ -1,40 +1,34 @@
-module.exports = (sequelize, DataTypes) => {
-
-    const estoque = sequelize.define('estoque', {
-        id: {
+const estoque = sequelize.define('estoque', {
+       id: {
             type: DataTypes.STRING,
-            primaryKey: true
+            primaryKey: true,
+            allowNull: false,
         },
         fil: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
         },
         estoque: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
         },
         empenho: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
         },
         disponivel: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
         },
     },
         {
-            // Other model options go here
+            tableName: 'estoque',
             timestamps: false,
-
             createdAt: false,
-
             updatedAt: false,
-
             freezeTableName: true
-
-        });
-
+        },
+    );
     return estoque;
 };
-
 
