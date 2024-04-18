@@ -100,16 +100,6 @@ exports.create = (req, res) => {
 
       console.log(pedido_id);
 
-      // const pedido_itens = {
-      //     id_produto: req.body.pedido_itens.id_produto,
-      //     id_pedido: pedido_id,
-      //     produto: req.body.produto,
-      //     preco: req.body.preco,
-      //     qtde: req.body.qtde,
-      //     total: req.body.total,
-      //     peso: req.body.peso
-      // };
-
       const itensArray = req.body.pedido_itens;
 
       // Use map() to iterate over itensArray and create promises for each item insertion
