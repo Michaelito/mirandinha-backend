@@ -66,6 +66,7 @@ exports.findOne = (req, res) => {
 exports.create = (req, res) => {
   const payload = {
     cnpjf: req.body.cnpjf,
+    user_id: req.body.user_id,
     nome: req.body.nome,
     cep: req.body.cep,
     endnum: req.body.endnum,

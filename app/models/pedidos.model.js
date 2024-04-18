@@ -1,10 +1,14 @@
 module.exports = (sequelize, DataTypes) => {
 
-  const pedidos = sequelize.define('pedidos', {
+  const pedidos = sequelize.define("pedidos", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      foreignKey: true,
     },
     cnpjf: { type: DataTypes.STRING },
     nome: { type: DataTypes.STRING },
@@ -22,23 +26,23 @@ module.exports = (sequelize, DataTypes) => {
     dh_mov: { type: DataTypes.DATE },
     id_fpagto: {
       type: DataTypes.INTEGER,
-      foreignKey: true
+      foreignKey: true,
     },
     id_pagto: {
       type: DataTypes.INTEGER,
-      foreignKey: true
+      foreignKey: true,
     },
     id_vended1: {
       type: DataTypes.INTEGER,
-      foreignKey: true
+      foreignKey: true,
     },
     id_transp: {
       type: DataTypes.INTEGER,
-      foreignKey: true
+      foreignKey: true,
     },
     id_frete: {
       type: DataTypes.INTEGER,
-      foreignKey: true
+      foreignKey: true,
     },
     prazo: { type: DataTypes.INTEGER },
     peso_bru: { type: DataTypes.DECIMAL(10, 4) },
@@ -46,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     total: { type: DataTypes.DECIMAL(10, 4) },
     frete: { type: DataTypes.DECIMAL(10, 4) },
     desconto: { type: DataTypes.DECIMAL(10, 4) },
-    total_geral: { type: DataTypes.DECIMAL(10, 4) }
+    total_geral: { type: DataTypes.DECIMAL(10, 4) },
   });
 
   return pedidos;
