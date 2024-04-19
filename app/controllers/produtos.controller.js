@@ -1,6 +1,8 @@
 const db = require("../models");
 const Products = db.produtos;
+const Estoque = db.estoque;
 const Op = db.Sequelize.Op;
+
 exports.findAll = async (req, res) => {
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -38,7 +40,9 @@ exports.findAll = async (req, res) => {
 exports.findAllGroup = (req, res) => {
   const id = req.params.id;
 
-  console.log(id);
+  Products.hasOne(Estoque, {
+    foreignKey: "id",
+  });
 
   Products.findAll({ where: { id_grupo1: id } })
     .then((data) => {
@@ -62,7 +66,19 @@ exports.findAllGroup = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Products.findByPk(id)
+  Products.hasOne(Estoque, {
+    foreignKey: "id",
+  });
+
+  Products.findByPk(id, {
+    include: [
+      {
+        model: Estoque,
+        required: false,
+        attributes: ["fil", "estoque", "empenho", "disponivel"],
+      },
+    ],
+  })
     .then((data) => {
       res.send({
         status: true,
@@ -74,8 +90,8 @@ exports.findOne = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
+        status: false,
         message: "Error retrieving Data with id=" + id,
       });
     });
 };
-

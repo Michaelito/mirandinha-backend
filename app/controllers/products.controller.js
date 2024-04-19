@@ -1,5 +1,6 @@
 const db = require("../models");
 const Products = db.product;
+const Estoque = db.estoque;
 const Op = db.Sequelize.Op;
 
 exports.findAll = (req, res) => {
@@ -42,13 +43,13 @@ exports.findAllGroup = (req, res) => {
 
   Products.findAll({ where: { id_grupo1: id } })
     .then((data) => {
-       res.send({
-         status: true,
-         message: "The request has succeeded",
-         data: {
-           products: data,
-         },
-       });
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          products: data,
+        },
+      });
     })
     .catch((err) => {
       res.status(500).send({
@@ -61,7 +62,18 @@ exports.findAllGroup = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Products.findByPk(id)
+  Estoque.hasOne(produtos, {
+    foreignKey: "id",
+  });
+
+  Products.findByPk(id, {
+    include: [
+      {
+        model: Estoque,
+        required: false,
+      },
+    ],
+  })
     .then((data) => {
       res.send({
         status: true,

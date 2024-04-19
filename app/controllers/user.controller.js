@@ -92,7 +92,7 @@ exports.findOne = (req, res) => {
     where: { user_id: id },
   });
 
-  users.hasMany(datausers, {
+  users.hasOne(datausers, {
     foreignKey: "user_id",
   });
 
