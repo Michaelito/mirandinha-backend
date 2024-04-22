@@ -17,7 +17,12 @@ exports.findAll = (req, res) => {
     : null;
 
   pedidos
-    .findAll({ where: condition })
+    .findAll({
+      where: condition,
+      order: [
+        ["id", "DESC"], // Order by age descending
+      ],
+    })
     .then((data) => {
       res
         .send({
