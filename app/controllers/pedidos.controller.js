@@ -151,7 +151,12 @@ exports.findAllUser = (req, res) => {
   const id = req.params.id;
 
   pedidos
-    .findAll({ where: { user_id: id } })
+    .findAll({
+      where: { user_id: id },
+      order: [
+        ["id", "DESC"], // Order by age descending
+      ],
+    })
     .then((data) => {
       res.send({
         status: true,
