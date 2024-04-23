@@ -74,7 +74,7 @@ exports.create = (req, res) => {
       cidade: req.body.cidade,
       estado: req.body.estado,
       pais: "BR",
-      ativo: 1,
+      ativo: 0,
     };
 
     // Save Tutorial in the database
@@ -120,36 +120,31 @@ exports.delete = (req, res) => {
   }
 };
 
-// Update User in database
-exports.update = (req, res) => {
+// Update a Tutorial by the id in the request
+exports.update = async (req, res) => {
   const id = req.params.id;
 
-  const teste = address_users.findOne({ where: { user_id: 3 } });
+  await address_users.update(
+    { ativo: 0 },
+    { where: { user_id: req.body.user_id } }
+  );
 
-  console.log(teste.toJSON());
-
-  const resultSet = address_users.findOne({ where: { id: id } });
-
-  try {
-    const num = address_users.update(req.body, {
-      where: { id: id },
-    });
-
-    if (num == 1) {
-      res.send({
-        message: `Data was updated successfully.`,
-        abc: resultSet,
+  await address_users
+    .update({ ativo: 1 }, { where: { id: id } })
+    .then((num) => {
+      if (num == 1) {
+        res.send({
+          message: "Data was updated successfully.",
+        });
+      } else {
+        res.send({
+          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error updating Data with id=" + id,
       });
-    } else {
-      res.send({
-        message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`,
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      message: "Error updating category with id=" + id,
     });
-  }
 };
-
