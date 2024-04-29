@@ -1,8 +1,10 @@
 const db = require("../models");
+const pedidoService = require("../services/pedido.service");
 const pedidos = db.pedidos;
 const pedidosItens = db.pedidos_itens;
 const { uuid } = require('uuidv4');
 const Op = db.Sequelize.Op;
+const jsonxml = require('jsonxml');
 
 
 // Retrieve all from the database.
@@ -10,10 +12,10 @@ exports.findAll = (req, res) => {
   const id = req.query.id;
   var condition = id
     ? {
-        id: {
-          [Op.like]: `%${id}%`,
-        },
-      }
+      id: {
+        [Op.like]: `%${id}%`,
+      },
+    }
     : null;
 
   pedidos
@@ -114,8 +116,9 @@ exports.create = (req, res) => {
     desconto: req.body.desconto,
     total_geral: req.body.total_geral,
   };
-
-  // Save Tutorial in the database
+  const xmlData = jsonxml(payload);
+  pedidoService.createPedido(req, res, xmlData);
+  // Save Pedido in the database
   pedidos
     .create(payload)
     .then((data) => {
@@ -137,7 +140,7 @@ exports.create = (req, res) => {
         itensArray.push(insertionPromise);
       });
 
-      res.send(data);
+      // res.send(data);
     })
 
     .catch((err) => {
