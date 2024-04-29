@@ -2,9 +2,9 @@ const db = require("../models");
 const clienteService = require("../services/cliente.service");
 const Clientes = db.clientes;
 const Op = db.Sequelize.Op;
+const jsonxml = require('jsonxml');
 
 exports.create = (req, res) => {
-
   // Create a Ciente
   const cliente = {
     lj: req.body.lj,
@@ -42,52 +42,49 @@ exports.create = (req, res) => {
   // Save Tutorial in the database
   Clientes.create(cliente)
     .then(data => {
-      res.send(data);
+      //res.send(data);
     })
     .catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating the Cliente."
       });
     });
-  const data =
-    <clientes>
-      <nsu>DataTypes.STRING</nsu>
-      <id type="DataTypes.INTEGER" allowNull="false" primaryKey="true" autoIncrement="true" />
-      <lj>DataTypes.STRING</lj>
-      <nome>DataTypes.STRING</nome>
-      <guerra>DataTypes.STRING</guerra>
-      <id_pessoa>DataTypes.STRING</id_pessoa>
-      <id_tipo>DataTypes.STRING</id_tipo>
-      <id_vended1>DataTypes.STRING</id_vended1>
-      <id_vended2>DataTypes.STRING</id_vended2>
-      <id_vended3>DataTypes.STRING</id_vended3>
-      <id_tabpre>DataTypes.STRING</id_tabpre>
-      <id_pagto>DataTypes.STRING</id_pagto>
-      <id_fpagto>DataTypes.STRING</id_fpagto>
-      <id_transp>DataTypes.STRING</id_transp>
-      <lj_transp>DataTypes.STRING</lj_transp>
-      <id_frete>DataTypes.STRING</id_frete>
-      <cnpj>DataTypes.STRING</cnpj>
-      <ie>DataTypes.STRING</ie>
-      <email>DataTypes.STRING</email>
-      <ddd1>DataTypes.STRING</ddd1>
-      <fone1>DataTypes.STRING</fone1>
-      <ddd2>DataTypes.STRING</ddd2>
-      <fone2>DataTypes.STRING</fone2>
-      <cep>DataTypes.STRING</cep>
-      <endereco>DataTypes.STRING</endereco>
-      <endnum>DataTypes.STRING</endnum>
-      <endcpl>DataTypes.STRING</endcpl>
-      <bairro>DataTypes.STRING</bairro>
-      <id_cidade>DataTypes.STRING</id_cidade>
-      <cidade>DataTypes.STRING</cidade>
-      <uf>DataTypes.STRING</uf>
-      <id_pais>DataTypes.STRING</id_pais>
-    </clientes>
+  const xmlData = jsonxml(cliente);
+  clienteService.createClienteExsam(req, res, xmlData);
 
-  clienteService.createClienteExsam(data);
-
-
+  // '<?xml version="1.0" encoding="UTF-8"?>' +
+  // "<cliente>" +
+  // "<lj>DataTypes.STRING</lj>" +
+  // "<nome>DataTypes.STRING</nome>" +
+  // "<guerra>DataTypes.STRING</guerra>" +
+  // "<id_pessoa>DataTypes.STRING</id_pessoa>" +
+  // "<id_tipo>DataTypes.STRING</id_tipo>" +
+  // "<id_vended1>DataTypes.STRING</id_vended1>" +
+  // "<id_vended2>DataTypes.STRING</id_vended2>" +
+  // "<id_vended3>DataTypes.STRING</id_vended3>" +
+  // "<id_tabpre>DataTypes.STRING</id_tabpre>" +
+  // "<id_pagto>DataTypes.STRING</id_pagto>" +
+  // "<id_fpagto>DataTypes.STRING</id_fpagto>" +
+  // "<id_transp>DataTypes.STRING</id_transp>" +
+  // "<lj_transp>DataTypes.STRING</lj_transp>" +
+  // "<id_frete>DataTypes.STRING</id_frete>" +
+  // "<cnpj>DataTypes.STRING</cnpj>" +
+  // "<ie>DataTypes.STRING</ie>" +
+  // "<email>DataTypes.STRING</email>" +
+  // "<ddd1>DataTypes.STRING</ddd1>" +
+  // "<fone1>DataTypes.STRING</fone1>" +
+  // "<ddd2>DataTypes.STRING</ddd2>" +
+  // "<fone2>DataTypes.STRING</fone2>" +
+  // "<cep>DataTypes.STRING</cep>" +
+  // "<endereco>DataTypes.STRING</endereco>" +
+  // "<endnum>DataTypes.STRING</endnum>" +
+  // "<endcpl>DataTypes.STRING</endcpl>" +
+  // "<bairro>DataTypes.STRING</bairro>" +
+  // "<id_cidade>DataTypes.STRING</id_cidade>" +
+  // "<cidade>DataTypes.STRING</cidade>" +
+  // "<uf>DataTypes.STRING</uf>" +
+  // "<id_pais>DataTypes.STRING</id_pais>" +
+  // "</cliente>";
 };
 exports.findAll = async (req, res) => {
   const nome = req.query.nome;

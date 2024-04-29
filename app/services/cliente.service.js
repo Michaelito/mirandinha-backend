@@ -1,5 +1,5 @@
 const axios = require("axios");
-exports.createClienteExsam = (data) => {
+exports.createClienteExsam = (req, res, data) => {
   var options = {
     method: "POST",
     url: "http://exsammirandinha.ddns.com.br:7780/Web.Api",
@@ -34,7 +34,8 @@ exports.createClienteExsam = (data) => {
     .then(function (response) {
       res.send({
         status: true,
-        data: response.data,
+        data: data,
+
       });
     })
     .catch(function (error) {
