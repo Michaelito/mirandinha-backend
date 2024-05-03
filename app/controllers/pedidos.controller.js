@@ -6,7 +6,7 @@ const Op = db.Sequelize.Op;
 
 
 // Retrieve all from the database.
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
   const id = req.query.id;
   var condition = id
     ? {
@@ -16,33 +16,40 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  pedidos
-    .findAll({
-      where: condition,
-      order: [
-        ["id", "DESC"], // Order by age descending
-      ],
-    })
-    .then((data) => {
-      res
-        .send({
-          status: true,
-          message: "The request has succeeded",
-          data: {
-            pedidos: data,
-          },
-        })
-        .status(200);
-    })
-    .catch((err) => {
-      res
-        .send({
-          status: false,
-          message: err + "The request has not succeeded",
-          data: null,
-        })
-        .status(500);
-    });
+  const pageAsNumber = Number.parseInt(req.query.page);
+  const sizeAsNumber = Number.parseInt(req.query.size);
+
+  let page = 0;
+  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+    page = pageAsNumber;
+  }
+
+  let size = 20;
+  if (
+    !Number.isNaN(sizeAsNumber) &&
+    !(sizeAsNumber > 50) &&
+    !(sizeAsNumber < 1)
+  ) {
+    size = sizeAsNumber;
+  }
+  const pedidosWithCount = await pedidos.findAndCountAll({
+    where: condition,
+    limit: size,
+    offset: page * size,
+    order: [
+      ["id", "DESC"], // Order by age descending
+    ],
+  });
+  res.send({
+    status: true,
+    message: "The request has succeeded",
+    limit: size,
+    page: page,
+    totalPages: Math.ceil(pedidosWithCount.count / Number.parseInt(size)),
+    data: {
+      pedidos: pedidosWithCount.rows,
+    },
+  });
 };
 
 // Find a single Data with an id
