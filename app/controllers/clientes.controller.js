@@ -2,87 +2,92 @@ const db = require("../models");
 const clienteService = require("../services/cliente.service");
 const Clientes = db.clientes;
 const Op = db.Sequelize.Op;
+const jsonxml = require('jsonxml');
 
 exports.create = (req, res) => {
-  // // Create a Ciente
-  // const cliente = {
-  //   lj: req.body.lj,
-  //   nome: req.body.nome,
-  //   guerra: req.body.guerra,
-  //   id_pessoa: req.body.id_pessoa,
-  //   id_tipo: req.body.id_tipo,
-  //   id_vended1: req.body.id_vended1,
-  //   id_vended2: req.body.id_vended2,
-  //   id_vended3: req.body.id_vended3,
-  //   id_tabpre: req.body.id_tabpre,
-  //   id_pagto: req.body.id_pagto,
-  //   id_fpagto: req.body.id_fpagto,
-  //   id_transp: req.body.id_transp,
-  //   lj_transp: req.body.lj_transp,
-  //   id_frete: req.body.id_frete,
-  //   cnpj: req.body.cnpj,
-  //   ie: req.body.ie,
-  //   email: req.body.email,
-  //   ddd1: req.body.ddd1,
-  //   fone1: req.body.fone1,
-  //   ddd2: req.body.ddd2,
-  //   fone2: req.body.fone2,
-  //   cep: req.body.cep,
-  //   endereco: req.body.endereco,
-  //   endnum: req.body.endnum,
-  //   endcpl: req.body.endcpl,
-  //   bairro: req.body.bairro,
-  //   id_cidade: req.body.id_cidade,
-  //   cidade: req.body.cidade,
-  //   uf: req.body.uf,
-  //   id_pais: req.body.id_pais
-  // };
-  // // Save Tutorial in the database
-  // Clientes.create(cliente)
-  //   .then(data => {
-  //     res.send(data);
-  //   })
-  //   .catch(err => {
-  //     res.status(500).send({
-  //       message: err.message || "Some error occurred while creating the Cliente."
-  //     });
-  //   });
-  // const data =
-  //   <clientes>
-  //     <nsu>DataTypes.STRING</nsu>
-  //     <id type="DataTypes.INTEGER" allowNull="false" primaryKey="true" autoIncrement="true" />
-  //     <lj>DataTypes.STRING</lj>
-  //     <nome>DataTypes.STRING</nome>
-  //     <guerra>DataTypes.STRING</guerra>
-  //     <id_pessoa>DataTypes.STRING</id_pessoa>
-  //     <id_tipo>DataTypes.STRING</id_tipo>
-  //     <id_vended1>DataTypes.STRING</id_vended1>
-  //     <id_vended2>DataTypes.STRING</id_vended2>
-  //     <id_vended3>DataTypes.STRING</id_vended3>
-  //     <id_tabpre>DataTypes.STRING</id_tabpre>
-  //     <id_pagto>DataTypes.STRING</id_pagto>
-  //     <id_fpagto>DataTypes.STRING</id_fpagto>
-  //     <id_transp>DataTypes.STRING</id_transp>
-  //     <lj_transp>DataTypes.STRING</lj_transp>
-  //     <id_frete>DataTypes.STRING</id_frete>
-  //     <cnpj>DataTypes.STRING</cnpj>
-  //     <ie>DataTypes.STRING</ie>
-  //     <email>DataTypes.STRING</email>
-  //     <ddd1>DataTypes.STRING</ddd1>
-  //     <fone1>DataTypes.STRING</fone1>
-  //     <ddd2>DataTypes.STRING</ddd2>
-  //     <fone2>DataTypes.STRING</fone2>
-  //     <cep>DataTypes.STRING</cep>
-  //     <endereco>DataTypes.STRING</endereco>
-  //     <endnum>DataTypes.STRING</endnum>
-  //     <endcpl>DataTypes.STRING</endcpl>
-  //     <bairro>DataTypes.STRING</bairro>
-  //     <id_cidade>DataTypes.STRING</id_cidade>
-  //     <cidade>DataTypes.STRING</cidade>
-  //     <uf>DataTypes.STRING</uf>
-  //     <id_pais>DataTypes.STRING</id_pais>
-  //   </clientes>
-  // clienteService.createClienteExsam(data);
+  // Create a Ciente
+  const cliente = {
+    lj: req.body.lj,
+    nome: req.body.nome,
+    guerra: req.body.guerra,
+    id_pessoa: req.body.id_pessoa,
+    id_tipo: req.body.id_tipo,
+    id_vended1: req.body.id_vended1,
+    id_vended2: req.body.id_vended2,
+    id_vended3: req.body.id_vended3,
+    id_tabpre: req.body.id_tabpre,
+    id_pagto: req.body.id_pagto,
+    id_fpagto: req.body.id_fpagto,
+    id_transp: req.body.id_transp,
+    lj_transp: req.body.lj_transp,
+    id_frete: req.body.id_frete,
+    cnpj: req.body.cnpj,
+    ie: req.body.ie,
+    email: req.body.email,
+    ddd1: req.body.ddd1,
+    fone1: req.body.fone1,
+    ddd2: req.body.ddd2,
+    fone2: req.body.fone2,
+    cep: req.body.cep,
+    endereco: req.body.endereco,
+    endnum: req.body.endnum,
+    endcpl: req.body.endcpl,
+    bairro: req.body.bairro,
+    id_cidade: req.body.id_cidade,
+    cidade: req.body.cidade,
+    uf: req.body.uf,
+    id_pais: req.body.id_pais
+  };
+  const xmlData =
+    '<?xml version="1.0" encoding="UTF-8"?>' +
+    "<cliente>" +
+    "<lj>" + cliente.lj + "</lj>" +
+    "<nome>" + cliente.nome + "</nome>" +
+    "<guerra>" + cliente.guerra + "</guerra>" +
+    "<id_pessoa>" + cliente.id_pessoa + "</id_pessoa>" +
+    "<id_tipo>" + cliente.id_tipo + "</id_tipo>" +
+    "<id_vended1>" + cliente.id_vended1 + "</id_vended1>" +
+    "<id_vended2>" + cliente.id_vended2 + "</id_vended2>" +
+    "<id_vended3>" + cliente.id_vended3 + "</id_vended3>" +
+    "<id_tabpre>" + cliente.id_tabpre + "</id_tabpre>" +
+    "<id_pagto>" + cliente.id_pagto + "</id_pagto>" +
+    "<id_fpagto>" + cliente.id_fpagto + "</id_fpagto>" +
+    "<id_transp>" + cliente.id_transp + "</id_transp>" +
+    "<lj_transp>" + cliente.lj_transp + "</lj_transp>" +
+    "<id_frete>" + cliente.id_frete + "</id_frete>" +
+    "<cnpj>" + cliente.cnpj + "</cnpj>" +
+    "<ie>" + cliente.ie + "</ie>" +
+    "<email>" + cliente.email + "</email>" +
+    "<ddd1>" + cliente.ddd1 + "</ddd1>" +
+    "<fone1>" + cliente.fone1 + "</fone1>" +
+    "<ddd2>" + cliente.ddd2 + "</ddd2>" +
+    "<fone2>" + cliente.fone2 + "</fone2>" +
+    "<cep>" + cliente.cep + "</cep>" +
+    "<endereco>" + cliente.endereco + "</endereco>" +
+    "<endnum>" + cliente.endnum + "</endnum>" +
+    "<endcpl>" + cliente.endcpl + "</endcpl>" +
+    "<bairro>" + cliente.bairro + "</bairro>" +
+    "<id_cidade>" + cliente.id_cidade + "</id_cidade>" +
+    "<cidade>" + cliente.cidade + "</cidade>" +
+    "<uf>" + cliente.uf + "</uf>" +
+    "<id_pais>" + cliente.id_pais + "</id_pais>" +
+    "</cliente>";
+
+  // Save Tutorial in the database
+  Clientes.create(cliente)
+    .then(data => {
+      //res.send(data);
+      clienteService.createClienteExsam(req, res, xmlData);
+
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating the Cliente."
+      });
+    });
+
+
+
 };
 exports.findAll = async (req, res) => {
   const nome = req.query.nome;
