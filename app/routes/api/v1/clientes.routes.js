@@ -15,6 +15,9 @@ module.exports = app => {
     // Retrieve a single Tutorial with id
     router.get("/:id", controller.findOne);
 
+     // Update a Data with id
+    router.put("/:id", controller.update);
+
     app.use('/api/v1/clientes', router);
 
 

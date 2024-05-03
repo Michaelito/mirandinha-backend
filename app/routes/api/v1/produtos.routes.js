@@ -11,8 +11,11 @@ module.exports = (app) => {
   // Retrieve all controller
   router.get("/group/:id", controller.findAllGroup);
 
-  // Retrieve a single Tutorial with id
+  // Retrieve a single Data with id
   router.get("/:id", controller.findOne);
+
+    // Update a Data with id
+    router.put("/:id", controller.update);
 
   app.use("/api/v1/produtos", router);
 };

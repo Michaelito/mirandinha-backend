@@ -79,33 +79,7 @@ exports.findAllGroup = async (req, res) => {
 
 };
 
-// exports.findAllGroup = (req, res) => {
-
-//   const id = req.params.id;
-
-//   Products.hasOne(Estoque, {
-//     foreignKey: "id",
-//   });
-
-//   Products.findAll({ where: { id_grupo1: id } })
-//     .then((data) => {
-//       res.send({
-//         status: true,
-//         message: "The request has succeeded",
-//         data: {
-//           products: data,
-//         },
-//       });
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         message:
-//           err.message || "Some error occurred while retrieving tutorials.",
-//       });
-//     });
-// };
-
-// Find a single Tutorial with an id
+// Find a single Data with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
@@ -137,4 +111,29 @@ exports.findOne = (req, res) => {
         message: "Error retrieving Data with id=" + id,
       });
     });
+};
+
+// Update a Data by the id in the request
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  Products.update(req.body, {
+          where: { id: id }
+      })
+      .then(num => {
+          if (num == 1) {
+              res.send({
+                  message: "Data was updated successfully."
+              });
+          } else {
+              res.send({
+                  message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`
+              });
+          }
+      })
+      .catch(err => {
+          res.status(500).send({
+              message: "Error updating Data with id=" + id
+          });
+      });
 };

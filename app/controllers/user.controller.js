@@ -122,7 +122,6 @@ exports.findOne = (req, res) => {
           required: false,
           attributes: [
             "id",
-            "user_id",
             "cep",
             "logradouro",
             "numero",
