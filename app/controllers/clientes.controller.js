@@ -38,46 +38,18 @@ exports.create = (req, res) => {
     uf: req.body.uf,
     id_pais: req.body.id_pais
   };
-  const xmlData =
-    '<?xml version="1.0" encoding="UTF-8"?>' +
-    "<cliente>" +
-    "<lj>" + cliente.lj + "</lj>" +
-    "<nome>" + cliente.nome + "</nome>" +
-    "<guerra>" + cliente.guerra + "</guerra>" +
-    "<id_pessoa>" + cliente.id_pessoa + "</id_pessoa>" +
-    "<id_tipo>" + cliente.id_tipo + "</id_tipo>" +
-    "<id_vended1>" + cliente.id_vended1 + "</id_vended1>" +
-    "<id_vended2>" + cliente.id_vended2 + "</id_vended2>" +
-    "<id_vended3>" + cliente.id_vended3 + "</id_vended3>" +
-    "<id_tabpre>" + cliente.id_tabpre + "</id_tabpre>" +
-    "<id_pagto>" + cliente.id_pagto + "</id_pagto>" +
-    "<id_fpagto>" + cliente.id_fpagto + "</id_fpagto>" +
-    "<id_transp>" + cliente.id_transp + "</id_transp>" +
-    "<lj_transp>" + cliente.lj_transp + "</lj_transp>" +
-    "<id_frete>" + cliente.id_frete + "</id_frete>" +
-    "<cnpj>" + cliente.cnpj + "</cnpj>" +
-    "<ie>" + cliente.ie + "</ie>" +
-    "<email>" + cliente.email + "</email>" +
-    "<ddd1>" + cliente.ddd1 + "</ddd1>" +
-    "<fone1>" + cliente.fone1 + "</fone1>" +
-    "<ddd2>" + cliente.ddd2 + "</ddd2>" +
-    "<fone2>" + cliente.fone2 + "</fone2>" +
-    "<cep>" + cliente.cep + "</cep>" +
-    "<endereco>" + cliente.endereco + "</endereco>" +
-    "<endnum>" + cliente.endnum + "</endnum>" +
-    "<endcpl>" + cliente.endcpl + "</endcpl>" +
-    "<bairro>" + cliente.bairro + "</bairro>" +
-    "<id_cidade>" + cliente.id_cidade + "</id_cidade>" +
-    "<cidade>" + cliente.cidade + "</cidade>" +
-    "<uf>" + cliente.uf + "</uf>" +
-    "<id_pais>" + cliente.id_pais + "</id_pais>" +
-    "</cliente>";
-
+ 
   // Save Tutorial in the database
   Clientes.create(cliente)
     .then(data => {
-      //res.send(data);
-      clienteService.createClienteExsam(req, res, xmlData);
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+            cliente: data
+        }
+    }).status(200);
+      //clienteService.createClienteExsam(req, res, xmlData);
 
     })
     .catch(err => {
