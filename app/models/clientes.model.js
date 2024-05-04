@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true,
         },
+        id_exsam: DataTypes.STRING,
         lj: DataTypes.STRING,
         nome: DataTypes.STRING,
         guerra: DataTypes.STRING,
