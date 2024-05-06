@@ -9,7 +9,7 @@ module.exports = (app) => {
   // Retrieve all controller
   router.get("/", controller.findAll);
 
-  router.post("/cliente", controller.createClient);
+  router.post("/", controller.createClient);
 
   app.use("/api/v1/exsam", router);
 };
