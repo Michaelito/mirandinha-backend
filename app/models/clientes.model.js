@@ -1,8 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     
     const clientes = sequelize.define('clientes', {
-        nsu: DataTypes.STRING,
-         id: {
+        id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true,
@@ -40,15 +39,9 @@ module.exports = (sequelize, DataTypes) => {
         id_pais: DataTypes.STRING
         },
         {
-
             timestamps: false,
-
             createdAt: false,
-
             updatedAt: false,
-
-
-
         }
     );
     return clientes;

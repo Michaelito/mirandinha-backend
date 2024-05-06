@@ -98,6 +98,7 @@ exports.findOne = (req, res) => {
 
   users.hasMany(address_users, {
     foreignKey: "user_id",
+    order: [["ativo", "ASC"]],
   });
 
   users
