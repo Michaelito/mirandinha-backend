@@ -4,59 +4,60 @@ const Clientes = db.clientes;
 const Op = db.Sequelize.Op;
 
 
-exports.create = (req, res) => {
-  // Create a Ciente
-  const cliente = {
-    lj: req.body.lj,
-    nome: req.body.nome,
-    guerra: req.body.guerra,
-    id_pessoa: req.body.id_pessoa,
-    id_tipo: req.body.id_tipo,
-    id_vended1: req.body.id_vended1,
-    id_vended2: req.body.id_vended2,
-    id_vended3: req.body.id_vended3,
-    id_tabpre: req.body.id_tabpre,
-    id_pagto: req.body.id_pagto,
-    id_fpagto: req.body.id_fpagto,
-    id_transp: req.body.id_transp,
-    lj_transp: req.body.lj_transp,
-    id_frete: req.body.id_frete,
-    cnpj: req.body.cnpj,
-    ie: req.body.ie,
-    email: req.body.email,
-    ddd1: req.body.ddd1,
-    fone1: req.body.fone1,
-    ddd2: req.body.ddd2,
-    fone2: req.body.fone2,
-    cep: req.body.cep,
-    endereco: req.body.endereco,
-    endnum: req.body.endnum,
-    endcpl: req.body.endcpl,
-    bairro: req.body.bairro,
-    id_cidade: req.body.id_cidade,
-    cidade: req.body.cidade,
-    uf: req.body.uf,
-    id_pais: req.body.id_pais
-  };
+exports.create = async (req, res) => {
+  try {
+    // Create a Ciente
+    const cliente = {
+      lj: req.body.lj,
+      nome: req.body.nome,
+      guerra: req.body.guerra,
+      id_pessoa: req.body.id_pessoa,
+      id_tipo: req.body.id_tipo,
+      id_vended1: req.body.id_vended1,
+      id_vended2: req.body.id_vended2,
+      id_vended3: req.body.id_vended3,
+      id_tabpre: req.body.id_tabpre,
+      id_pagto: req.body.id_pagto,
+      id_fpagto: req.body.id_fpagto,
+      id_transp: req.body.id_transp,
+      lj_transp: req.body.lj_transp,
+      id_frete: req.body.id_frete,
+      cnpj: req.body.cnpj,
+      ie: req.body.ie,
+      email: req.body.email,
+      ddd1: req.body.ddd1,
+      fone1: req.body.fone1,
+      ddd2: req.body.ddd2,
+      fone2: req.body.fone2,
+      cep: req.body.cep,
+      endereco: req.body.endereco,
+      endnum: req.body.endnum,
+      endcpl: req.body.endcpl,
+      bairro: req.body.bairro,
+      id_cidade: req.body.id_cidade,
+      cidade: req.body.cidade,
+      uf: req.body.uf,
+      id_pais: req.body.id_pais
+    };
 
-  // Save Tutorial in the database
-  clienteService.createClienteExsam(res, cliente);
-  Clientes.create(cliente)
-    .then(data => {
-      // res.send({
-      //   status: true,
-      //   data: data,
-      //   message: "The request has succeeded",
-      // });
-
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message,
-      });
+    // Save Tutorial in the database
+    const externalResponse = await clienteService.createClienteExsam(cliente);
+    const localResponse = await
+      Clientes.create(cliente)
+    res.send({
+      localResponse: localResponse,
+      message: "Cliente criado com sucesso no Banco de Dados local!",
+      externalData: externalResponse,
+    });
+  }
+  catch (err) {
+    res.status(500).send({
+      message: err.message,
     });
 
-};
+
+  };
+}
 exports.findAll = async (req, res) => {
   const nome = req.query.nome;
   var condition = nome
