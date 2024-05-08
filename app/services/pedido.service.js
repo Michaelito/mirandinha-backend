@@ -1,48 +1,76 @@
 const axios = require("axios");
-exports.createPedido = (data, req, res) => {
-    var options = {
-        method: "POST",
-        url: "http://exsammirandinha.ddns.com.br:7780/Web.Api",
-        headers: {
+const { response } = require("express");
+
+class PedidoService {
+
+
+    constructor() {
+        this.baseUrl = "http://exsammirandinha.ddns.com.br:7780/Web.Api";
+        this.headers = {
             "Content-Type": "application/xml",
             Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
-        },
-        data: data,
-        //   '<?xml version="1.0" encoding="UTF-8"?>' +
-        //   "<cliente><cnpjf>3148374fg8863</cnpjf>" +
-        //   "<nome>faquere faquere</nome>" +
-        //   "<cep>0928sdfgsdf0360</cep>" +
-        //   "<endereco>RUA FORTUNATA NAZARO</endereco>" +
-        //   "<endnum>68</endnum>" +
-        //   "<endcpl>BL.XYZ</endcpl>" +
-        //   "<bairro>PONTE GRANDE</bairro>" +
-        //   "<id_cidade>3518800</id_cidade>" +
-        //   "<cidade>GUARULHOS</cidade>" +
-        //   "<uf>SP</uf>" +
-        //   "<email>suporte@exsam.com.br</email>" +
-        //   "<ddd1>11</ddd1>" +
-        //   "<fone1>242514555523</fone1>" +
-        //   "<ddd2></ddd2>" +
-        //   "<fone2></fone2>" +
-        //   "<id_fpagto>15</id_fpagto>" +
-        //   "<id_pagto>30</id_pagto>" +
-        //   "</cliente >",
-    };
+        };
+    }
 
-    axios
-        .request(options)
-        .then(function (response) {
-            // res.send({
-            //     // status: true,
-            //     // data: response.data,
-
-            // });
-        })
-        .catch(function (error) {
-            console.error(error);
-            // res.send({
-            //     status: false,
-            //     message: error,
-            // });
-        });
+    async createPedidoExsam(pedido, itensArray) {
+        try {
+            const options = {
+                method: "POST",
+                url: this.baseUrl,
+                headers: this.headers,
+                data:
+                    '<?xml version="1.0" encoding="UTF-8"?>' +
+                    "<pedido>" +
+                    "<id> </id>" +
+                    "<cnpjf>" + pedido.cnpjf + "</cnpjf>" +
+                    "<nome>" + pedido.nome + "</nome>" +
+                    "<cep>" + pedido.cep + "</cep>" +
+                    "<endereco>" + pedido.endereco + "</endereco>" +
+                    "<endnum>" + pedido.endnum + "</endnum>" +
+                    "<endcpl>" + pedido.endcpl + "</endcpl>" +
+                    "<bairro>" + pedido.bairro + "</bairro>" +
+                    "<id_cidade>" + pedido.id_cidade + "</id_cidade>" +
+                    "<cidade>" + pedido.cidade + "</cidade>" +
+                    "<uf>" + pedido.uf + "</uf>" +
+                    "<email>" + pedido.email + "</email>" +
+                    "<ddd1>" + pedido.ddd1 + "</ddd1>" +
+                    "<fone1>" + pedido.fone1 + "</fone1>" +
+                    "<dh_mov>" + pedido.dh_mov + "</dh_mov>" +
+                    "<id_fpagto>" + pedido.id_fpagto + "</id_fpagto>" +
+                    "<id_pagto>" + pedido.id_pagto + "</id_pagto>" +
+                    "<id_vended1>" + pedido.id_vended1 + "</id_vended1>" +
+                    "<id_transp>" + pedido.id_transp + "</id_transp>" +
+                    "<id_frete>" + pedido.id_frete + "</id_frete>" +
+                    "<prazo>" + pedido.prazo + "</prazo>" +
+                    "<peso_bru>" + pedido.peso_bru + "</peso_bru>" +
+                    "<peso_liq>" + pedido.peso_liq + "</peso_liq>" +
+                    "<total>" + pedido.total + "</total>" +
+                    "<frete>" + pedido.frete + "</frete>" +
+                    "<desconto>" + pedido.desconto + "</desconto>" +
+                    "<total_geral>" + pedido.total_geral + "</total_geral>" +
+                    "<itens>" +
+                    "<item>" +
+                    "<id_produto>" + itensArray[0].id_produto + "</id_produto>" +
+                    "<produto>" + itensArray[0].produto + "</produto>" +
+                    "<preco>" + itensArray[0].preco + "</preco>" +
+                    "<qtde>" + itensArray[0].qtde + "</qtde>" +
+                    "<total>" + itensArray[0].total + "</total>" +
+                    "<peso>" + itensArray[0].peso + "</peso>" +
+                    "</item>" +
+                    "</itens>" +
+                    "</pedido>"
+            };
+            console.log(options.data);
+            const response = await axios.request(options);
+            return {
+                status: true,
+                data: options.data,
+                response: response.data,
+                message: "Pedido criado com sucesso na api!",
+            };
+        } catch (error) {
+            throw error.message;
+        }
+    }
 }
+module.exports = new PedidoService();
