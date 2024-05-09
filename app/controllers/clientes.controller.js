@@ -45,9 +45,13 @@ exports.create = async (req, res) => {
     const localResponse = await
       Clientes.create(cliente)
     res.send({
-      localResponse: localResponse,
-      message: "Cliente criado com sucesso no Banco de Dados local!",
-      externalData: externalResponse,
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        cliente: data,
+        ApiData: externalResponse,
+      },
+
     });
   }
   catch (err) {
