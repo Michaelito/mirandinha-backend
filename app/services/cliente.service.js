@@ -63,8 +63,8 @@ class ClienteService {
       const response = await axios.request(options);
       return {
         status: true,
+        message: "The request has succeeded",
         data: response.data,
-        message: "Cliente criado com sucesso na api!",
       };
     } catch (error) {
       throw error.message;
