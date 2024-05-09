@@ -60,16 +60,15 @@ class PedidoService {
                     "</itens>" +
                     "</pedido>"
             };
-            console.log(options.data);
             const response = await axios.request(options);
             return {
                 status: true,
-                data: options.data,
-                response: response.data,
-                message: "Pedido criado com sucesso na api!",
+                message: "The request has succeeded",
+                data: response.data,
             };
         } catch (error) {
             throw error.message;
+
         }
     }
 }

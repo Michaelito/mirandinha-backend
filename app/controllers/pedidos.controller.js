@@ -130,11 +130,6 @@ exports.create = async (req, res) => {
     const localResponse = pedidos.create(payload)
       .then((data) => {
         const pedido_id = data.id;
-
-        console.log(pedido_id);
-
-
-
         // Use map() to iterate over itensArray and create promises for each item insertion
         itensArray.forEach((pedido_item) => {
           // Create a promise for each item insertion
@@ -142,15 +137,17 @@ exports.create = async (req, res) => {
             ...pedido_item, // Spread the properties of pedido_item
             pedido_id: pedido_id, // Assign the pedido_id to the item
           });
-
           // Push the promise into the array
           itensArray.push(insertionPromise);
         });
-
         res.send({
-          message: "Pedido criado com sucesso no Banco de Dados local!",
-          externalData: externalResponse,
-          localResponse: data,
+          status: true,
+          message: "The request has succeeded",
+          data: {
+            pedido: data,
+            ApiData: externalResponse,
+          },
+
         });
       })
   }
