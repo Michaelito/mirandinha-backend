@@ -61,6 +61,7 @@ exports.create = (req, res) => {
 
 
 };
+
 exports.findAll = async (req, res) => {
   const nome = req.query.nome;
   var condition = nome

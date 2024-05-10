@@ -12,7 +12,7 @@ exports.findAll = (req, res) => {
                 status: true,
                 message: "The request has succeeded",
                 data: {
-                    tutorial: data
+                    grupos: data
                 }
             }).status(200);
         })

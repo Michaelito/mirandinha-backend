@@ -1,5 +1,14 @@
 const axios = require("axios");
 const xmlJson = require("xml-js");
+const xml2js = require('xml2js')
+// import File System Module 
+
+  
+// import xml2js Module 
+const parseString = require("xml2js");  
+
+
+
 
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
@@ -53,4 +62,50 @@ exports.createClient = (req, res) => {
         message: error,
       });
     });
+};
+
+
+
+exports.updateData = (req, res) => {
+
+
+  
+  var axios = require("axios").default;
+
+  var options = {
+    method: 'GET',
+    url: 'http://exsammirandinha.ddns.com.br:7780/Web.Api',
+    params: {nsu: '0'},
+    headers: {Authorization: 'Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7'}
+  };
+  
+  axios.request(options).then(function (response) {
+    console.log(response.data);
+
+    const xml = response.data
+
+    // convert XML to JSON
+    xml2js.parseString(xml, (err, result) => {
+      if (err) {
+        throw err
+      }
+
+      // `result` is a JavaScript object
+      // convert it to a JSON string
+      const json = JSON.stringify(result, null, 4)
+
+      // log JSON string
+      console.log(json)
+      res.send(json)
+    })
+
+
+
+
+
+  }).catch(function (error) {
+    console.error(error);
+  });
+
+
 };

@@ -1,6 +1,7 @@
 const db = require("../models");
 const Products = db.produtos;
 const Estoque = db.estoque;
+const grupos = db.grupo;
 const Op = db.Sequelize.Op;
 
 exports.findAll = async (req, res) => {
@@ -66,12 +67,17 @@ exports.findAllGroup = async (req, res) => {
     offset: page * size,
   });
 
-  res.send({
+  const grupo = await grupos.findOne({
+    where: { id: id },
+  });
+
+   res.json({
     status: true,
     message: "The request has succeeded",
     limit: size,
     page: page,
     totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
+    grupo: grupo.nome,
     data: {
       products: productWithCount.rows,
     },
