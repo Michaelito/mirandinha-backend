@@ -154,29 +154,69 @@ exports.create = (req, res) => {
     });
 };
 
-exports.findAllUser = (req, res) => {
+exports.findAllUser = async (req, res) => {
   const id = req.params.id;
 
-  pedidos
-    .findAll({
-      where: { user_id: id },
-      order: [
-        ["id", "DESC"], // Order by age descending
-      ],
-    })
-    .then((data) => {
-      res.send({
-        status: true,
-        message: "The request has succeeded",
-        data: {
-          pedidos: data,
-        },
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: false,
-        message: err.message || "Some error occurred while retrieving Data.",
-      });
-    });
+  const pageAsNumber = Number.parseInt(req.query.page);
+  const sizeAsNumber = Number.parseInt(req.query.size);
+
+  let page = 0;
+  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+    page = pageAsNumber;
+  }
+
+  let size = 20;
+  if (
+    !Number.isNaN(sizeAsNumber) &&
+    !(sizeAsNumber > 50) &&
+    !(sizeAsNumber < 1)
+  ) {
+    size = sizeAsNumber;
+  }
+
+  const pedidosWithCount = await pedidos.findAndCountAll({
+    where: { user_id: id },
+    order: [
+            ["id", "DESC"], 
+          ],
+    limit: size,
+    offset: page * size,
+    order: [
+      ["id", "DESC"], // Order by age descending
+    ],
+  });
+  res.send({
+    status: true,
+    message: "The request has succeeded",
+    limit: size,
+    page: page,
+    totalPages: Math.ceil(pedidosWithCount.count / Number.parseInt(size)),
+    data: {
+      pedidos: pedidosWithCount.rows,
+    },
+  });
+
+
+  // pedidos
+  //   .findAll({
+  //     where: { user_id: id },
+  //     order: [
+  //       ["id", "DESC"], // Order by age descending
+  //     ],
+  //   })
+  //   .then((data) => {
+  //     res.send({
+  //       status: true,
+  //       message: "The request has succeeded",
+  //       data: {
+  //         pedidos: data,
+  //       },
+  //     });
+  //   })
+  //   .catch((err) => {
+  //     res.status(500).send({
+  //       status: false,
+  //       message: err.message || "Some error occurred while retrieving Data.",
+  //     });
+  //   });
 };
