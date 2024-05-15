@@ -41,7 +41,6 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findAllGroup = async (req, res) => {
-  
   const id = req.params.id;
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -61,28 +60,40 @@ exports.findAllGroup = async (req, res) => {
     size = sizeAsNumber;
   }
 
-  const productWithCount = await Products.findAndCountAll({
-    where: { id_grupo1: id },
-    limit: size,
-    offset: page * size,
-  });
-
   const grupo = await grupos.findOne({
     where: { id: id },
   });
 
-   res.json({
-    status: true,
-    message: "The request has succeeded",
+  await Products.findAndCountAll({
+    where: { id_grupo1: id },
     limit: size,
-    page: page,
-    totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
-    grupo: grupo.nome,
-    data: {
-      products: productWithCount.rows,
-    },
-  });
-
+    offset: page * size,
+  })
+    .then((productWithCount) => {
+     
+      if (productWithCount.count >= 1) {
+        res.send({
+          status: true,
+          message: "The request has succeeded",
+          limit: size,
+          page: page,
+          totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
+          grupo: grupo.nome,
+          data: {
+            products: productWithCount.rows,
+          },
+        });
+      } else {
+        res.send({
+          message: `Cannot localizar Data with id=${id}. Maybe Data was not found or empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error updating Data with id=" + id,
+      });
+    });
 };
 
 // Find a single Data with an id
@@ -124,22 +135,22 @@ exports.update = (req, res) => {
   const id = req.params.id;
 
   Products.update(req.body, {
-          where: { id: id }
-      })
-      .then(num => {
-          if (num == 1) {
-              res.send({
-                  message: "Data was updated successfully."
-              });
-          } else {
-              res.send({
-                  message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`
-              });
-          }
-      })
-      .catch(err => {
-          res.status(500).send({
-              message: "Error updating Data with id=" + id
-          });
+    where: { id: id },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.send({
+          message: "Data was updated successfully.",
+        });
+      } else {
+        res.send({
+          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error updating Data with id=" + id,
       });
+    });
 };
