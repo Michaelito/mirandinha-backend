@@ -24,12 +24,13 @@ db.users = require("./user.model.js")(sequelize, Sequelize);
 db.address_users = require("./address_users.model.js")(sequelize, Sequelize);
 db.data_users = require("./data_user.model.js")(sequelize, Sequelize);
 db.grupo = require("./grupo.model.js")(sequelize, Sequelize);
+db.grupo_format = require("./grupo_format.model.js")(sequelize, Sequelize);
+db.estoque = require("./estoque.model.js")(sequelize, Sequelize);
 db.fpagto = require("./fpagto.model.js")(sequelize, Sequelize);
 db.cpagto = require("./cpagto.model.js")(sequelize, Sequelize);
 db.produtos = require("./produtos.model")(sequelize, Sequelize);
 db.clientes = require("./clientes.model")(sequelize, Sequelize);
 db.pedidos = require("./pedidos.model.js")(sequelize, Sequelize);
 db.pedidos_itens = require("./pedidos_itens.model.js")(sequelize, Sequelize);
-db.estoque = require("./estoque.model.js")(sequelize, Sequelize);
 
 module.exports = db;

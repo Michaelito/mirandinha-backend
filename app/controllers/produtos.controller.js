@@ -70,7 +70,6 @@ exports.findAllGroup = async (req, res) => {
     offset: page * size,
   })
     .then((productWithCount) => {
-     
       if (productWithCount.count >= 1) {
         res.send({
           status: true,
@@ -85,6 +84,7 @@ exports.findAllGroup = async (req, res) => {
         });
       } else {
         res.send({
+          status: true,
           message: `Cannot localizar Data with id=${id}. Maybe Data was not found or empty!`,
         });
       }

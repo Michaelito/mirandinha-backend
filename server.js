@@ -65,6 +65,7 @@ require("./app/routes/api/v1/clientes.routes")(app);
 require("./app/routes/api/v1/pedidos.routes")(app);
 require("./app/routes/api/v1/pedidos_itens.routes")(app);
 require("./app/routes/api/v1/estoque.routes")(app);
+require("./app/routes/api/v1/grupo_format.routes")(app);
 require("./app/routes/api/v1/exsam.routes")(app);
 
 
