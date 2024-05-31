@@ -41,7 +41,7 @@ exports.findAllGroup = (req, res) => {
 
   console.log(id);
 
-  Products.findAll({ where: { id_grupo1: id } })
+  Products.findAll({ where: { id_grupo3: id } })
     .then((data) => {
       res.send({
         status: true,
