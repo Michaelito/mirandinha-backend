@@ -65,7 +65,7 @@ exports.findAllGroup = async (req, res) => {
   });
 
   await Products.findAndCountAll({
-    where: { id_grupo1: id },
+    where: { grupo_format: id },
     limit: size,
     offset: page * size,
   })
@@ -91,7 +91,7 @@ exports.findAllGroup = async (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error updating Data with id=" + id,
+        message: "Error Data with id=" + id,
       });
     });
 };

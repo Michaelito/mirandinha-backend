@@ -1,13 +1,16 @@
+const { grupo_format } = require(".");
+
 module.exports = (sequelize, DataTypes) => {
 
   const produtos = sequelize.define(
     "produtos",
     {
-      nsu: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
       id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
+      id_exsam: {
         type: DataTypes.STRING,
         primaryKey: true,
       },
@@ -23,8 +26,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      id_grupo1: {
+      grupo_format: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      id_grupo1: {
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       id_grupo2: {
@@ -45,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       unimed: {
         type: DataTypes.STRING,
+        allowNull: true,
+      },
+      preco_pf: {
+        type: DataTypes.DECIMAL,
         allowNull: true,
       },
       preco: {

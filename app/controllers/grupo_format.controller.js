@@ -59,3 +59,28 @@ exports.findAll = (req, res) => {
         });
 };
 
+// Update a Data by the id in the request
+exports.update = (req, res) => {
+    const id = req.params.id;
+  
+    GrupoFormat.update(req.body, {
+      where: { id: id },
+    })
+      .then((num) => {
+        if (num == 1) {
+          res.send({
+            message: "Data was updated successfully.",
+          });
+        } else {
+          res.send({
+            message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+          });
+        }
+      })
+      .catch((err) => {
+        res.status(500).send({
+          message: "Error updating Data with id=" + id,
+        });
+      });
+  };
+
