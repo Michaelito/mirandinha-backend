@@ -41,60 +41,87 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findAllGroup = async (req, res) => {
-  const id = req.params.id;
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.size);
 
-  let page = 0;
-  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-    page = pageAsNumber;
-  }
+    const id = req.params.id;
 
-  let size = 20;
-
-  if (
-    !Number.isNaN(sizeAsNumber) &&
-    !(sizeAsNumber > 50) &&
-    !(sizeAsNumber < 1)
-  ) {
-    size = sizeAsNumber;
-  }
-
-  const grupo = await grupos.findOne({
-    where: { id: id },
-  });
-
-  await Products.findAndCountAll({
-    where: { grupo_format: id },
-    limit: size,
-    offset: page * size,
-  })
-    .then((productWithCount) => {
-      if (productWithCount.count >= 1) {
-        res.send({
+    Products.findAll({ where: {grupo_format: id} })
+    .then((data) => {
+      res
+        .send({
           status: true,
           message: "The request has succeeded",
-          limit: size,
-          page: page,
-          totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
-          grupo: grupo.nome,
           data: {
-            products: productWithCount.rows,
+            products: data,
           },
-        });
-      } else {
-        res.send({
-          status: true,
-          message: `Cannot localizar Data with id=${id}. Maybe Data was not found or empty!`,
-        });
-      }
+        })
+        .status(200);
     })
     .catch((err) => {
-      res.status(500).send({
-        message: "Error Data with id=" + id,
-      });
+      res
+        .send({
+          status: false,
+          message: "The request has not succeeded",
+          data: null,
+        })
+        .status(500);
     });
 };
+
+// exports.findAllGroup = async (req, res) => {
+//   const id = req.params.id;
+//   const pageAsNumber = Number.parseInt(req.query.page);
+//   const sizeAsNumber = Number.parseInt(req.query.size);
+
+//   let page = 0;
+//   if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+//     page = pageAsNumber;
+//   }
+
+//   let size = 20;
+
+//   if (
+//     !Number.isNaN(sizeAsNumber) &&
+//     !(sizeAsNumber > 50) &&
+//     !(sizeAsNumber < 1)
+//   ) {
+//     size = sizeAsNumber;
+//   }
+
+//   const grupo = await grupos.findOne({
+//     where: { id: id },
+//   });
+
+//   await Products.findAndCountAll({
+//     where: { grupo_format: id },
+//     limit: size,
+//     offset: page * size,
+//   })
+//     .then((productWithCount) => {
+//       if (productWithCount.count >= 1) {
+//         res.send({
+//           status: true,
+//           message: "The request has succeeded",
+//           limit: size,
+//           page: page,
+//           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
+//           grupo: grupo.nome,
+//           data: {
+//             products: productWithCount.rows,
+//           },
+//         });
+//       } else {
+//         res.send({
+//           status: true,
+//           message: `Cannot localizar Data with id=${id}. Maybe Data was not found or empty!`,
+//         });
+//       }
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message: "Error Data with id=" + id,
+//       });
+//     });
+// };
 
 // Find a single Data with an id
 exports.findOne = (req, res) => {
