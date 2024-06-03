@@ -10,7 +10,7 @@ module.exports = app => {
 
     router.post("/", controller.create);
 
-    router.put("/", controller.update);
+    router.put("/:id", controller.update);
 
     app.use('/api/v1/grupo_format', router);
 
