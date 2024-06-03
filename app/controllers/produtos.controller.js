@@ -44,11 +44,6 @@ exports.findAllGroup = async (req, res) => {
 
     const id = req.params.id;
 
-    users.hasOne(datausers, {
-      foreignKey: "user_id",
-    });
-
-
     Products.findAll({ where: {grupo_format: id} })
     .then((data) => {
       res
