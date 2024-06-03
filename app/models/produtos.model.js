@@ -29,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       grupo_format: {
         type: DataTypes.STRING,
         allowNull: true,
+        forenkey: true,
       },
       id_grupo1: {
         type: DataTypes.INTEGER,

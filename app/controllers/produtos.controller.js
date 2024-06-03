@@ -1,7 +1,7 @@
 const db = require("../models");
 const Products = db.produtos;
 const Estoque = db.estoque;
-const grupos = db.grupo;
+const grupos = db.grupo_format;
 const Op = db.Sequelize.Op;
 
 exports.findAll = async (req, res) => {
@@ -22,7 +22,7 @@ exports.findAll = async (req, res) => {
   ) {
     size = sizeAsNumber;
   }
-
+  
   const productWithCount = await Products.findAndCountAll({
     limit: size,
     offset: page * size,
@@ -43,6 +43,11 @@ exports.findAll = async (req, res) => {
 exports.findAllGroup = async (req, res) => {
 
     const id = req.params.id;
+
+    users.hasOne(datausers, {
+      foreignKey: "user_id",
+    });
+
 
     Products.findAll({ where: {grupo_format: id} })
     .then((data) => {
