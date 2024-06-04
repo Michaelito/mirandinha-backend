@@ -8,6 +8,9 @@ module.exports = app => {
     // Retrieve all controller
     router.get("/", controller.findAll);
 
+    // Retrieve a single Data with id
+    router.get("/:id", controller.findOne);
+
     router.post("/", controller.create);
 
     router.put("/:id", controller.update);
