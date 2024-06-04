@@ -43,7 +43,7 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  GrupoFormat.findAll({ where: condition })
+  GrupoFormat.findAll({ where: {status: 1} })
     .then((data) => {
       res
         .send({
