@@ -68,6 +68,11 @@ require("./app/routes/api/v1/estoque.routes")(app);
 require("./app/routes/api/v1/grupo_format.routes")(app);
 require("./app/routes/api/v1/exsam.routes")(app);
 
+require("./app/routes/api/v1/michaelgrupo.routes")(app);
+require("./app/routes/api/v1/michaelproduto.routes")(app);
+
+
+
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
