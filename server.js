@@ -70,6 +70,7 @@ require("./app/routes/api/v1/exsam.routes")(app);
 
 require("./app/routes/api/v1/michaelgrupo.routes")(app);
 require("./app/routes/api/v1/michaelproduto.routes")(app);
+require("./app/routes/api/v1/michaelpedido.routes")(app);
 
 
 

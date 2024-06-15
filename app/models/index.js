@@ -35,5 +35,6 @@ db.pedidos_itens = require("./pedidos_itens.model.js")(sequelize, Sequelize);
 
 db.michaelgrupos = require("./michaelgrupo.model.js")(sequelize, Sequelize);
 db.michaelprodutos = require("./michaelproduto.model.js")(sequelize, Sequelize);
+db.michaelpedidos = require("./michaelpedidos.model.js")(sequelize, Sequelize);
 
 module.exports = db;
