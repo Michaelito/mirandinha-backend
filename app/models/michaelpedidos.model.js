@@ -9,6 +9,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(36),
       allowNull: false,
     },
+    cliente: {
+      type: DataTypes.STRING(50),
+    },
+    celular: {
+      type: DataTypes.STRING(20),
+    },
     produto_id: {
       type: DataTypes.INTEGER,
       forenkey: true,

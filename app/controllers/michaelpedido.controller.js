@@ -5,18 +5,21 @@ const { uuid } = require("uuidv4");
 
 // Create and Save a new Data
 exports.create = (req, res) => {
-  const pedidosArray = req.body;
+  
+  const pedidosArray = req.body.pedido_itens;
 
   // Use map() to iterate over itensArray and create promises for each item insertion
-  const data = pedidosArray.forEach((pedido) => {
+  const data = pedidosArray.forEach((pedido_item) => {
     // Create a promise for each item insertion
     let insertPedido = Pedidos.create({
-      ...pedido, // Spread the properties of pedido
+      ...pedido_item, // Spread the properties of pedido
       uuid: uuid(),
-      valor_total: parseInt(pedido.qtde) * parseFloat(pedido.valor_unit),
+      cliente: req.body.cliente.nome,
+      celular: req.body.cliente.celular,
+      valor_total: parseInt(pedido_item.qtde) * parseFloat(pedido_item.valor_unit),
     });
 
-    console.log(pedido.qte * pedido.valor_unit);
+  
     // Push the promise into the array
     pedidosArray.push(insertPedido);
   });
