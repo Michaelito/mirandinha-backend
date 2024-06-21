@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const pedidos = sequelize.define("michaelpedidos", {
+  const pedidos = sequelize.define("michaelpedido_itens", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -9,11 +9,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(36),
       allowNull: false,
     },
-    cliente: {
-      type: DataTypes.STRING(50),
+    pedido_id: {
+      type: DataTypes.INTEGER,
+      foreignKey: true,
     },
-    celular: {
-      type: DataTypes.STRING(20),
+    produto_id: {
+      type: DataTypes.INTEGER,
+      forenkey: true,
+    },
+    produto: {
+      type: DataTypes.STRING(255),
+    },
+    qtde: {
+      type: DataTypes.INTEGER,
+    },
+    valor_unitario: {
+      type: DataTypes.DECIMAL(10, 2),
     },
     valor_desconto: {
       type: DataTypes.DECIMAL(10, 2),
