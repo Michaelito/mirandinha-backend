@@ -5,10 +5,13 @@ module.exports = app => {
 
     var router = require("express").Router();
 
-    // Retrieve all controller
-    router.get("/", controller.findAll,);
+    // Create a new Data
+    router.post("/", controller.create);
 
-    // Retrieve a single Tutorial with id
+    // Retrieve all controller
+    router.get("/", controller.findAll);
+
+    // Retrieve a single Data with id
     router.get("/:id", controller.findOne);
 
     // Retrieve all controller

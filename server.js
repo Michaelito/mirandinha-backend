@@ -67,6 +67,8 @@ require("./app/routes/api/v1/pedidos_itens.routes")(app);
 require("./app/routes/api/v1/estoque.routes")(app);
 require("./app/routes/api/v1/grupo_format.routes")(app);
 require("./app/routes/api/v1/exsam.routes")(app);
+require("./app/routes/api/v1/cores.routes")(app);
+require("./app/routes/api/v1/produtos_grade.routes")(app);
 
 require("./app/routes/api/v1/michaelgrupo.routes")(app);
 require("./app/routes/api/v1/michaelproduto.routes")(app);

@@ -2,6 +2,7 @@ const db = require("../models");
 const Products = db.produtos;
 const Estoque = db.estoque;
 const grupos = db.grupo_format;
+const GradeProdutos = db.produtos_grade
 const Op = db.Sequelize.Op;
 
 exports.findAll = async (req, res) => {
@@ -127,16 +128,16 @@ exports.findAllGroup = async (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Products.hasOne(Estoque, {
-    foreignKey: "id",
+  Products.hasMany(GradeProdutos, {
+    foreignKey: "produto_id",
   });
 
   Products.findByPk(id, {
     include: [
       {
-        model: Estoque,
+        model: GradeProdutos,
         required: false,
-        attributes: ["fil", "estoque", "empenho", "disponivel"],
+        attributes: ["cores_id", "quantidade"],
       },
     ],
   })
