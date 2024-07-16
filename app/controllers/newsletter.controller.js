@@ -1,11 +1,13 @@
 const db = require("../models");
 const Newsletter = db.newsletter;
 const Op = db.Sequelize.Op;
+const { uuid } = require('uuidv4');
 
 // Create and Save a new Newsletter
 exports.create = (req, res) => {
   // Create a Newsletter
   const json = {
+    uuid: uuid(),
     title: req.body.title,
     description: req.body.description,
     img: req.body.img,
