@@ -9,6 +9,10 @@ exports.findAll = async (req, res) => {
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
+  Products.hasMany(GradeProdutos, {
+    foreignKey: "produto_id",
+  });
+
   let page = 0;
   if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
     page = pageAsNumber;
@@ -25,6 +29,13 @@ exports.findAll = async (req, res) => {
   }
 
   const productWithCount = await Products.findAndCountAll({
+    include: [
+      {
+        model: GradeProdutos,
+        required: false,
+        attributes: ["cores_id", "quantidade"],
+      },
+    ],
     limit: size,
     offset: page * size,
   });
@@ -73,6 +84,10 @@ exports.findAllGroup = async (req, res) => {
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
+  Products.hasMany(GradeProdutos, {
+    foreignKey: "produto_id",
+  });
+
   let page = 0;
   if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
     page = pageAsNumber;
@@ -93,6 +108,13 @@ exports.findAllGroup = async (req, res) => {
   });
 
   await Products.findAndCountAll({
+    include: [
+      {
+        model: GradeProdutos,
+        required: false,
+        attributes: ["cores_id", "quantidade"],
+      },
+    ],
     where: { grupo_format: id },
     limit: size,
     offset: page * size,
