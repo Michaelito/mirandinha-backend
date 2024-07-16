@@ -34,6 +34,7 @@ db.pedidos = require("./pedidos.model.js")(sequelize, Sequelize);
 db.pedidos_itens = require("./pedidos_itens.model.js")(sequelize, Sequelize);
 db.cores = require("./cores.model.js")(sequelize, Sequelize);
 db.produtos_grade = require("./produtos_grade.model.js")(sequelize, Sequelize);
+db.subgrupo = require("./subgrupo.model.js")(sequelize, Sequelize);
 
 db.michaelgrupos = require("./michaelgrupo.model.js")(sequelize, Sequelize);
 db.michaelprodutos = require("./michaelproduto.model.js")(sequelize, Sequelize);

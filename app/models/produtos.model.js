@@ -26,6 +26,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      aplicacao: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      video: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      manual_tecnico: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       grupo_format: {
         type: DataTypes.STRING,
         allowNull: true,

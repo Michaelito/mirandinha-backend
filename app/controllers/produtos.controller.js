@@ -2,7 +2,7 @@ const db = require("../models");
 const Products = db.produtos;
 const Estoque = db.estoque;
 const grupos = db.grupo_format;
-const GradeProdutos = db.produtos_grade
+const GradeProdutos = db.produtos_grade;
 const Op = db.Sequelize.Op;
 
 exports.findAll = async (req, res) => {
@@ -23,7 +23,7 @@ exports.findAll = async (req, res) => {
   ) {
     size = sizeAsNumber;
   }
-  
+
   const productWithCount = await Products.findAndCountAll({
     limit: size,
     offset: page * size,
