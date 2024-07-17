@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      qrcode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       grupo_format: {
         type: DataTypes.STRING,
         allowNull: true,
