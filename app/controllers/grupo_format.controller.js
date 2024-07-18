@@ -1,5 +1,6 @@
 const db = require("../models");
 const GrupoFormat = db.grupo_format;
+const SubGrupo = db.subgrupo;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 
@@ -43,7 +44,21 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  GrupoFormat.findAll({ where: {status: 1} })
+  GrupoFormat.hasMany(SubGrupo, {
+    foreignKey: "grupo_id",
+  });
+
+  GrupoFormat.findAll({
+    include: [
+      {
+        model: SubGrupo,
+        required: false,
+        attributes: [["id", "id_subgrupo"], "name"],
+      },
+    ],
+
+    where: { status: 1 },
+  })
     .then((data) => {
       res
         .send({
@@ -70,7 +85,19 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  GrupoFormat.findByPk(id)
+  GrupoFormat.hasMany(SubGrupo, {
+    foreignKey: "grupo_id",
+  });
+
+  GrupoFormat.findByPk(id, {
+    include: [
+      {
+        model: SubGrupo,
+        required: false,
+        attributes: [["id", "id_subgrupo"], "name"],
+      },
+    ],
+  })
     .then((data) => {
       res
         .send({
