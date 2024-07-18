@@ -40,6 +40,8 @@ exports.findAll = (req, res) => {
             "document",
             "type",
             "rg_ie",
+            "phone",
+            "cellphone",
             "birthdate",
             "createdAt",
           ],
@@ -113,6 +115,8 @@ exports.findOne = (req, res) => {
             "document",
             "type",
             "rg_ie",
+            "phone",
+            "cellphone",
             "birthdate",
             "createdAt",
           ],
@@ -190,7 +194,9 @@ exports.create = (req, res) => {
                 uuid: uuid(),
                 user_id: last_id,
                 document: req.body.document,
-                fullname: req.body.fullname
+                fullname: req.body.fullname,
+                phone: req.body.phone,
+                cellphone: req.body.cellphone
             };
 
             datausers.create(payload_data);
@@ -219,6 +225,8 @@ exports.update = (req, res) => {
         fullname: req.body.data_user.fullname,
         birthdate: req.body.data_user.birthdate,
         rg_ie: req.body.data_user.rg_ie,
+        phone: req.body.data_user.phone,
+        cellphone: req.body.data_user.cellphone,
       },
       // Define the condition for the update operation
       { where: { user_id: id } }
