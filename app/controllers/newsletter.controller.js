@@ -1,7 +1,7 @@
 const db = require("../models");
 const Newsletter = db.newsletter;
 const Op = db.Sequelize.Op;
-const { uuid } = require('uuidv4');
+const { uuid } = require("uuidv4");
 
 // Create and Save a new Newsletter
 exports.create = (req, res) => {
@@ -87,3 +87,58 @@ exports.findOne = (req, res) => {
     });
 };
 
+// Update a Data by the id in the request
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  Newsletter.update(req.body, {
+    where: { id: id },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.status(200).send({
+          status: true,
+          message: "Data was updated successfully.",
+        });
+      } else {
+        res.status(200).send({
+          status: true,
+          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: false,
+        message: "Error updating Data with id=" + id,
+      });
+    });
+};
+
+// Delete a Data with the specified id in the request
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Newsletter.destroy({
+    where: { id: id },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.status(200).send({
+          status: true,
+          message: "Data was deleted successfully!",
+        });
+      } else {
+        res.status(200).send({
+          status: true,
+          message: `Cannot delete Data with id=${id}. Maybe Data was not found!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: false,
+        message: "Could not delete Data with id=" + id,
+      });
+    });
+};
