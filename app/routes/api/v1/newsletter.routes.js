@@ -13,5 +13,11 @@ module.exports = (app) => {
   // Retrieve a single Data with id
   router.get("/:id", controller.findOne);
 
+    // Update a Data with id
+    router.put("/:id", controller.update);
+
+    // Delete a Data with id
+    router.delete("/:id", controller.delete);
+
   app.use("/api/v1/newsletter", router);
 };
