@@ -7,7 +7,11 @@ module.exports = (app) => {
 
   var router = require("express").Router();
 
+  
+  router.get("/", controller.findAll);
+
   router.post("/", controller.create);
+
 
   app.use("/api/v1/michael/pedidos", router);
 };
