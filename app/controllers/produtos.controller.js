@@ -1,7 +1,5 @@
 const db = require("../models");
 const Products = db.produtos;
-const ProdutosGrade = db.produtos_grade;
-const Estoque = db.estoque;
 const grupos = db.grupo_format;
 const GradeProdutos = db.produtos_grade;
 const Op = db.Sequelize.Op;
@@ -162,24 +160,35 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
   const id = req.params.id;
 
+  const produtos_grade = req.body.produtos_grade;
+
   Products.update(req.body, {
     where: { id: id },
   })
     .then((num) => {
-      if (num == 1) {
+      //if (num == 1) {
        
-        ProdutosGrade.update(req.body.produtos_grade, {
-          where: { produto_id: id },
-        })
+        // GradeProdutos.update(req.body.produtos_grade, {
+        //   where: { produto_id: id },
+        // })
+
+        GradeProdutos.upsert({
+            produto_id: id,
+            cor_id: produtos_grade.cor_id,
+            cor: produtos_grade.cor,
+            hexadecimal: produtos_grade.hexadecimal,
+            img: produtos_grade.img,
+            quantidade: 0
+        });
        
         res.send({
           message: "Data was updated successfully.",
         });
-      } else {
-        res.send({
-          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
-        });
-      }
+      // } else {
+      //   res.send({
+      //     message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+      //   });
+      // }
     })
     .catch((err) => {
       res.status(500).send({

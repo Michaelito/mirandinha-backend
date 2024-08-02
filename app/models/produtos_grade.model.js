@@ -1,14 +1,15 @@
 module.exports = (Sequelize, DataTypes) => {
-
-    const produtos_grade = Sequelize.define('produtos_grade', {
+  const produtos_grade = Sequelize.define(
+    "produtos_grade",
+    {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       uuid: {
         type: DataTypes.STRING(36),
-        allowNull: false
+        allowNull: false,
       },
       produto_id: {
         type: DataTypes.INTEGER,
@@ -23,11 +24,11 @@ module.exports = (Sequelize, DataTypes) => {
       },
       hexadecimal: {
         type: DataTypes.STRING(50),
-        allowNull: false
+        allowNull: false,
       },
       img: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
       },
       quantidade: {
         type: DataTypes.INTEGER,
@@ -35,16 +36,23 @@ module.exports = (Sequelize, DataTypes) => {
       status: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
-        allowNull: false
+        allowNull: false,
       },
       deletedAt: {
         type: DataTypes.DATE,
         allowNull: true,
         defaultValue: null,
       },
-    });
+    },
+    {
+      // Other model options go here
+      timestamps: false,
 
-   
-    return produtos_grade;
-  };
-  
+      createdAt: false,
+
+      updatedAt: false,
+    }
+  );
+
+  return produtos_grade;
+};

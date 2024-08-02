@@ -2,17 +2,16 @@ const dbConfig = require("../config/db.config.js");
 
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-    host: dbConfig.HOST,
-    dialect: dbConfig.dialect,
-    operatorsAliases: false,
-    logging: false,
+  host: dbConfig.HOST,
+  dialect: dbConfig.dialect,
+  logging: false,
 
-    pool: {
-        max: dbConfig.pool.max,
-        min: dbConfig.pool.min,
-        acquire: dbConfig.pool.acquire,
-        idle: dbConfig.pool.idle
-    }
+  pool: {
+    max: dbConfig.pool.max,
+    min: dbConfig.pool.min,
+    acquire: dbConfig.pool.acquire,
+    idle: dbConfig.pool.idle,
+  },
 });
 
 const db = {};
@@ -41,6 +40,9 @@ db.newsletter = require("./newsletter.model.js")(sequelize, Sequelize);
 db.michaelgrupos = require("./michaelgrupo.model.js")(sequelize, Sequelize);
 db.michaelprodutos = require("./michaelproduto.model.js")(sequelize, Sequelize);
 db.michaelpedidos = require("./michaelpedidos.model.js")(sequelize, Sequelize);
-db.michaelpedido_itens = require("./michaelpedido_itens.model.js")(sequelize, Sequelize);
+db.michaelpedido_itens = require("./michaelpedido_itens.model.js")(
+  sequelize,
+  Sequelize
+);
 
 module.exports = db;
