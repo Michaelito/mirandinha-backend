@@ -1,5 +1,6 @@
 const db = require("../models");
 const Products = db.produtos;
+const ProdutosGrade = db.produtos_grade;
 const Estoque = db.estoque;
 const grupos = db.grupo_format;
 const GradeProdutos = db.produtos_grade;
@@ -52,32 +53,6 @@ exports.findAll = async (req, res) => {
   });
 };
 
-// exports.findAllGroup = async (req, res) => {
-
-//     const id = req.params.id;
-
-//     Products.findAll({ where: {grupo_format: id} })
-//     .then((data) => {
-//       res
-//         .send({
-//           status: true,
-//           message: "The request has succeeded",
-//           data: {
-//             products: data,
-//           },
-//         })
-//         .status(200);
-//     })
-//     .catch((err) => {
-//       res
-//         .send({
-//           status: false,
-//           message: "The request has not succeeded",
-//           data: null,
-//         })
-//         .status(500);
-//     });
-// };
 
 exports.findAllGroup = async (req, res) => {
   console.log('products all group/id')
@@ -187,11 +162,18 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
   const id = req.params.id;
 
+
+
   Products.update(req.body, {
     where: { id: id },
   })
     .then((num) => {
       if (num == 1) {
+       
+        ProdutosGrade.update(req.body.produtos_grade, {
+          where: { produto_id: id },
+        })
+       
         res.send({
           message: "Data was updated successfully.",
         });

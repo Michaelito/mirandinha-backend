@@ -10,7 +10,7 @@ exports.create = (req, res) => {
   const payload = {
     uuid: uuid(),
     produto_id: req.body.produto_id,
-    cores: req.body.cores,
+    cor: req.body.cor,
     hexadecimal: req.body.hexadecimal,
     img: req.body.img,
     quantidade: req.body.quantidade,
