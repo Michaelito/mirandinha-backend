@@ -34,7 +34,7 @@ exports.findAll = async (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cor", "hexadecimal", "img", "quantidade"],
+        attributes: ["cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
     limit: size,
@@ -89,7 +89,7 @@ exports.findAllGroup = async (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cor", "hexadecimal", "img", "quantidade"]
+        attributes: ["cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
     where: { grupo_format: id },
@@ -137,7 +137,7 @@ exports.findOne = (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cor", "hexadecimal", "img", "quantidade"],
+        attributes: ["cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
   })
@@ -161,8 +161,6 @@ exports.findOne = (req, res) => {
 // Update a Data by the id in the request
 exports.update = (req, res) => {
   const id = req.params.id;
-
-
 
   Products.update(req.body, {
     where: { id: id },

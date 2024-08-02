@@ -14,9 +14,12 @@ module.exports = (Sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         foreignKey: true,
       },
+      cor_id: {
+        type: DataTypes.INTEGER(2),
+        foreignKey: true,
+      },
       cor: {
         type: DataTypes.STRING(50),
-        foreignKey: true,
       },
       hexadecimal: {
         type: DataTypes.STRING(50),
