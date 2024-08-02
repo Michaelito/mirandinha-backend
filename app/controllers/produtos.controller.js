@@ -80,6 +80,8 @@ exports.findAll = async (req, res) => {
 // };
 
 exports.findAllGroup = async (req, res) => {
+  console.log('products all group/id')
+  
   const id = req.params.id;
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -106,7 +108,7 @@ exports.findAllGroup = async (req, res) => {
   const grupo = await grupos.findOne({
     where: { id: id },
   });
-
+  
   await Products.findAndCountAll({
     include: [
       {
@@ -127,7 +129,8 @@ exports.findAllGroup = async (req, res) => {
           limit: size,
           page: page,
           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
-          grupo: grupo.nome,
+          grupo: grupo.name,
+          subgrupo: grupo.name,
           data: {
             products: productWithCount.rows,
           },
@@ -159,7 +162,7 @@ exports.findOne = (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cores_id", "quantidade"],
+        attributes: ["cor", "hexadecimal", "img", "quantidade"],
       },
     ],
   })

@@ -14,9 +14,17 @@ module.exports = (Sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         foreignKey: true,
       },
-      cores_id: {
-        type: DataTypes.INTEGER,
+      cor: {
+        type: DataTypes.STRING(50),
         foreignKey: true,
+      },
+      hexadecimal: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+      },
+      img: {
+        type: DataTypes.TEXT,
+        allowNull: false
       },
       quantidade: {
         type: DataTypes.INTEGER,

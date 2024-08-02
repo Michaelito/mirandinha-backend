@@ -14,8 +14,8 @@ module.exports = (app) => {
   // Retrieve a single Data with id
   router.get("/:id", controller.findOne);
 
-    // Update a Data with id
-    router.put("/:id", controller.update);
+  // Update a Data with id
+  router.put("/:id", controller.update);
 
   app.use("/api/v1/produtos", router);
 };

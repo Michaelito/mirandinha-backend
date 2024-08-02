@@ -5,19 +5,14 @@ const { uuid } = require("uuidv4");
 
 // Create and Save a new Data
 exports.create = (req, res) => {
-  // Validate request
-  if (!req.body.cores_id) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-    });
-    return;
-  }
 
   // Create a Data
   const payload = {
     uuid: uuid(),
     produto_id: req.body.produto_id,
-    cores_id: req.body.cores_id,
+    cores: req.body.cores,
+    hexadecimal: req.body.hexadecimal,
+    img: req.body.img,
     quantidade: req.body.quantidade,
   };
 
