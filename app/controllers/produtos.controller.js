@@ -32,7 +32,7 @@ exports.findAll = async (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cor_id", "cor", "hexadecimal", "img", "quantidade"],
+        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
     limit: size,
@@ -87,7 +87,7 @@ exports.findAllGroup = async (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cor_id", "cor", "hexadecimal", "img", "quantidade"],
+        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
     where: { grupo_format: id },
@@ -135,7 +135,7 @@ exports.findOne = (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["cor_id", "cor", "hexadecimal", "img", "quantidade"],
+        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
   })
