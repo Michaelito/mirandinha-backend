@@ -1,11 +1,10 @@
 const db = require("../models");
-const Cores = db.produtos_grade;
+const ProdutosGrade = db.produtos_grade;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 
 // Create and Save a new Data
 exports.create = (req, res) => {
-
   // Create a Data
   const payload = {
     uuid: uuid(),
@@ -18,9 +17,13 @@ exports.create = (req, res) => {
   };
 
   // Save Data in the database
-  Cores.create(payload)
+  ProdutosGrade.create(payload)
     .then((data) => {
-      res.send(data);
+      res.send({
+        status: true,
+        message: "Data was updated successfully.",
+        produto_grade: data,
+      });
     })
     .catch((err) => {
       res.status(500).send({
@@ -40,7 +43,7 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  Cores.findAll({ where: condition })
+  ProdutosGrade.findAll({ where: condition })
     .then((data) => {
       res
         .send({
@@ -67,7 +70,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Cores.findByPk(id)
+  ProdutosGrade.findByPk(id)
     .then((data) => {
       res.send(data);
     })
@@ -79,28 +82,62 @@ exports.findOne = (req, res) => {
 };
 
 // Update a Data by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
+  console.log("Update Grade");
+
   const id = req.params.id;
 
-  Cores.update(req.body, {
+  const checDataExists = await ProdutosGrade.findOne({
     where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.send({
-          message: "Data was updated successfully.",
-        });
-      } else {
-        res.send({
-          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
-        });
-      }
+  });
+
+  if (checDataExists) {
+    ProdutosGrade.update(req.body, {
+      where: { id: id },
     })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error updating Data with id=" + id,
+      .then((num) => {
+        if (num == 1) {
+          res.send({
+            message: "Data was updated successfully.",
+          });
+        } else {
+          res.send({
+            message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+          });
+        }
+      })
+      .catch((err) => {
+        res.status(500).send({
+          message: "Error updating Data with id=" + id,
+        });
       });
-    });
+  } else {
+    const payload = {
+      uuid: uuid(),
+      produto_id: req.body.produto_id,
+      cor_id: req.body.cor_id,
+      cor: req.body.cor,
+      hexadecimal: req.body.hexadecimal,
+      img: req.body.img,
+      quantidade: req.body.quantidade,
+    };
+
+    // Save Data in the database
+    ProdutosGrade.create(payload)
+      .then((data) => {
+        res.send({
+          status: true,
+          message: "Data was updated successfully.",
+          produto_grade: data,
+        });
+      })
+      .catch((err) => {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred while creating the Data.",
+        });
+      });
+  }
 };
 
 // Delete a Data with the specified id in the request

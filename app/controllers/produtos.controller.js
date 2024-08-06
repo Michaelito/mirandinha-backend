@@ -160,35 +160,19 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
   const id = req.params.id;
 
-  const produtos_grade = req.body.produtos_grade;
-
-  Products.update(req.body, {
-    where: { id: id },
+  Products.upsert(req.body, {
+    where: { produto_id: id },
   })
     .then((num) => {
-      //if (num == 1) {
-       
-        // GradeProdutos.update(req.body.produtos_grade, {
-        //   where: { produto_id: id },
-        // })
-
-        GradeProdutos.upsert({
-            produto_id: id,
-            cor_id: produtos_grade.cor_id,
-            cor: produtos_grade.cor,
-            hexadecimal: produtos_grade.hexadecimal,
-            img: produtos_grade.img,
-            quantidade: 0
-        });
-       
+      if (num == 1) {
         res.send({
           message: "Data was updated successfully.",
         });
-      // } else {
-      //   res.send({
-      //     message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
-      //   });
-      // }
+      } else {
+        res.send({
+          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+        });
+      }
     })
     .catch((err) => {
       res.status(500).send({
