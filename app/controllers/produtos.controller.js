@@ -1,3 +1,4 @@
+const { or } = require("sequelize");
 const db = require("../models");
 const Products = db.produtos;
 const grupos = db.grupo_format;
@@ -91,6 +92,7 @@ exports.findAllGroup = async (req, res) => {
       },
     ],
     where: { grupo_format: id },
+    order : [["id", "ASC"]],
     limit: size,
     offset: page * size,
   })
