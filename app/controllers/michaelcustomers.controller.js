@@ -67,7 +67,29 @@ exports.findAll = (req, res) => {
       }
     : null;
 
-  Customers.findAll({ where: condition })
+  Customers.hasMany(Customers_address, {
+    foreignKey: "customers_id",
+  });
+
+  Customers.findAll({
+    include: [
+      {
+        model: Customers_address,
+        required: false,
+        attributes: [
+          "phone",
+          "zip",
+          "street",
+          "number",
+          "complement",
+          "city",
+          "neighborhood",
+          "reference",
+        ],
+      },
+    ],
+    where: condition,
+  })
     .then((data) => {
       res.send({
         status: true,
@@ -90,7 +112,28 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Customers.findByPk(id)
+  Customers.hasMany(Customers_address, {
+    foreignKey: "customers_id",
+  });
+
+  Customers.findByPk(id, {
+    include: [
+      {
+        model: Customers_address,
+        required: false,
+        attributes: [
+          "phone",
+          "zip",
+          "street",
+          "number",
+          "complement",
+          "city",
+          "neighborhood",
+          "reference",
+        ],
+      },
+    ],
+  })
     .then((data) => {
       res.send({
         status: true,
