@@ -40,9 +40,8 @@ db.newsletter = require("./newsletter.model.js")(sequelize, Sequelize);
 db.michaelgrupos = require("./michaelgrupo.model.js")(sequelize, Sequelize);
 db.michaelprodutos = require("./michaelproduto.model.js")(sequelize, Sequelize);
 db.michaelpedidos = require("./michaelpedidos.model.js")(sequelize, Sequelize);
-db.michaelpedido_itens = require("./michaelpedido_itens.model.js")(
-  sequelize,
-  Sequelize
-);
+db.michaelpedido_itens = require("./michaelpedido_itens.model.js")(sequelize, Sequelize);
+db.michaelcustomers = require("./michaelcustomers.model.js")(sequelize, Sequelize);
+db.michael_customers_address = require("./michaelcustomers_address.model.js")(sequelize, Sequelize);
 
 module.exports = db;

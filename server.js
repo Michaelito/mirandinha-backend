@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const http = require('http');
 const debug = require('debug')('nodestr:server');
-const { uuid } = require('uuidv4');
 const db = require("./app/models");
 
 
@@ -78,6 +77,8 @@ require("./app/routes/api/v1/newsletter.routes")(app);
 require("./app/routes/api/v1/michaelgrupo.routes")(app);
 require("./app/routes/api/v1/michaelproduto.routes")(app);
 require("./app/routes/api/v1/michaelpedido.routes")(app);
+require("./app/routes/api/v1/michaelcustomers.routes")(app);
+require("./app/routes/api/v1/michaelcustomers_address.routes")(app);
 
 
 
