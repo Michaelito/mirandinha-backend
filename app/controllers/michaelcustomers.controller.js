@@ -23,7 +23,7 @@ exports.create = (req, res) => {
       const json_customers_address = {
         uuid: uuidv4(),
         enterprise_id: req.body.address.enterprise_id,
-        customers_id: customer_id ,
+        customers_id: customer_id,
         delivery_id: req.body.address.delivery_id,
         phone: req.body.address.phone,
         zip: req.body.address.zip,
@@ -36,8 +36,6 @@ exports.create = (req, res) => {
       };
 
       Customers_address.create(json_customers_address);
-
-      
 
       // Create a customers address
 
@@ -71,24 +69,20 @@ exports.findAll = (req, res) => {
 
   Customers.findAll({ where: condition })
     .then((data) => {
-      res
-        .send({
-          status: true,
-          message: "The request has succeeded",
-          data: {
-            tutorial: data,
-          },
-        })
-        .status(200);
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          customers: data,
+        },
+      });
     })
     .catch((err) => {
-      res
-        .send({
-          status: false,
-          message: "The request has not succeeded",
-          data: null,
-        })
-        .status(500);
+      res.send({
+        status: false,
+        message: "The request has not succeeded",
+        data: null,
+      });
     });
 };
 
@@ -98,10 +92,17 @@ exports.findOne = (req, res) => {
 
   Customers.findByPk(id)
     .then((data) => {
-      res.send(data);
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          customers: data,
+        },
+      });
     })
     .catch((err) => {
       res.status(500).send({
+        status: false,
         message: "Error retrieving Data with id=" + id,
       });
     });
@@ -117,6 +118,7 @@ exports.update = (req, res) => {
     .then((num) => {
       if (num == 1) {
         res.send({
+          status: true,
           message: "Customers was updated successfully.",
         });
       } else {
@@ -127,6 +129,7 @@ exports.update = (req, res) => {
     })
     .catch((err) => {
       res.status(500).send({
+        status: false,
         message: "Error updating Customers with id=" + id,
       });
     });
