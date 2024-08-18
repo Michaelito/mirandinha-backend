@@ -158,17 +158,32 @@ exports.update = (req, res) => {
   Customers.update(req.body, {
     where: { id: id },
   })
-    .then((num) => {
-      if (num == 1) {
-        res.send({
-          status: true,
-          message: "Customers was updated successfully.",
-        });
-      } else {
-        res.send({
-          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
-        });
-      }
+    .then((data) => {
+
+      Customers_address.update(req.body.address, {
+        where: { customers_id: id },
+      })
+
+      res.send({
+        status: true,
+        message: "Customers was updated successfully.",
+        data: {
+          customers: data,
+        },
+      });
+
+
+
+      // if (num == 1) {
+      //   res.send({
+      //     status: true,
+      //     message: "Customers was updated successfully.",
+      //   });
+      // } else {
+      //   res.send({
+      //     message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+      //   });
+      // }
     })
     .catch((err) => {
       res.status(500).send({
