@@ -46,7 +46,7 @@ exports.findAll = (req, res) => {
         status: true,
         message: "The request has succeeded",
         data: {
-          pedido: data,
+          pedidos: data,
         },
       });
     })
