@@ -3,8 +3,7 @@ const users = db.users;
 const datausers = db.data_users;
 const address_users = db.address_users;
 const Op = db.Sequelize.Op;
-const { uuid } = require('uuidv4');
-
+const { uuid } = require("uuidv4");
 
 // Create and Save a new Tutorial
 
@@ -159,78 +158,71 @@ exports.findOne = (req, res) => {
 
 // Create and Save a new User
 exports.create = (req, res) => {
-    // Validate request
-    if (!req.body.login) {
-        res.status(400).send({
-            message: "Content can not be empty!"
-        });
-        return;
-    }
+  // Validate request
+  if (!req.body.login) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+    return;
+  }
 
-    const crypto = require('crypto');
+  const crypto = require("crypto");
 
-    // Create an MD5 hash object
-    const md5Hash = crypto.createHash('md5');
+  // Create an MD5 hash object
+  const md5Hash = crypto.createHash("md5");
 
-    // Update the hash object with the password
-    md5Hash.update(req.body.password);
+  // Update the hash object with the password
+  md5Hash.update(req.body.password);
 
-    // Get the hexadecimal representation of the hash
-    const password_md5 = md5Hash.digest('hex');
+  // Get the hexadecimal representation of the hash
+  const password_md5 = md5Hash.digest("hex");
 
-    const payload = {
+  const payload = {
+    uuid: uuid(),
+    login: req.body.login,
+    password: req.body.password
+      ? password_md5
+      : "25d55ad283aa400af464c76d713c07ad",
+    profile: req.body.profile,
+  };
+
+  // Save Tutorial in the database
+  users
+    .create(payload)
+    .then((data) => {
+      last_id = data.id;
+      const payload_data = {
         uuid: uuid(),
-        login: req.body.login,
-        password: req.body.password ? password_md5 : '25d55ad283aa400af464c76d713c07ad',
-        profile: req.body.profile
-    };
+        user_id: last_id,
+        document: req.body.document,
+        fullname: req.body.fullname,
+        phone: req.body.phone,
+        cellphone: req.body.cellphone,
+      };
 
-    // Save Tutorial in the database
-    users.create(payload)
-        .then(data => {
-           
-            last_id = data.id
-            const payload_data = {
-                uuid: uuid(),
-                user_id: last_id,
-                document: req.body.document,
-                fullname: req.body.fullname,
-                phone: req.body.phone,
-                cellphone: req.body.cellphone
-            };
+      datausers.create(payload_data);
+      res.send(data);
+    })
 
-            datausers.create(payload_data);
-            res.send(data);
-        })
-
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating data."
-            });
-        });
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating data.",
+      });
+    });
 };
 // Update User in database
 exports.update = (req, res) => {
   const id = req.params.id;
 
   try {
-    users.update(req.body, {
-      where: { id: id },
-    });
+    // users.update(req.body, {
+    //   where: { id: id },
+    // });
 
     // Update records with a specific condition
-    datausers.update(
-      // Set the values you want to update
-      {
-        fullname: req.body.data_user.fullname,
-        birthdate: req.body.data_user.birthdate,
-        rg_ie: req.body.data_user.rg_ie,
-        phone: req.body.data_user.phone,
-        cellphone: req.body.data_user.cellphone,
-      },
-      // Define the condition for the update operation
-      { where: { user_id: id } }
-    );
+    datausers.update(req.body, {
+      where: { user_id: id },
+    });
 
     res.send({
       message: "Data was updated successfully.",

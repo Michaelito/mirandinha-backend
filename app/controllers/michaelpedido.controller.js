@@ -58,7 +58,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const pedido_id = req.params.id;
 
-  PedidoItens.findAll({where: {pedido_id: pedido_id}})
+  PedidoItens.findAll({ where: { pedido_id: pedido_id } })
     .then((data) => {
       res.status(200).send({
         status: true,
@@ -78,17 +78,11 @@ exports.findOne = (req, res) => {
 
 // Create and Save a new Data
 exports.create = (req, res) => {
-  const clientebody = req.body.cliente;
-
   const pedidobody = req.body.pedido;
 
   const payloadPedido = {
     uuid: uuid(),
-    cliente: clientebody.nome,
-    celular: clientebody.celular,
-    valor_desconto: pedidobody.valor_desconto,
-    valor_total: pedidobody.valor_total,
-    obs: pedidobody.obs,
+    ...pedidobody,
   };
 
   Pedidos.create(payloadPedido)
