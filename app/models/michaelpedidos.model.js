@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         primaryKey: true,
       },
+      uuid: {
+        type: DataTypes.STRING(36),
+        allowNull: false,
+      },
       id_periodo: {
         type: DataTypes.INTEGER,
       },
@@ -55,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       etapa: {
         type: DataTypes.INTEGER,
+        comment: "0= Aberto 1, 2=Produção, 3=Despacho, 4=Entrega, 5=Retorno Entrega, = 6=Cancelado",
       },
       data_hora_confirmacao: {
         type: DataTypes.DATE,

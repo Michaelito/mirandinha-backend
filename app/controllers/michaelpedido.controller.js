@@ -1,40 +1,45 @@
 const db = require("../models");
 const Pedidos = db.michaelpedidos;
 const PedidoItens = db.michaelpedido_itens;
+
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 
 // Retrieve all Tutorials from the database.
 exports.findAll = (req, res) => {
-  const cliente = req.query.cliente;
-  var condition = cliente
+  const id_cliente = req.query.id_cliente;
+  var condition = id_cliente
     ? {
-        cliente: {
-          [Op.like]: `%${cliente}%`,
+        id_cliente: {
+          [Op.like]: `%${id_cliente}%`,
         },
       }
     : null;
 
-  // Pedidos.hasMany(PedidoItens, {
-  //   foreignKey: "pedido_id",
-  // });
+  Pedidos.hasMany(PedidoItens, {
+    foreignKey: "pedido_id",
+  });
+  
+  Pedidos.hasMany(PedidoItens, {
+    foreignKey: "pedido_id",
+  });
 
   Pedidos.findAll({
     where: condition,
-    // include: [
-    //   {
-    //     model: PedidoItens,
-    //     required: false,
-    //     attributes: [
-    //       "produto",
-    //       "qtde",
-    //       "valor_unitario",
-    //       "valor_desconto",
-    //       "valor_total",
-    //       "obs",
-    //     ],
-    //   },
-    // ],
+    include: [
+      {
+        model: PedidoItens,
+        required: false,
+        attributes: [
+          "produto",
+          "qtde",
+          "valor_unitario",
+          "valor_desconto",
+          "valor_total",
+          "obs",
+        ],
+      },
+    ],
   })
     .then((data) => {
       res.status(200).send({
@@ -78,10 +83,22 @@ exports.findOne = (req, res) => {
 
 // Create and Save a new Data
 exports.create = (req, res) => {
-  const pedidobody = req.body.pedido;
+  const pedidobody = req.body;
+
+  const currentDate = new Date(); // Get the current date and time
+
+  // Adjust for timezone offset (-3 hours)
+  const timezoneOffset = -3 * 60; // Convert hours to minutes
+  const adjustedDate = new Date(
+    currentDate.getTime() + timezoneOffset * 60 * 1000
+  );
+
+  const etapa = req.body.id_cliente_endereco == null ? 0 : 1;
 
   const payloadPedido = {
     uuid: uuid(),
+    data_pedido: adjustedDate,
+    etapa: etapa,
     ...pedidobody,
   };
 
