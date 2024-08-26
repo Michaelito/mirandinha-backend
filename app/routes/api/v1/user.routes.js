@@ -16,6 +16,9 @@ module.exports = app => {
 
     // Create a new data
     router.post("/", controller.create);
+    
+    // Create a new data
+    router.post("/update_password", controller.update_password);
 
     // Update a data with id
     router.put("/:id", controller.update);

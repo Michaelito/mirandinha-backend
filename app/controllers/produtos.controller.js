@@ -91,7 +91,7 @@ exports.findAllGroup = async (req, res) => {
         attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
-    where: { grupo_format: id },
+    where: { id_grupo1: id },
     order : [["id", "ASC"]],
     limit: size,
     offset: page * size,

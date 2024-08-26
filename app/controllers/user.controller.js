@@ -190,7 +190,10 @@ exports.create = (req, res) => {
   users
     .create(payload)
     .then((data) => {
-      last_id = data.id;
+      const last_id = data.id;
+
+      const type = req.body.document > 11 ? 1 : 2;
+
       const payload_data = {
         uuid: uuid(),
         user_id: last_id,
@@ -198,6 +201,8 @@ exports.create = (req, res) => {
         fullname: req.body.fullname,
         phone: req.body.phone,
         cellphone: req.body.cellphone,
+        type: type,
+        birthdate: req.body.birthdate,
       };
 
       datausers.create(payload_data);
@@ -210,6 +215,63 @@ exports.create = (req, res) => {
       });
     });
 };
+
+exports.update_password = async (req, res) => {
+  
+  res.send({
+    message: "Data was updated successfully.",
+  });
+
+  // const crypto = require("crypto");
+
+  // // Create an MD5 hash object
+  // const md5Hash = crypto.createHash("md5");
+
+  // // Update the hash object with the password
+  // md5Hash.update(req.body.pass_old);
+
+  // // Get the hexadecimal representation of the hash
+  // const password_old = md5Hash.digest("hex");
+
+  // const verify_user = await users.findOne({
+  //   where: { uuid: req.body.uuid, password: password_old },
+  // });
+
+  // if (!verify_user) {
+  //   res.status(500).send({
+  //     message: err.message || "Data not found.",
+  //   });
+  // }
+
+  // // Update the hash object with the password
+  // md5Hash.update(req.body.pass_new);
+
+  // // Get the hexadecimal representation of the hash
+  // const password_new = md5Hash.digest("hex");
+
+  // const payload = {
+  //   uuid: uuid(),
+  //   login: req.body.login,
+  //   password: password_new,
+  //   profile: req.body.profile,
+  // };
+
+  // // Save Tutorial in the database
+  // users
+  //   .create(payload)
+  //   .then((data) => {
+  //     res.send({
+  //       message: "Data was updated successfully.",
+  //     });
+  //   })
+
+  //   .catch((err) => {
+  //     res.status(500).send({
+  //       message: err.message || "Some error occurred while creating data.",
+  //     });
+  //   });
+};
+
 // Update User in database
 exports.update = (req, res) => {
   const id = req.params.id;
