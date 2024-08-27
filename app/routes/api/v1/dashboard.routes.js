@@ -4,8 +4,8 @@ module.exports = (app) => {
 
   var router = require("express").Router();
 
-  // Retrieve all controller
-  router.post("/", controller.findAll);
+  // Retrieve a single data with id
+  router.get("/:id", controller.findOne);
 
   app.use("/api/v1/dashboard", router);
 };

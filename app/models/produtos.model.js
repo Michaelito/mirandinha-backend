@@ -1,4 +1,3 @@
-const { grupo_format } = require(".");
 
 module.exports = (sequelize, DataTypes) => {
 
@@ -114,6 +113,7 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: false,
     }
   );
+
 
   return produtos;
 };

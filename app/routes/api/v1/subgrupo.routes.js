@@ -4,12 +4,7 @@ module.exports = (app) => {
 
   var router = require("express").Router();
 
-  // Retrieve all controller
-  router.get("/", controller.findAll);
-
-  router.get("/", controller.findOne);
-
-  router.post("/", controller.create);
+  router.get("/:id", controller.findOne);
 
   app.use("/api/v1/subgrupo", router);
 };

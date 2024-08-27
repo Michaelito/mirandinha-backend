@@ -4,8 +4,8 @@ const Pedidos = db.pedidos;
 const { fn, col, Op } = require("sequelize");
 
 // Retrieve all GrupoFormats from the database.
-exports.findAll = async (req, res) => {
-  const id = req.body.id;
+exports.findOne = async (req, res) => {
+  const id = req.params.id;
 
   try {
     // Consulta para somar quantidade e soma total por mês e ano
@@ -27,25 +27,23 @@ exports.findAll = async (req, res) => {
       order: [[fn("DATE_FORMAT", col("createdAt"), "%Y-%m"), "ASC"]],
     });
 
-    // Verifica se a contagem de pedidos é zero
+    // Validate if there are any records in resultPedidos
     if (resultPedidos.length === 0) {
+      // If no records were found, send a "No records" response
+      return res
+        .status(404)
+        .json({ message: "No orders found for this user." });
+    } else {
+      // Enviando resposta com os dados de pedidos
       res.status(200).send({
         status: true,
-        message: "Data not found"
+        message: "The request has succeeded",
+        data: {
+          dashboard: resultPedidos,
+        },
       });
     }
-
-    // Enviando resposta com os dados de pedidos
-    res.status(200).send({
-      status: true,
-      message: "The request has succeeded",
-      data: {
-        dashboard: resultPedidos,
-      },
-    });
   } catch (error) {
-    console.error("Erro ao buscar dados dos pedidos:", error);
-
     // Enviando resposta de erro
     res.status(500).send({
       status: false,

@@ -91,7 +91,7 @@ exports.findAllGroup = async (req, res) => {
         attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
       },
     ],
-    where: { id_grupo1: id },
+    where: { grupo_format: id },
     order : [["id", "ASC"]],
     limit: size,
     offset: page * size,
@@ -106,6 +106,78 @@ exports.findAllGroup = async (req, res) => {
           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
           grupo: grupo.name,
           subgrupo: grupo.name,
+          data: {
+            products: productWithCount.rows,
+          },
+        });
+      } else {
+        res.send({
+          status: true,
+          message: `Cannot localizar Data with id=${id}. Maybe Data was not found or empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error Data with id=" + id,
+      });
+    });
+};
+
+exports.findAllSubGroup = async (req, res) => {
+  console.log('products all subgroup/id')
+  
+  const id = req.params.id;
+  const pageAsNumber = Number.parseInt(req.query.page);
+  const sizeAsNumber = Number.parseInt(req.query.size);
+
+  Products.hasMany(GradeProdutos, {
+    foreignKey: "produto_id",
+  });
+
+  let page = 0;
+  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+    page = pageAsNumber;
+  }
+
+  let size = 20;
+
+  if (
+    !Number.isNaN(sizeAsNumber) &&
+    !(sizeAsNumber > 50) &&
+    !(sizeAsNumber < 1)
+  ) {
+    size = sizeAsNumber;
+  }
+
+  // const grupo = await grupos.findOne({
+  //   where: { id: id },
+  // });
+  
+  await Products.findAndCountAll({
+    include: [
+      {
+        model: GradeProdutos,
+        required: false,
+        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
+      },
+    ],
+    where: { id_grupo1: id },
+    order : [["id", "ASC"]],
+    limit: size,
+    offset: page * size,
+  })
+    .then((productWithCount) => {
+      if (productWithCount.count >= 1) {
+        res.send({
+          status: true,
+          message: "The request has succeeded",
+          limit: size,
+          logging: console.log, 
+          page: page,
+          totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
+          // grupo: grupo.name,
+          // subgrupo: grupo.name,
           data: {
             products: productWithCount.rows,
           },
