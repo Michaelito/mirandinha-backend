@@ -19,7 +19,7 @@ exports.findOne = async (req, res) => {
     status: true,
     message: "The request has succeeded",
     data: {
-      dashboard: results,
+      subgrupos: results,
     },
   });
 };
