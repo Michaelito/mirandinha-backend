@@ -2,6 +2,7 @@ const { or } = require("sequelize");
 const db = require("../models");
 const Products = db.produtos;
 const grupos = db.grupo_format;
+const grupo_geral = db.grupo;
 const GradeProdutos = db.produtos_grade;
 const Op = db.Sequelize.Op;
 
@@ -150,9 +151,17 @@ exports.findAllSubGroup = async (req, res) => {
     size = sizeAsNumber;
   }
 
-  // const grupo = await grupos.findOne({
-  //   where: { id: id },
-  // });
+  const produtosresult = await Products.findOne({
+    where: { id_grupo1: id },
+  });
+
+  const grupo_nome = await grupos.findOne({
+    where: { id: produtosresult.grupo_format },
+  });
+
+  const subgrupo_nome = await grupo_geral.findOne({
+    where: { id: produtosresult.id_grupo1 },
+  });
   
   await Products.findAndCountAll({
     include: [
@@ -176,8 +185,8 @@ exports.findAllSubGroup = async (req, res) => {
           logging: console.log, 
           page: page,
           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
-          // grupo: grupo.name,
-          // subgrupo: grupo.name,
+          grupo: grupo_nome.name,
+          subgrupo: subgrupo_nome.nome,
           data: {
             products: productWithCount.rows,
           },
