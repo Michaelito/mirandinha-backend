@@ -5,7 +5,9 @@ const sequelize = require("../config/database");
 
 // Find a single Data with an id
 exports.findOne = async (req, res) => {
-  const id = req.params.id;
+
+  // Verifica se o parâmetro id é fornecido e válido, caso contrário, define como 1
+  const id = req.params.id ? req.params.id : 394;
 
   const results = await sequelize.query(
     "SELECT  DISTINCT g.id, g.nome nome FROM produtos p JOIN grupos g ON g.id = p.id_grupo1 WHERE p.grupo_format = " + id,
