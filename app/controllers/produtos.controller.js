@@ -44,7 +44,7 @@ exports.findAll = async (req, res) => {
   }
 
   const productWithCount = await Products.findAndCountAll(
-    { where: condition },
+    //{ where: condition },
     {
       include: [
         {
@@ -121,7 +121,7 @@ exports.findAllGroup = async (req, res) => {
   });
 
   await Products.findAndCountAll(
-    { where: condition },
+    //{ where: condition },
     {
       include: [
         {
@@ -184,6 +184,8 @@ exports.findAllSubGroup = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
+  } else{
+    null
   }
 
   const id = req.params.id;
@@ -222,7 +224,7 @@ exports.findAllSubGroup = async (req, res) => {
   });
 
   await Products.findAndCountAll(
-    { where: condition },
+    //{ where: condition },
     {
       include: [
         {
