@@ -10,6 +10,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING(36),
       allowNull: false,
     },
+    empresa_id: {
+      type: Sequelize.STRING(36),
+      allowNull: false,
+    },
     login: {
       type: Sequelize.STRING(50),
     },

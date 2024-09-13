@@ -12,13 +12,13 @@ module.exports = app => {
     router.post("/", auth.verifyJWT, controller.create);
 
     // Retrieve all controller
-    router.get("/", auth.verifyJWT, controller.findAll,);
+    router.get("/",controller.findAll);
 
     // Retrieve all published controller
     router.get("/published", controller.findAllPublished);
 
     // Retrieve a single Tutorial with id
-    router.get("/:id", controller.findOne);
+    router.get("/:uuid/:id", controller.findOne);
 
     // Update a Tutorial with id
     router.put("/:id", controller.update);

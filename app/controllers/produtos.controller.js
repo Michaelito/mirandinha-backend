@@ -4,9 +4,23 @@ const Products = db.produtos;
 const grupos = db.grupo_format;
 const grupo_geral = db.grupo;
 const GradeProdutos = db.produtos_grade;
+const sequelize = require("../config/database");
 const Op = db.Sequelize.Op;
 
 exports.findAll = async (req, res) => {
+  const nome = req.query.nome;
+
+  var condition = {};
+
+  if (nome) {
+    condition = {
+      [Op.or]: [
+        { nome: { [Op.like]: `%${nome}%` } },
+        { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
+      ],
+    };
+  }
+
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
@@ -29,17 +43,27 @@ exports.findAll = async (req, res) => {
     size = sizeAsNumber;
   }
 
-  const productWithCount = await Products.findAndCountAll({
-    include: [
-      {
-        model: GradeProdutos,
-        required: false,
-        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
-      },
-    ],
-    limit: size,
-    offset: page * size,
-  });
+  const productWithCount = await Products.findAndCountAll(
+    { where: condition },
+    {
+      include: [
+        {
+          model: GradeProdutos,
+          required: false,
+          attributes: [
+            "id",
+            "cor_id",
+            "cor",
+            "hexadecimal",
+            "img",
+            "quantidade",
+          ],
+        },
+      ],
+      limit: size,
+      offset: page * size,
+    }
+  );
 
   res.send({
     status: true,
@@ -53,10 +77,22 @@ exports.findAll = async (req, res) => {
   });
 };
 
-
 exports.findAllGroup = async (req, res) => {
-  console.log('products all group/id')
-  
+  console.log("products all group/id");
+
+  const nome = req.query.nome;
+
+  var condition = {};
+
+  if (nome) {
+    condition = {
+      [Op.or]: [
+        { nome: { [Op.like]: `%${nome}%` } },
+        { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
+      ],
+    };
+  }
+
   const id = req.params.id;
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -83,20 +119,30 @@ exports.findAllGroup = async (req, res) => {
   const grupo = await grupos.findOne({
     where: { id: id },
   });
-  
-  await Products.findAndCountAll({
-    include: [
-      {
-        model: GradeProdutos,
-        required: false,
-        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
-      },
-    ],
-    where: { grupo_format: id },
-    order : [["id", "ASC"]],
-    limit: size,
-    offset: page * size,
-  })
+
+  await Products.findAndCountAll(
+    { where: condition },
+    {
+      include: [
+        {
+          model: GradeProdutos,
+          required: false,
+          attributes: [
+            "id",
+            "cor_id",
+            "cor",
+            "hexadecimal",
+            "img",
+            "quantidade",
+          ],
+        },
+      ],
+      where: { grupo_format: id },
+      order: [["id", "ASC"]],
+      limit: size,
+      offset: page * size,
+    }
+  )
     .then((productWithCount) => {
       if (productWithCount.count >= 1) {
         res.send({
@@ -126,8 +172,20 @@ exports.findAllGroup = async (req, res) => {
 };
 
 exports.findAllSubGroup = async (req, res) => {
-  console.log('products all subgroup/id')
-  
+  console.log("products all subgroup/id");
+  const nome = req.query.nome;
+
+  var condition = {};
+
+  if (nome) {
+    condition = {
+      [Op.or]: [
+        { nome: { [Op.like]: `%${nome}%` } },
+        { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
+      ],
+    };
+  }
+
   const id = req.params.id;
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -162,27 +220,37 @@ exports.findAllSubGroup = async (req, res) => {
   const subgrupo_nome = await grupo_geral.findOne({
     where: { id: produtosresult.id_grupo1 },
   });
-  
-  await Products.findAndCountAll({
-    include: [
-      {
-        model: GradeProdutos,
-        required: false,
-        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
-      },
-    ],
-    where: { id_grupo1: id },
-    order : [["id", "ASC"]],
-    limit: size,
-    offset: page * size,
-  })
+
+  await Products.findAndCountAll(
+    { where: condition },
+    {
+      include: [
+        {
+          model: GradeProdutos,
+          required: false,
+          attributes: [
+            "id",
+            "cor_id",
+            "cor",
+            "hexadecimal",
+            "img",
+            "quantidade",
+          ],
+        },
+      ],
+      where: { id_grupo1: id },
+      order: [["id", "ASC"]],
+      limit: size,
+      offset: page * size,
+    }
+  )
     .then((productWithCount) => {
       if (productWithCount.count >= 1) {
         res.send({
           status: true,
           message: "The request has succeeded",
           limit: size,
-          logging: console.log, 
+          logging: console.log,
           page: page,
           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
           grupo: grupo_nome.name,
