@@ -39,7 +39,6 @@ exports.create = (req, res) => {
 // Retrieve all Tutorials from the database.
 exports.findAll = (req, res) => {
   const nome = req.query.nome;
-  
 
   var condition = {};
 
@@ -47,7 +46,7 @@ exports.findAll = (req, res) => {
     condition = {
       [Op.or]: [
         { nome: { [Op.like]: `%${nome}%` } },
-        { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
+        { id_exsam: { [Op.like]: `%${nome}%` } }, 
       ],
     };
   }
@@ -59,7 +58,7 @@ exports.findAll = (req, res) => {
           status: true,
           message: "The request has succeeded",
           data: {
-            tutorial: data,
+            produtos: data,
           },
         })
         .status(200);

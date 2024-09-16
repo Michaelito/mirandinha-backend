@@ -8,6 +8,7 @@ const sequelize = require("../config/database");
 const Op = db.Sequelize.Op;
 
 exports.findAll = async (req, res) => {
+
   const nome = req.query.nome;
 
   var condition = {};
@@ -19,7 +20,7 @@ exports.findAll = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
-  }
+  } 
 
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -44,7 +45,7 @@ exports.findAll = async (req, res) => {
   }
 
   const productWithCount = await Products.findAndCountAll(
-    //{ where: condition },
+    { where: condition },
     {
       include: [
         {
@@ -80,9 +81,10 @@ exports.findAll = async (req, res) => {
 exports.findAllGroup = async (req, res) => {
   console.log("products all group/id");
 
+  const id = req.params.id;
   const nome = req.query.nome;
 
-  var condition = {};
+  var condition = { id_grupo1: id };
 
   if (nome) {
     condition = {
@@ -91,9 +93,8 @@ exports.findAllGroup = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
-  }
-
-  const id = req.params.id;
+  } 
+  
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
@@ -173,9 +174,11 @@ exports.findAllGroup = async (req, res) => {
 
 exports.findAllSubGroup = async (req, res) => {
   console.log("products all subgroup/id");
+  
+  const id = req.params.id;
   const nome = req.query.nome;
 
-  var condition = {};
+  var condition = { id_grupo1: id };
 
   if (nome) {
     condition = {
@@ -184,11 +187,8 @@ exports.findAllSubGroup = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
-  } else{
-    null
-  }
+  } 
 
-  const id = req.params.id;
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
@@ -240,7 +240,7 @@ exports.findAllSubGroup = async (req, res) => {
           ],
         },
       ],
-      where: { id_grupo1: id },
+      where: condition,
       order: [["id", "ASC"]],
       limit: size,
       offset: page * size,
@@ -252,7 +252,6 @@ exports.findAllSubGroup = async (req, res) => {
           status: true,
           message: "The request has succeeded",
           limit: size,
-          logging: console.log,
           page: page,
           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
           grupo: grupo_nome.name,
