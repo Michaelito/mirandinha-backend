@@ -51,6 +51,7 @@ async function login(req, res) {
         user: {
           id: user.id,
           uuid: user.uuid,
+          empresa_id: user.empresa_id,
           login: user.login,
           fullname: datauser.fullname,
           token: user.token,

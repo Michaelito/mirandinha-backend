@@ -14,6 +14,8 @@ module.exports = (app) => {
 
   router.post("/", controller.create);
 
+  router.put("/status/:id", controller.statusOrder);
+
 
   app.use("/api/v1/michael/pedidos", router);
 };

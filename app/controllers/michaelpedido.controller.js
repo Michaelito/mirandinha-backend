@@ -5,7 +5,7 @@ const PedidoItens = db.michaelpedido_itens;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 
-// Retrieve all Tutorials from the database.
+// Retrieve all Datas from the database.
 exports.findAll = (req, res) => {
   const id_cliente = req.query.id_cliente;
   var condition = id_cliente
@@ -59,7 +59,7 @@ exports.findAll = (req, res) => {
     });
 };
 
-// Find a single Tutorial with an id
+// Find a single Data with an id
 exports.findOne = (req, res) => {
   const pedido_id = req.params.id;
 
@@ -135,6 +135,33 @@ exports.create = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         message: err.message || "Some error occurred while creating data.",
+      });
+    });
+};
+
+exports.statusOrder = (req, res) => {
+  const id = req.params.id;
+
+  Pedidos.update(req.body, {
+    where: { id: id },
+  })
+    .then((num) => {
+      if (num == 1) {
+        res.status(200).send({
+          status: true,
+          message: "Data was updated successfully.",
+        });
+      } else {
+        res.status(200).send({
+          status: true,
+          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: false,
+        message: "Error updating Data with id=" + id,
       });
     });
 };

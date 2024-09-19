@@ -177,6 +177,7 @@ exports.findAllSubGroup = async (req, res) => {
   
   const id = req.params.id;
   const nome = req.query.nome;
+  const uuid = req.query.uuid;
 
   var condition = { id_grupo1: id };
 

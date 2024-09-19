@@ -2,7 +2,7 @@ const db = require("../models");
 const Tutorial = db.tutorials;
 const Products = db.produtos;
 const User = db.users;
-const Cliente = db.clientes
+const Cliente = db.clientes;
 const sequelize = require("../config/database");
 const Op = db.Sequelize.Op;
 
@@ -46,7 +46,7 @@ exports.findAll = (req, res) => {
     condition = {
       [Op.or]: [
         { nome: { [Op.like]: `%${nome}%` } },
-        { id_exsam: { [Op.like]: `%${nome}%` } }, 
+        { id_exsam: { [Op.like]: `%${nome}%` } },
       ],
     };
   }
@@ -77,17 +77,18 @@ exports.findAll = (req, res) => {
 // Find a single Tutorial with an id
 exports.findOne = async (req, res) => {
   const id = req.params.id;
-  const uuid = req.params.uuid;
+  const emp_id = req.params.emp_id;
 
-
-  const tabpreco = await sequelize.query(
-    "select t.fator from clientes c join users u on u.empresa_id = c.id join tabpreco t on t.id = c.id_tabpre where u.uuid = '" +
-    uuid +"'",
-    {
-      type: sequelize.QueryTypes.SELECT,
-    }
-  );
-
+  if (emp_id) {
+    const tabpreco = await sequelize.query(
+      "select t.fator from clientes c join tabpreco t on t.id = c.id_tabpre where c.id = '" +
+        emp_id +
+        "'",
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+  }
 
   Products.findByPk(id)
     .then((data) => {
@@ -97,12 +98,10 @@ exports.findOne = async (req, res) => {
         });
       }
 
-
-
       // Modify the data as needed
       const modifiedData = {
         ...data.dataValues, // Extract data values from Sequelize object
-        preco: data.preco, 
+        preco: data.preco,
         precoxtabpreco: tabpreco[0].fator * data.preco,
         // Add or modify other fields as needed
       };
