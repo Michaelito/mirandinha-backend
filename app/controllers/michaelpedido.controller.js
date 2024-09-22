@@ -118,6 +118,7 @@ exports.create = (req, res) => {
           uuid: uuid(),
           pedido_id: pedido_id,
           valor_total: valorTotal,
+          valor_desconto: isNaN(parseFloat(pedido_item.valor_desconto)) ? 0 : parseFloat(pedido_item.valor_desconto),
         });
 
         // Push the promise into the array
