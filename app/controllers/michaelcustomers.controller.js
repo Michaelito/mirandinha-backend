@@ -195,47 +195,46 @@ exports.update = (req, res) => {
 exports.customerPhone = async (req, res) => {
   const phone = req.params.phone;
 
-  const customer = await Customers_address.findOne({
+  const customerAddress = await Customers_address.findOne({
     where: { phone: phone },
   });
+  
+  if (!customerAddress) {
+    res.status(404).send({
+      status: false,
+      message: "Customer not found",
+    });
+    return
+  }
 
-
-  console.log(customer.customers_id)
-    
-  const Customer = await Customers.findOne({
-    where: { id: customer.customers_id },
+  const customer = await Customers.findOne({
+    where: { id: customerAddress.customers_id },
   });
-  
-  
-  console.log(CustomerAddress)
-  return
-  
 
-  const DeliveryValue = await DeliverysValue.findOne({
-    where: { id: CustomerAddress.delivery_id },
+  const deliveryValue = await DeliverysValue.findOne({
+    where: { id: customerAddress.delivery_id },
   });
 
   obj = {
-    uuid: Customer.uuid,
-    name: Customer.name,
-    email: Customer.email,
-    birth_date: Customer.birth_date,
-    gender: Customer.gender,
-    phone: CustomerAddress.phone,
+    uuid: customer.uuid,
+    name: customer.name,
+    email: customer.email,
+    birth_date: customer.birth_date,
+    gender: customer.gender,
+    phone: customer.phone,
     address: {
-      zip: CustomerAddress.zip,
-      delivery: DeliveryValue.valor_taxa,
-      street: CustomerAddress.street,
-      number: CustomerAddress.number,
-      complement: CustomerAddress.complement,
-      city: CustomerAddress.city,
-      neighborhood: CustomerAddress.neighborhood,
-      reference: CustomerAddress.reference,
+      zip: customerAddress.zip,
+      rate_value: deliveryValue.valor_taxa,
+      street: customerAddress.street,
+      number: customerAddress.number,
+      complement: customerAddress.complement,
+      city: customerAddress.city,
+      neighborhood: customerAddress.neighborhood,
+      reference: customerAddress.reference,
     },
   };
 
   try {
-    
     res.send({
       status: true,
       message: "The request has succeeded",
@@ -243,8 +242,6 @@ exports.customerPhone = async (req, res) => {
         customer: obj,
       },
     });
-
-
   } catch (error) {
     res.status(500).send({
       status: false,
