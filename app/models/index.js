@@ -4,6 +4,7 @@ const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
+  logging: false,
   
 
   pool: {
@@ -53,5 +54,6 @@ db.michael_customers_address = require("./michaelcustomers_address.model.js")(
   Sequelize
 );
 db.deliveryValue = require("./michaeldeliveryvalue.model.js")(sequelize, Sequelize);
+db.motoboy = require("./motoboy.model.js")(sequelize, Sequelize);
 
 module.exports = db;
