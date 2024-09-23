@@ -9,6 +9,8 @@ module.exports = (app) => {
 
   router.get("/:id", controller.findOne);
 
+  router.get("/phone/:phone", controller.customerPhone);
+
   router.post("/", controller.create);
 
   router.put("/:id", controller.update);

@@ -1,6 +1,7 @@
 const db = require("../models");
 const Customers = db.michaelcustomers;
 const Customers_address = db.michael_customers_address;
+const DeliverysValue = db.deliveryValue;
 const Op = db.Sequelize.Op;
 const { v4: uuidv4 } = require("uuid");
 
@@ -11,6 +12,7 @@ exports.create = (req, res) => {
     uuid: uuidv4(),
     enterprise_id: 1,
     name: req.body.name,
+    email: req.body.email,
     birth_date: req.body.birth_date,
     gender: req.body.gender,
   };
@@ -25,7 +27,7 @@ exports.create = (req, res) => {
         enterprise_id: req.body.address.enterprise_id,
         customers_id: customer_id,
         delivery_id: req.body.address.delivery_id,
-        phone: req.body.address.phone,
+        phone: req.body.phone,
         zip: req.body.address.zip,
         street: req.body.address.street,
         number: req.body.address.number,
@@ -159,10 +161,9 @@ exports.update = (req, res) => {
     where: { id: id },
   })
     .then((data) => {
-
       Customers_address.update(req.body.address, {
         where: { customers_id: id },
-      })
+      });
 
       res.send({
         status: true,
@@ -171,8 +172,6 @@ exports.update = (req, res) => {
           customers: data,
         },
       });
-
-
 
       // if (num == 1) {
       //   res.send({
@@ -191,4 +190,65 @@ exports.update = (req, res) => {
         message: "Error updating Customers with id=" + id,
       });
     });
+};
+
+exports.customerPhone = async (req, res) => {
+  const phone = req.params.phone;
+
+  const customer = await Customers_address.findOne({
+    where: { phone: phone },
+  });
+
+
+  console.log(customer.customers_id)
+    
+  const Customer = await Customers.findOne({
+    where: { id: customer.customers_id },
+  });
+  
+  
+  console.log(CustomerAddress)
+  return
+  
+
+  const DeliveryValue = await DeliverysValue.findOne({
+    where: { id: CustomerAddress.delivery_id },
+  });
+
+  obj = {
+    uuid: Customer.uuid,
+    name: Customer.name,
+    email: Customer.email,
+    birth_date: Customer.birth_date,
+    gender: Customer.gender,
+    phone: CustomerAddress.phone,
+    address: {
+      zip: CustomerAddress.zip,
+      delivery: DeliveryValue.valor_taxa,
+      street: CustomerAddress.street,
+      number: CustomerAddress.number,
+      complement: CustomerAddress.complement,
+      city: CustomerAddress.city,
+      neighborhood: CustomerAddress.neighborhood,
+      reference: CustomerAddress.reference,
+    },
+  };
+
+  try {
+    
+    res.send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        customer: obj,
+      },
+    });
+
+
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "Error retrieving Data with id=" + id,
+    });
+  }
 };
