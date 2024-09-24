@@ -185,8 +185,8 @@ exports.create = async (req, res) => {
     uuid: uuid(),
     data_pedido: adjustedDate,
     etapa: pedidobody.id_cliente_endereco == null ? 0 : 1,
-    nome: pedidobody.cliente.nome ? pedidobody.cliente.nome : "",
-    celular: pedidobody.cliente.celular ? pedidobody.cliente.celular : "",
+    nome: pedidobody.tipo_entrega == 1 ? pedidobody.cliente.nome : "",
+    celular: pedidobody.tipo_entrega == 1 ? pedidobody.cliente.celular : "",
     ...pedidobody,
   };
 
