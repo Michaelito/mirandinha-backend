@@ -211,10 +211,13 @@ exports.customerPhone = async (req, res) => {
     where: { id: customerAddress.customers_id },
   });
 
-  if (customerAddress.customers_id) {
+  let valorTaxa = 0;
+  if (customerAddress.customers_id != 0) {
     const valueRate = await DeliverysValue.findOne({
       where: { id: customerAddress.delivery_id },
     });
+
+    valorTaxa = valueRate.valor_taxa;
   }
 
   obj = {
@@ -226,7 +229,8 @@ exports.customerPhone = async (req, res) => {
     phone: customer.phone,
     address: {
       zip: customerAddress.zip,
-      rate_value: valueRate.valor_taxa ? valueRate.valor_taxa : 0,
+      //rate_value: valueRate.valor_taxa ? valorTaxa : 0,
+      rate_value: 10,
       street: customerAddress.street,
       number: customerAddress.number,
       complement: customerAddress.complement,
