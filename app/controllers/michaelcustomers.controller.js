@@ -198,24 +198,24 @@ exports.customerPhone = async (req, res) => {
   const customerAddress = await Customers_address.findOne({
     where: { phone: phone },
   });
-  
+
   if (!customerAddress) {
     res.status(404).send({
       status: false,
       message: "Customer not found",
     });
-    return
+    return;
   }
 
   const customer = await Customers.findOne({
     where: { id: customerAddress.customers_id },
   });
 
-  console.log("id taxa:", customerAddress.delivery_id)
-
-  const valueRate = await DeliverysValue.findOne({
-    where: { id: customerAddress.delivery_id },
-  });
+  if (customerAddress.customers_id) {
+    const valueRate = await DeliverysValue.findOne({
+      where: { id: customerAddress.delivery_id },
+    });
+  }
 
   obj = {
     uuid: customer.uuid,
@@ -226,7 +226,7 @@ exports.customerPhone = async (req, res) => {
     phone: customer.phone,
     address: {
       zip: customerAddress.zip,
-      rate_value: valueRate.valor_taxa,
+      rate_value: valueRate.valor_taxa ? valueRate.valor_taxa : 0,
       street: customerAddress.street,
       number: customerAddress.number,
       complement: customerAddress.complement,
