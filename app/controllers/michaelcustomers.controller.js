@@ -226,7 +226,7 @@ exports.customerPhone = async (req, res) => {
     email: customer.email,
     birth_date: customer.birth_date,
     gender: customer.gender,
-    phone: customer.phone,
+    phone: customerAddress.phone,
     address: {
       zip: customerAddress.zip,
       //rate_value: valueRate.valor_taxa ? valorTaxa : 0,
