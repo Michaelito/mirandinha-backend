@@ -6,7 +6,6 @@ module.exports = (app) => {
   const controller = require("../../../controllers/michaelpedido.controller.js");
 
   var router = require("express").Router();
-
   
   router.get("/", controller.findAll);
 

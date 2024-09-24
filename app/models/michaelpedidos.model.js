@@ -106,6 +106,12 @@ module.exports = (sequelize, DataTypes) => {
       ordenar: {
         type: DataTypes.INTEGER,
       },
+      nome: {
+        type: DataTypes.STRING(100)
+      },
+      celular: {
+        type: DataTypes.STRING(100)
+      },
     },
     {
       tableName: "michaelpedidos",
