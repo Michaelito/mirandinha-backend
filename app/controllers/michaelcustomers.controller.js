@@ -211,14 +211,14 @@ exports.customerPhone = async (req, res) => {
     where: { id: customerAddress.customers_id },
   });
 
-  let valorTaxa = 0;
-  if (customerAddress.customers_id != 0) {
-    const valueRate = await DeliverysValue.findOne({
-      where: { id: customerAddress.delivery_id },
-    });
+  // let valorTaxa = 0;
+  // if (customerAddress.customers_id != 0) {
+  //   const valueRate = await DeliverysValue.findOne({
+  //     where: { id: customerAddress.delivery_id },
+  //   });
 
-    valorTaxa = valueRate.valor_taxa;
-  }
+  //   valorTaxa = valueRate.valor_taxa;
+  // }
 
   obj = {
     uuid: customer.uuid,
