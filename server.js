@@ -81,6 +81,7 @@ require("./app/routes/api/v1/michaelcustomers.routes")(app);
 require("./app/routes/api/v1/michaelcustomers_address.routes")(app);
 require("./app/routes/api/v1/motoboy.routes")(app);
 require("./app/routes/api/v1/payment.routes")(app);
+require("./app/routes/api/v1/deliveryArea.routes")(app);
 
 
 
