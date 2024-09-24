@@ -1,6 +1,8 @@
 const db = require("../models");
 const Pedidos = db.michaelpedidos;
 const PedidoItens = db.michaelpedido_itens;
+const CustomersModel = db.michaelcustomers;
+const CustomersAddressModel = db.michael_customers_address;
 
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
@@ -19,9 +21,9 @@ exports.findAll = (req, res) => {
   Pedidos.hasMany(PedidoItens, {
     foreignKey: "pedido_id",
   });
-  
-  Pedidos.hasMany(PedidoItens, {
-    foreignKey: "pedido_id",
+
+  Pedidos.hasOne(CustomersModel, {
+    foreignKey: "id_cliente",
   });
 
   Pedidos.findAll({
@@ -38,6 +40,11 @@ exports.findAll = (req, res) => {
           "valor_total",
           "obs",
         ],
+      },
+      {
+        model: CustomersModel,
+        required: false,
+        attributes: ["name"],
       },
     ],
   })
@@ -60,25 +67,46 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single Data with an id
-exports.findOne = (req, res) => {
-  const pedido_id = req.params.id;
+exports.findOne = async (req, res) => {
+  const id = req.params.id;
 
-  PedidoItens.findAll({ where: { pedido_id: pedido_id } })
-    .then((data) => {
-      res.status(200).send({
-        status: true,
-        message: "The request has succeeded",
-        data: {
-          pedido: data,
-        },
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: false,
-        message: "Error retrieving Data with id=" + id,
-      });
+  const pedidos = await PedidosModel.findOne({
+    where: { id: id },
+  });
+
+  const pedidosItens = await PedidosItensModel.findOne({
+    where: { pedido_id: id },
+  });
+
+  const customer = await CustomersModel.findOne({
+    where: { pedido_id: id },
+  });
+
+  const customerAddress = await CustomersAddressModel.findOne({
+    where: { pedido_id: id },
+  });
+
+  payload = {
+    pedidos: pedidos,
+    pedidosItens: pedidosItens,
+    customer: customer,
+    customerAddress: customerAddress,
+  };
+
+  try {
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        pedido: payload,
+      },
     });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "Error updating Data with id=" + id,
+    });
+  }
 };
 
 // Create and Save a new Data
@@ -118,7 +146,9 @@ exports.create = (req, res) => {
           uuid: uuid(),
           pedido_id: pedido_id,
           valor_total: valorTotal,
-          valor_desconto: isNaN(parseFloat(pedido_item.valor_desconto)) ? 0 : parseFloat(pedido_item.valor_desconto),
+          valor_desconto: isNaN(parseFloat(pedido_item.valor_desconto))
+            ? 0
+            : parseFloat(pedido_item.valor_desconto),
         });
 
         // Push the promise into the array

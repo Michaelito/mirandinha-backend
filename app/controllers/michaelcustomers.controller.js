@@ -211,7 +211,9 @@ exports.customerPhone = async (req, res) => {
     where: { id: customerAddress.customers_id },
   });
 
-  const deliveryValue = await DeliverysValue.findOne({
+  console.log("id taxa:", customerAddress.delivery_id)
+
+  const valueRate = await DeliverysValue.findOne({
     where: { id: customerAddress.delivery_id },
   });
 
@@ -224,7 +226,7 @@ exports.customerPhone = async (req, res) => {
     phone: customer.phone,
     address: {
       zip: customerAddress.zip,
-      rate_value: deliveryValue.valor_taxa,
+      rate_value: valueRate.valor_taxa,
       street: customerAddress.street,
       number: customerAddress.number,
       complement: customerAddress.complement,
