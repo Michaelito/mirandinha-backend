@@ -43,13 +43,18 @@ exports.findAll = async (req, res) => {
           },
         });
 
+        if (!customer) {
+          var nomeBalcao = pedido.nome ? pedido.nome : "Não informado";
+          var celularBalcao = pedido.celular ? pedido.celular : "Não informado";
+        }
+
         // Structure the payload for each pedido
         return {
           ...pedido.dataValues,
           pedido_itens: pedidoItens,
           customer: {
-            name: customer ? customer.name : null, // Check if customer exists
-            phone: customerAddress ? customerAddress.phone : null, // Check if address exists
+            name: customer ? customer.name : nomeBalcao, // Fallback if customer is null
+            phone: customerAddress ? customerAddress.phone : celularBalcao, // Fallback if address is null
           },
           address: customerAddress || null, // Return null if address does not exist
         };
