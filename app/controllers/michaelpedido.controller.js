@@ -9,77 +9,67 @@ const CustomersAddressModel = db.michael_customers_address;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 
-// Retrieve all Datas from the database.
 exports.findAll = async (req, res) => {
   try {
-    // Busca todos os pedidos
+    // Fetch all pedidos
     const pedidos = await PedidosModel.findAll();
-    
-    // Verifica se existem pedidos
-    if (!pedidos || pedidos.length === 0) {
-      return res.status(404).send({
-        status: false,
-        message: "No orders found.",
-      });
-    }
 
-    // Mapeia cada pedido para adicionar os detalhes de itens e cliente
+    // Map through each pedido to fetch related items and customer details
     const payload = await Promise.all(pedidos.map(async (pedido) => {
+      // Fetch associated items for each pedido
       const pedidoItens = await PedidosItensModel.findAll({
         where: { pedido_id: pedido.id },
         attributes: {
-          exclude: ["id", "pedido_id", "status", "createdAt", "updatedAt"], // Ocultar colunas indesejadas
+          exclude: ["id", "pedido_id", "status", "createdAt", "updatedAt"],
         },
       });
 
+      // Fetch customer details
       const customer = await CustomersModel.findOne({
         where: { id: pedido.id_cliente },
       });
 
-      // Inicializa o objeto customerAddress como null
-      let customerAddress = null;
+      // Fetch customer address details
+      const customerAddress = await CustomersAddressModel.findOne({
+        where: { customers_id: pedido.id_cliente },
+        attributes: {
+          exclude: [
+            "id",
+            "enterprise_id",
+            "customers_id",
+            "delivery_id",
+            "createdAt",
+            "updatedAt",
+          ],
+        },
+      });
 
-      // Se o cliente foi encontrado, busca o endereço
-      if (customer) {
-        customerAddress = await CustomersAddressModel.findOne({
-          where: { customers_id: pedido.id_cliente },
-          attributes: {
-            exclude: [
-              "id",
-              "enterprise_id",
-              "customers_id",
-              "delivery_id",
-              "createdAt",
-              "updatedAt",
-            ], // Ocultar colunas indesejadas
-          },
-        });
-      }
-
+      // Structure the payload for each pedido
       return {
-        pedido,
+        ...pedido.dataValues,
         pedido_itens: pedidoItens,
-        customer: customer ? { // Se o cliente foi encontrado, retorna suas informações
-          name: customer.name,
-          phone: customerAddress ? customerAddress.phone : null, // Verifica se o endereço existe antes de acessar 'phone'
-        } : null, // Se não, retorna null
-        address: customerAddress, // Retorna o endereço, que pode ser null
+        customer: {
+          name: customer ? customer.name : null, // Check if customer exists
+          phone: customerAddress ? customerAddress.phone : null, // Check if address exists
+        },
+        address: customerAddress || null, // Return null if address does not exist
       };
     }));
 
-    // Envia a resposta com os dados dos pedidos
+    // Respond with the aggregated data
     res.status(200).send({
       status: true,
       message: "The request has succeeded",
-      data: payload,
+      data: {
+        pedidos: payload,
+      },
     });
     
   } catch (error) {
-    // Envia erro caso ocorra
-    console.error("Error retrieving data: ", error); // Log do erro
     res.status(500).send({
       status: false,
-      message: "Error retrieving data: " + error.message,
+      message: "Error fetching data",
+      error: error.message,
     });
   }
 };
@@ -123,8 +113,9 @@ exports.findOne = async (req, res) => {
     },
   });
 
-  payload = {
-    pedido,
+  // Modify the data as needed
+  const payload = {
+    ...pedido.dataValues,
     pedido_itens: pedidoItens,
     customer: {
       name: customer.name,
@@ -137,7 +128,9 @@ exports.findOne = async (req, res) => {
     res.status(200).send({
       status: true,
       message: "The request has succeeded",
-      data: payload,
+      data: {
+        pedido: payload,
+      },
     });
   } catch (error) {
     res.status(500).send({
