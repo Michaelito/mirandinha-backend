@@ -1,6 +1,7 @@
 const db = require("../models");
 const PedidosModel = db.michaelpedidos;
 const PedidosItensModel = db.michaelpedido_itens;
+const PedidosPagamentoModel = db.michaelpedido_pagamento;
 const CustomersModel = db.michaelcustomers;
 const CustomersAddressModel = db.michael_customers_address;
 
@@ -165,9 +166,6 @@ exports.findOne = async (req, res) => {
 exports.create = async (req, res) => {
   const pedidobody = req.body;
 
-  // Log the incoming request body for debugging
-  console.log("Received body:", pedidobody);
-
   // Check if pedido_itens exists and is an array
   if (!Array.isArray(pedidobody.pedido_itens)) {
     return res.status(400).send({
@@ -184,8 +182,6 @@ exports.create = async (req, res) => {
     currentDate.getTime() + timezoneOffset * 60 * 1000
   );
 
-  console.log("name", pedidobody.cliente);
-
   const payloadPedido = {
     uuid: uuid(),
     data_pedido: adjustedDate,
@@ -194,8 +190,6 @@ exports.create = async (req, res) => {
     celular: pedidobody.tipo_entrega == 1 ? pedidobody.cliente.celular : "",
     ...pedidobody,
   };
-
-  console.log("payload" + payloadPedido);
 
   try {
     const data = await PedidosModel.create(payloadPedido);
@@ -216,8 +210,19 @@ exports.create = async (req, res) => {
       });
     });
 
-    // Wait for all items to be inserted
-    await Promise.all(pedidosArray);
+    // Map and create pedido_pagamento entries
+    const pagamentosArray = pedidobody.pedido_pagamento.map((pedido_pagamento) => {
+      return PedidosPagamentoModel.create({
+        ...pedido_pagamento, // Spread the properties of pedido_pgamento
+        uuid: uuid(),
+        pedido_id: pedido_id,
+        pagamento_id: pedido_pagamento.pagamento_id,
+        valor: parseFloat(pedido_pagamento.valor),
+      });
+    });
+
+    // Wait for all items and payments to be inserted
+    await Promise.all([...pedidosArray, ...pagamentosArray]);
 
     res.send({
       status: true,

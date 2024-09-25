@@ -57,6 +57,7 @@ db.deliveryValue = require("./michaeldeliveryvalue.model.js")(sequelize, Sequeli
 db.motoboy = require("./motoboy.model.js")(sequelize, Sequelize);
 db.payment = require("./payment.model.js")(sequelize, Sequelize);
 db.deliveryArea = require("./deliveryArea.model.js")(sequelize, Sequelize);
+db.michaelpedido_pagamento = require("./michaelpedido_pagamento.model.js")(sequelize, Sequelize);
 
 module.exports = db;
 
