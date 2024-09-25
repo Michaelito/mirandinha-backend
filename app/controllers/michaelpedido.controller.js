@@ -49,6 +49,22 @@ exports.findAll = async (req, res) => {
           var celularBalcao = pedido.celular ? pedido.celular : "Não informado";
         }
 
+        // Define as descrições baseadas no ID
+        const statusDescriptions = {
+          0: "aberto",
+          1: "pago",
+          2: "produção",
+          3: "embalado",
+          4: "entrega",
+          5: "finalizado",
+          6: "cancelado",
+        };
+
+        // Função que retorna a descrição baseada no ID
+        function getStatusDescription(id) {
+          return statusDescriptions[id] || "ID inválido";
+        }
+
         // Structure the payload for each pedido
         return {
           ...pedido.dataValues,
@@ -57,6 +73,7 @@ exports.findAll = async (req, res) => {
             name: customer ? customer.name : nomeBalcao, // Fallback if customer is null
             phone: customerAddress ? customerAddress.phone : celularBalcao, // Fallback if address is null
           },
+          etapa_label: getStatusDescription(pedido.etapa),
           address: customerAddress || null, // Return null if address does not exist
         };
       })
@@ -135,6 +152,22 @@ exports.findOne = async (req, res) => {
       var celularBalcao = pedido.celular ? pedido.celular : "Não informado";
     }
 
+    // Define as descrições baseadas no ID
+    const statusDescriptions = {
+      0: "aberto",
+      1: "pago",
+      2: "produção",
+      3: "embalado",
+      4: "entrega",
+      5: "finalizado",
+      6: "cancelado",
+    };
+
+    // Função que retorna a descrição baseada no ID
+    function getStatusDescription(id) {
+      return statusDescriptions[id] || "ID inválido";
+    }
+
     // Prepare payload data with checks
     const payload = {
       ...pedido.dataValues,
@@ -143,6 +176,7 @@ exports.findOne = async (req, res) => {
         name: customer ? customer.name : nomeBalcao, // Fallback if customer is null
         phone: customerAddress ? customerAddress.phone : celularBalcao, // Fallback if address is null
       },
+      etapa_label: getStatusDescription(pedido.etapa),
       address: customerAddress || null, // Return null if address does not exist
     };
 
@@ -211,15 +245,17 @@ exports.create = async (req, res) => {
     });
 
     // Map and create pedido_pagamento entries
-    const pagamentosArray = pedidobody.pedido_pagamento.map((pedido_pagamento) => {
-      return PedidosPagamentoModel.create({
-        ...pedido_pagamento, // Spread the properties of pedido_pgamento
-        uuid: uuid(),
-        pedido_id: pedido_id,
-        pagamento_id: pedido_pagamento.pagamento_id,
-        valor: parseFloat(pedido_pagamento.valor),
-      });
-    });
+    const pagamentosArray = pedidobody.pedido_pagamento.map(
+      (pedido_pagamento) => {
+        return PedidosPagamentoModel.create({
+          ...pedido_pagamento, // Spread the properties of pedido_pgamento
+          uuid: uuid(),
+          pedido_id: pedido_id,
+          pagamento_id: pedido_pagamento.pagamento_id,
+          valor: parseFloat(pedido_pagamento.valor),
+        });
+      }
+    );
 
     // Wait for all items and payments to be inserted
     await Promise.all([...pedidosArray, ...pagamentosArray]);
