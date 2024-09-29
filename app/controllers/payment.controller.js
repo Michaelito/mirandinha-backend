@@ -46,7 +46,7 @@ exports.findAll = (req, res) => {
         status: true,
         message: "The request has succeeded",
         data: {
-          motoboys: data,
+          payments: data,
         },
       });
     })
@@ -75,7 +75,7 @@ exports.findOne = async (req, res) => {
         status: true,
         message: "The request has succeeded",
         data: {
-          motoboy: data,
+          payment: data,
         },
       });
     })

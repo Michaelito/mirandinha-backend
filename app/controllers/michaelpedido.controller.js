@@ -4,6 +4,7 @@ const PedidosItensModel = db.michaelpedido_itens;
 const PedidosPagamentoModel = db.michaelpedido_pagamento;
 const CustomersModel = db.michaelcustomers;
 const CustomersAddressModel = db.michael_customers_address;
+const MotoboyModel = db.motoboy;
 
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
@@ -65,6 +66,13 @@ exports.findAll = async (req, res) => {
           return statusDescriptions[id] || "ID inválido";
         }
 
+        if(pedido.driver != 0){
+          var driverName = await MotoboyModel.findOne({
+            where: { id: pedido.driver },
+          });
+        }
+
+
         // Structure the payload for each pedido
         return {
           ...pedido.dataValues,
@@ -74,6 +82,7 @@ exports.findAll = async (req, res) => {
             phone: customerAddress ? customerAddress.phone : celularBalcao, // Fallback if address is null
           },
           etapa_label: getStatusDescription(pedido.etapa),
+          driver_name: pedido.driver != 0 ? driverName.name : null,
           address: customerAddress || null, // Return null if address does not exist
         };
       })
@@ -130,7 +139,11 @@ exports.findOne = async (req, res) => {
       where: { id: pedido.id_cliente },
     });
 
-    console.log("customer", customer);
+    if(pedido.driver != 0){
+      var driverName = await MotoboyModel.findOne({
+        where: { id: pedido.driver },
+      });
+    }
 
     // Fetch customer address details
     const customerAddress = await CustomersAddressModel.findOne({
@@ -147,11 +160,7 @@ exports.findOne = async (req, res) => {
       },
     });
 
-    if (!customer) {
-      var nomeBalcao = pedido.nome ? pedido.nome : "Não informado";
-      var celularBalcao = pedido.celular ? pedido.celular : "Não informado";
-    }
-
+   
     // Define as descrições baseadas no ID
     const statusDescriptions = {
       0: "aberto",
@@ -173,10 +182,11 @@ exports.findOne = async (req, res) => {
       ...pedido.dataValues,
       pedido_itens: pedidoItens,
       customer: {
-        name: customer ? customer.name : nomeBalcao, // Fallback if customer is null
-        phone: customerAddress ? customerAddress.phone : celularBalcao, // Fallback if address is null
+        name: pedido.tipo_entrega == 1 ?  customer.name : pedido.nome, // Fallback if customer is null
+        phone: pedido.tipo_entrega == 1 ? customerAddress.phone : pedido.celular, // Fallback if address is null
       },
       etapa_label: getStatusDescription(pedido.etapa),
+      driver_name: pedido.driver != 0 ? driverName.name : null,
       address: customerAddress || null, // Return null if address does not exist
     };
 
@@ -220,8 +230,8 @@ exports.create = async (req, res) => {
     uuid: uuid(),
     data_pedido: adjustedDate,
     etapa: pedidobody.id_cliente_endereco == null ? 0 : 1,
-    nome: pedidobody.tipo_entrega == 1 ? pedidobody.cliente.nome : "",
-    celular: pedidobody.tipo_entrega == 1 ? pedidobody.cliente.celular : "",
+    nome: pedidobody.tipo_entrega != 1 ? pedidobody.cliente.nome : "",
+    celular: pedidobody.tipo_entrega != 1 ? pedidobody.cliente.celular : "",
     ...pedidobody,
   };
 
