@@ -180,6 +180,7 @@ exports.create = (req, res) => {
   const payload = {
     uuid: uuid(),
     login: req.body.login,
+    empresa_id: req.body.empresa_id,
     password: req.body.password
       ? password_md5
       : "25d55ad283aa400af464c76d713c07ad",

@@ -11,8 +11,7 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
     },
     empresa_id: {
-      type: Sequelize.STRING(36),
-      allowNull: false,
+      type: Sequelize.INTEGER
     },
     login: {
       type: Sequelize.STRING(50),
