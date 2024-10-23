@@ -66,7 +66,7 @@ exports.findAll = async (req, res) => {
           return statusDescriptions[id] || "ID inválido";
         }
 
-        if(pedido.driver != 0){
+        if (pedido.driver != 0) {
           var driverName = await MotoboyModel.findOne({
             where: { id: pedido.driver },
           });
@@ -139,7 +139,7 @@ exports.findOne = async (req, res) => {
       where: { id: pedido.id_cliente },
     });
 
-    if(pedido.driver != 0){
+    if (pedido.driver != 0) {
       var driverName = await MotoboyModel.findOne({
         where: { id: pedido.driver },
       });
@@ -160,7 +160,7 @@ exports.findOne = async (req, res) => {
       },
     });
 
-   
+
     // Define as descrições baseadas no ID
     const statusDescriptions = {
       0: "aberto",
@@ -182,7 +182,7 @@ exports.findOne = async (req, res) => {
       ...pedido.dataValues,
       pedido_itens: pedidoItens,
       customer: {
-        name: pedido.tipo_entrega == 1 ?  customer.name : pedido.nome, // Fallback if customer is null
+        name: pedido.tipo_entrega == 1 ? customer.name : pedido.nome, // Fallback if customer is null
         phone: pedido.tipo_entrega == 1 ? customerAddress.phone : pedido.celular, // Fallback if address is null
       },
       etapa_label: getStatusDescription(pedido.etapa),
@@ -309,4 +309,21 @@ exports.statusOrder = (req, res) => {
         message: "Error updating Data with id=" + id,
       });
     });
+};
+
+
+exports.accept_order = async (req, res) => {
+  const pedidobody = req.body;
+
+  try {
+
+    res.send({
+      status: true,
+      message: "The request has succeeded"
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: err.message || "Some error occurred while creating data.",
+    });
+  }
 };
