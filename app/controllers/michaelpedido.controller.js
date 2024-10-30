@@ -132,6 +132,33 @@ exports.findOne = async (req, res) => {
       },
     });
 
+    // Fetch associated pedido items
+    const pedidoPagamentos = await PedidosPagamentoModel.findAll({
+      // Changed to findAll to get all items
+      where: { pedido_id: id },
+      attributes: {
+        exclude: ["id", "pedido_id", "obs", "status"],
+      },
+    });
+
+    const updatedPagamentos = pedidoPagamentos.map(pagamento => {
+      const pagamentoObj = pagamento.toJSON(); // Converte a instância do Sequelize em um objeto simples
+
+      if (pagamentoObj.pagamento_id === 1) {
+        pagamentoObj.descricao = "dinheiro"; // Altera o campo baseado na condição
+      }
+
+      if (pagamentoObj.pagamento_id === 2) {
+        pagamentoObj.descricao = "credito"; // Altera o campo baseado na condição
+      }
+
+      if (pagamentoObj.pagamento_id === 3) {
+        pagamentoObj.descricao = "debito"; // Altera o campo baseado na condição
+      }
+
+      return pagamentoObj; // Retorna o objeto atualizado
+    });
+
     console.log("pedidoItens", pedidoItens);
 
     // Fetch customer details
@@ -181,6 +208,7 @@ exports.findOne = async (req, res) => {
     const payload = {
       ...pedido.dataValues,
       pedido_itens: pedidoItens,
+      pedido_pagamentos: updatedPagamentos,
       customer: {
         name: pedido.tipo_entrega == 1 ? customer.name : pedido.nome, // Fallback if customer is null
         phone: pedido.tipo_entrega == 1 ? customerAddress.phone : pedido.celular, // Fallback if address is null
