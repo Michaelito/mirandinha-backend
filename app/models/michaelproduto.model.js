@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255)
     },
     valor: {
-      type: DataTypes.DECIMAL(10,2)
+      type: DataTypes.DECIMAL(10, 2)
+    },
+    valor_promocao: {
+      type: DataTypes.DECIMAL(10, 2)
     },
     img: {
       type: DataTypes.TEXT()
