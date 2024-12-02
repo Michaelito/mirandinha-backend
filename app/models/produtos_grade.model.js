@@ -11,15 +11,14 @@ module.exports = (Sequelize, DataTypes) => {
         type: DataTypes.STRING(36),
         allowNull: false,
       },
-      produto_id: {
+      id_exsam: {
+        type: DataTypes.INTEGER,
+      },
+      id_produto: {
         type: DataTypes.INTEGER,
         foreignKey: true,
       },
-      cor_id: {
-        type: DataTypes.INTEGER(2),
-        foreignKey: true,
-      },
-      cor: {
+      grade: {
         type: DataTypes.STRING(50),
       },
       hexadecimal: {

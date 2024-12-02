@@ -5,6 +5,7 @@ const User = db.users;
 const Cliente = db.clientes;
 const sequelize = require("../config/database");
 const Op = db.Sequelize.Op;
+const grupos = db.grupo_format;
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
@@ -76,44 +77,68 @@ exports.findAll = (req, res) => {
 
 // Find a single Tutorial with an id
 exports.findOne = async (req, res) => {
-  const id = req.params.id;
-  const emp_id = req.params.emp_id;
+  const { search } = req.params;
 
-  if (emp_id) {
-    const tabpreco = await sequelize.query(
-      "select t.fator from clientes c join tabpreco t on t.id = c.id_tabpre where c.id = '" +
-        emp_id +
-        "'",
+  try {
+    const products = await sequelize.query(
+      `SELECT DISTINCT id, id_grupo, id_subgrupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode FROM produtos WHERE id_subgrupo = ? OR nome LIKE ? `,
       {
+
+        replacements: [search, `%${search}%`],
         type: sequelize.QueryTypes.SELECT,
       }
     );
-  }
 
-  Products.findByPk(id)
-    .then((data) => {
-      if (!data) {
-        return res.status(404).send({
-          message: "Product not found with id=" + id,
-        });
-      }
+    if (products.length === 0) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
 
-      // Modify the data as needed
-      const modifiedData = {
-        ...data.dataValues, // Extract data values from Sequelize object
-        preco: data.preco,
-        precoxtabpreco: tabpreco[0].fator * data.preco,
-        // Add or modify other fields as needed
-      };
 
-      res.send(modifiedData);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error retrieving Product with id=" + id,
-      });
+    for (const product of products) {
+      const productGrade = await sequelize.query(
+        "SELECT id_exsam, grade, hexadecimal FROM produtos_grades WHERE id_produto = ?",
+        {
+          replacements: [product.id],
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      product.grades = productGrade;
+    }
+
+
+    // const group_name = await grupos.findOne({
+    //   where: { id: produtosresult.id_grupo },
+    // });
+
+    // console.log("response_product: ", products)
+
+    // const subgroup_name = await grupo_geral.findOne({
+    //   where: { id: produtosresult.id_subgrupo },
+    // });
+
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        // grupo: group_name.name,
+        // subgrupo: subgroup_name.nome,
+        product: products,
+      },
     });
+
+  } catch (error) {
+
+    res.status(200).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+
+  }
 };
+
+
+
 
 // Update a Tutorial by the id in the request
 exports.update = (req, res) => {

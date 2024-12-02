@@ -20,7 +20,7 @@ exports.findAll = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
-  } 
+  }
 
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
@@ -93,8 +93,8 @@ exports.findAllGroup = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
-  } 
-  
+  }
+
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
@@ -174,12 +174,11 @@ exports.findAllGroup = async (req, res) => {
 
 exports.findAllSubGroup = async (req, res) => {
   console.log("products all subgroup/id");
-  
+
   const id = req.params.id;
   const nome = req.query.nome;
-  const uuid = req.query.uuid;
 
-  var condition = { id_grupo1: id };
+  var condition = { id_subgrupo: id };
 
   if (nome) {
     condition = {
@@ -188,13 +187,13 @@ exports.findAllSubGroup = async (req, res) => {
         { id_exsam: { [Op.like]: `%${nome}%` } }, // buscando também na coluna 'codigo' com o mesmo parâmetro 'nome'
       ],
     };
-  } 
+  }
 
   const pageAsNumber = Number.parseInt(req.query.page);
   const sizeAsNumber = Number.parseInt(req.query.size);
 
   Products.hasMany(GradeProdutos, {
-    foreignKey: "produto_id",
+    foreignKey: "id_produto",
   });
 
   let page = 0;
@@ -212,17 +211,17 @@ exports.findAllSubGroup = async (req, res) => {
     size = sizeAsNumber;
   }
 
-  const produtosresult = await Products.findOne({
-    where: { id_grupo1: id },
-  });
+  // const produtosresult = await Products.findOne({
+  //   where: { id_subgrupo: id },
+  // });
 
-  const grupo_nome = await grupos.findOne({
-    where: { id: produtosresult.grupo_format },
-  });
+  // const grupo_nome = await grupos.findOne({
+  //   where: { id: produtosresult.id_grupo },
+  // });
 
-  const subgrupo_nome = await grupo_geral.findOne({
-    where: { id: produtosresult.id_grupo1 },
-  });
+  // const subgrupo_nome = await grupo_geral.findOne({
+  //   where: { id: produtosresult.id_subgrupo },
+  // });
 
   await Products.findAndCountAll(
     //{ where: condition },
@@ -233,8 +232,8 @@ exports.findAllSubGroup = async (req, res) => {
           required: false,
           attributes: [
             "id",
-            "cor_id",
-            "cor",
+            "id_exsam",
+            "grade",
             "hexadecimal",
             "img",
             "quantidade",
@@ -255,8 +254,8 @@ exports.findAllSubGroup = async (req, res) => {
           limit: size,
           page: page,
           totalPages: Math.ceil(productWithCount.count / Number.parseInt(size)),
-          grupo: grupo_nome.name,
-          subgrupo: subgrupo_nome.nome,
+          // grupo: grupo_nome.name,
+          // subgrupo: subgrupo_nome.nome,
           data: {
             products: productWithCount.rows,
           },
@@ -280,7 +279,7 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
 
   Products.hasMany(GradeProdutos, {
-    foreignKey: "produto_id",
+    foreignKey: "id_produto",
   });
 
   Products.findByPk(id, {
@@ -288,7 +287,7 @@ exports.findOne = (req, res) => {
       {
         model: GradeProdutos,
         required: false,
-        attributes: ["id", "cor_id", "cor", "hexadecimal", "img", "quantidade"],
+        attributes: ["id", "id_exsam", "grade", "hexadecimal", "img", "quantidade"],
       },
     ],
   })

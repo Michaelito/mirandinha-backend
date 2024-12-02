@@ -38,24 +38,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      grupo_format: {
+      id_grupo: {
         type: DataTypes.STRING,
         allowNull: true,
         forenkey: true,
       },
-      id_grupo1: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-      id_grupo2: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      id_grupo3: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      id_clafis: {
+      id_subgrupo: {
         type: DataTypes.STRING,
         allowNull: true,
       },
@@ -75,41 +63,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      qtde_emb: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      peso_bru: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      peso_liq: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      comp: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      larg: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      altu: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      modulo: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
     },
     {
       // Other model options go here
       timestamps: false,
-
       createdAt: false,
-
       updatedAt: false,
     }
   );
