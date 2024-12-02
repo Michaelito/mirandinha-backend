@@ -56,11 +56,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       preco_pf: {
-        type: DataTypes.DECIMAL,
+        type: DataTypes.DECIMAL(19, 4),
         allowNull: true,
       },
       preco: {
-        type: DataTypes.STRING,
+        type: DataTypes.DECIMAL(19, 4),
         allowNull: true,
       },
     },

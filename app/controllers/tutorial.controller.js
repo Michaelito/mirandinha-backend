@@ -89,6 +89,29 @@ exports.findOne = async (req, res) => {
       }
     );
 
+    console.log("aaaaaaaaaaaaaaa", products[0].id_grupo)
+
+    const grupo = await sequelize.query(
+      `SELECT name FROM grupo_formats WHERE id = ` + products[0].id_grupo,
+      {
+
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const nomeGrupo = grupo.length > 0 ? grupo[0].name.toUpperCase() : 'Grupo não encontrado';
+
+    const subgrupo = await sequelize.query(
+      `SELECT nome FROM grupos WHERE id = ?`,
+      {
+
+        replacements: [search],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : 'Sub Grupo não encontrado';
+
     if (products.length === 0) {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
@@ -103,26 +126,17 @@ exports.findOne = async (req, res) => {
         }
       );
 
-      product.grades = productGrade;
+      product.produtos_grades = productGrade;
     }
 
 
-    // const group_name = await grupos.findOne({
-    //   where: { id: produtosresult.id_grupo },
-    // });
-
-    // console.log("response_product: ", products)
-
-    // const subgroup_name = await grupo_geral.findOne({
-    //   where: { id: produtosresult.id_subgrupo },
-    // });
 
     res.status(200).send({
       status: true,
       message: "The request has succeeded",
       data: {
-        // grupo: group_name.name,
-        // subgrupo: subgroup_name.nome,
+        grupo: nomeGrupo,
+        subgrupo: nomeSubGrupo,
         product: products,
       },
     });
