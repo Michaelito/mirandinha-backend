@@ -87,6 +87,7 @@ exports.findAllSubGroup = async (req, res) => {
       `SELECT DISTINCT id, id_grupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode
        FROM produtos
        WHERE id_subgrupo = ? OR nome LIKE ?
+       ORDER BY nome ASC
        LIMIT ? OFFSET ?`,
       {
         replacements: [search, `%${search}%`, limit, offset],
@@ -117,17 +118,17 @@ exports.findAllSubGroup = async (req, res) => {
 
     const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : 'Sub Grupo não encontrado';
 
-    // for (const product of products) {
-    //   const productGrade = await sequelize.query(
-    //     "SELECT id_exsam, grade, hexadecimal FROM produtos_grades WHERE id_produto = ?",
-    //     {
-    //       replacements: [product.id],
-    //       type: sequelize.QueryTypes.SELECT,
-    //     }
-    //   );
+    for (const product of products) {
+      const productGrade = await sequelize.query(
+        "SELECT id_exsam, grade, hexadecimal FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        {
+          replacements: [product.id],
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
 
-    //   product.produtos_grades = productGrade;
-    // }
+      product.produtos_grades = productGrade;
+    }
 
     res.status(200).send({
       status: true,

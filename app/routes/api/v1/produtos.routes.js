@@ -10,8 +10,8 @@ module.exports = (app) => {
 
   // Retrieve all controller
   router.get("/group/:id", controller.findAllGroup);
-  
-  router.get("/subgroup/:id", controller.findAllSubGroup);
+
+  router.get("/subgroup/:search", controller.findAllSubGroup);
 
   // Retrieve a single Data with id
   router.get("/:id", controller.findOne);
