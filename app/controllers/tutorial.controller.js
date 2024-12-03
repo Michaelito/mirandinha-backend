@@ -79,7 +79,7 @@ exports.findAll = (req, res) => {
 exports.findAllSubGroup = async (req, res) => {
   const { search } = req.params;
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit) || 15;
   const offset = (page - 1) * limit;
 
   try {

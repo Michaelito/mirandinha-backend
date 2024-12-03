@@ -10,10 +10,9 @@ exports.findOne = async (req, res) => {
     const id = req.params.id ? req.params.id : 394;
 
     const results = await sequelize.query(
-      "SELECT DISTINCT g.id, g.nome nome FROM produtos p JOIN grupos g ON g.id = p.id_subgrupo WHERE p.id_grupo = " +
-      id,
+      "SELECT DISTINCT g.id, g.nome FROM produtos p JOIN grupos g ON g.id = p.id_subgrupo WHERE p.id_grupo = :id ORDER BY g.nome",
       {
-        replacements: { status: 1 },
+        replacements: { id: id, status: 1 },
         type: sequelize.QueryTypes.SELECT,
       }
     );

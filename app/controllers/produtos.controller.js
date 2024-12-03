@@ -183,7 +183,7 @@ exports.findAllSubGroup = async (req, res) => {
       `SELECT DISTINCT id, id_grupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode
        FROM produtos
        WHERE id_subgrupo = ? OR nome LIKE ?
-       ORDER BY nome ASC
+       ORDER BY id_subgrupo, nome ASC
        LIMIT ? OFFSET ?`,
       {
         replacements: [search, `%${search}%`, limit, offset],
