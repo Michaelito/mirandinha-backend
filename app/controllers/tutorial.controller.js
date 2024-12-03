@@ -120,7 +120,7 @@ exports.findAllSubGroup = async (req, res) => {
 
     for (const product of products) {
       const productGrade = await sequelize.query(
-        "SELECT id_exsam, grade, hexadecimal FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        "SELECT id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
           replacements: [product.id],
           type: sequelize.QueryTypes.SELECT,
