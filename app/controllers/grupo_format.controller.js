@@ -35,28 +35,9 @@ exports.create = (req, res) => {
 
 // Retrieve all GrupoFormats from the database.
 exports.findAll = (req, res) => {
-  const name = req.query.name;
-  var condition = name
-    ? {
-        name: {
-          [Op.like]: `%${name}%`,
-        },
-      }
-    : null;
-
-  GrupoFormat.hasMany(SubGrupo, {
-    foreignKey: "grupo_id",
-  });
 
   GrupoFormat.findAll({
-    include: [
-      {
-        model: SubGrupo,
-        required: false,
-        attributes: [["id", "id_subgrupo"], "name"],
-      },
-    ],
-
+    attributes: { exclude: ["deletedAt", "createdAt", "updatedAt"] },
     where: { status: 1 },
   })
     .then((data) => {

@@ -76,25 +76,31 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single Tutorial with an id
-exports.findOne = async (req, res) => {
+exports.findAllSubGroup = async (req, res) => {
   const { search } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
 
   try {
     const products = await sequelize.query(
-      `SELECT DISTINCT id, id_grupo, id_subgrupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode FROM produtos WHERE id_subgrupo = ? OR nome LIKE ? `,
+      `SELECT DISTINCT id, id_grupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode
+       FROM produtos
+       WHERE id_subgrupo = ? OR nome LIKE ?
+       LIMIT ? OFFSET ?`,
       {
-
-        replacements: [search, `%${search}%`],
+        replacements: [search, `%${search}%`, limit, offset],
         type: sequelize.QueryTypes.SELECT,
       }
     );
 
-    console.log("aaaaaaaaaaaaaaa", products[0].id_grupo)
+    if (products.length === 0) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
 
     const grupo = await sequelize.query(
-      `SELECT name FROM grupo_formats WHERE id = ` + products[0].id_grupo,
+      `SELECT name FROM grupo_formats WHERE id = ${products[0].id_grupo}`,
       {
-
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -104,7 +110,6 @@ exports.findOne = async (req, res) => {
     const subgrupo = await sequelize.query(
       `SELECT nome FROM grupos WHERE id = ?`,
       {
-
         replacements: [search],
         type: sequelize.QueryTypes.SELECT,
       }
@@ -112,24 +117,17 @@ exports.findOne = async (req, res) => {
 
     const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : 'Sub Grupo não encontrado';
 
-    if (products.length === 0) {
-      return res.status(404).send({ message: "Produto não encontrado" });
-    }
+    // for (const product of products) {
+    //   const productGrade = await sequelize.query(
+    //     "SELECT id_exsam, grade, hexadecimal FROM produtos_grades WHERE id_produto = ?",
+    //     {
+    //       replacements: [product.id],
+    //       type: sequelize.QueryTypes.SELECT,
+    //     }
+    //   );
 
-
-    for (const product of products) {
-      const productGrade = await sequelize.query(
-        "SELECT id_exsam, grade, hexadecimal FROM produtos_grades WHERE id_produto = ?",
-        {
-          replacements: [product.id],
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-
-      product.produtos_grades = productGrade;
-    }
-
-
+    //   product.produtos_grades = productGrade;
+    // }
 
     res.status(200).send({
       status: true,
@@ -137,17 +135,19 @@ exports.findOne = async (req, res) => {
       data: {
         grupo: nomeGrupo,
         subgrupo: nomeSubGrupo,
-        product: products,
+        products: products,
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: products.length,
+        },
       },
     });
-
   } catch (error) {
-
-    res.status(200).send({
+    res.status(500).send({
       status: false,
       message: "The request has not succeeded",
     });
-
   }
 };
 

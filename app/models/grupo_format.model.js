@@ -12,6 +12,9 @@ module.exports = (Sequelize, DataTypes) => {
     name: {
       type: DataTypes.STRING(255),
     },
+    background: {
+      type: DataTypes.STRING(7),
+    },
     status: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
