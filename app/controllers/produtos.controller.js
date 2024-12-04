@@ -202,7 +202,7 @@ exports.findAllSubGroup = async (req, res) => {
       }
     );
 
-    const nomeGrupo = grupo.length > 0 ? grupo[0].name.toUpperCase() : 'Grupo não encontrado';
+    const nomeGrupo = grupo.length > 0 ? grupo[0].name.toUpperCase() : '';
 
     const subgrupo = await sequelize.query(
       `SELECT nome FROM grupos WHERE id = ?`,
@@ -212,7 +212,7 @@ exports.findAllSubGroup = async (req, res) => {
       }
     );
 
-    const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : 'Sub Grupo não encontrado';
+    const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : '';
 
     for (const product of products) {
       const productGrade = await sequelize.query(
