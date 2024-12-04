@@ -17,7 +17,7 @@ exports.create = (req, res) => {
   const json = {
     uuid: uuid(),
     group_id: req.body.group_id,
-    name: req.body.name ,
+    name: req.body.name,
     descricao: req.body.descricao,
     img: req.body.img,
     valor: req.body.valor,
@@ -48,13 +48,15 @@ exports.create = (req, res) => {
 // Retrieve all Datas from the database.
 exports.findAll = (req, res) => {
   const name = req.query.name;
-  var condition = name
-    ? {
-        name: {
-          [Op.like]: `%${name}%`,
-        },
-      }
-    : null;
+  var condition = {
+    status: 1
+  };
+
+  if (name) {
+    condition.name = {
+      [Op.like]: `%${name}%`
+    };
+  }
 
   Produtos.findAll({ where: condition })
     .then((data) => {
@@ -97,7 +99,7 @@ exports.findOne = (req, res) => {
 exports.findAllGroup = async (req, res) => {
   const id = req.params.id;
 
-  Produtos.findAll({ where: { group_id: id } })
+  Produtos.findAll({ where: { group_id: id, status: 1 } })
     .then((data) => {
       res
         .send({
