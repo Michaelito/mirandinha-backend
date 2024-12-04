@@ -179,6 +179,20 @@ exports.findAllSubGroup = async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
+
+    const totalProductsResult = await sequelize.query(
+      `SELECT COUNT(DISTINCT id) AS total
+       FROM produtos
+       WHERE id_subgrupo = ? OR nome LIKE ?`,
+      {
+        replacements: [search, `%${search}%`],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const totalProducts = totalProductsResult[0].total;
+
+
     const products = await sequelize.query(
       `SELECT DISTINCT id, id_grupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode
        FROM produtos
@@ -236,7 +250,7 @@ exports.findAllSubGroup = async (req, res) => {
         pagination: {
           currentPage: page,
           itemsPerPage: limit,
-          totalItems: products.length,
+          totalItems: totalProducts,
         },
       },
     });
