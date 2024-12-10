@@ -84,7 +84,7 @@ exports.findAllSubGroup = async (req, res) => {
 
   try {
     const products = await sequelize.query(
-      `SELECT DISTINCT id, id_grupo, nome, descricao, preco, video, aplicacao, manual_tecnico, qrcode
+      `SELECT DISTINCT id, id_grupo, nome, descricao, preco, preco_pf, video, aplicacao, manual_tecnico, qrcode
        FROM produtos
        WHERE id_subgrupo = ? OR nome LIKE ?
        ORDER BY nome ASC
