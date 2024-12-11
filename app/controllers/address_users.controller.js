@@ -10,58 +10,72 @@ const objValidation = require('../validation/address_users_validation');
 
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
-    const cep = req.query.cep;
-    var condition = cep ? {
-        cep: {
-            [Op.like]: `%${cep}%`
-        }
-    } : null;
+  const cep = req.query.cep;
+  var condition = cep ? {
+    cep: {
+      [Op.like]: `%${cep}%`
+    }
+  } : null;
 
-    address_users.findAll({ where: condition })
-        .then(data => {
-            res.send({
-                status: true,
-                message: "The request has succeeded",
-                data: {
-                    users: data
-                }
-            }).status(200);
-        })
-        .catch(err => {
-            res.send({
-                status: false,
-                message: "The request has not succeeded",
-                data: null
-            }).status(500);
-        });
+  address_users.findAll({ where: condition })
+    .then(data => {
+      res.send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          users: data
+        }
+      }).status(200);
+    })
+    .catch(err => {
+      res.send({
+        status: false,
+        message: "The request has not succeeded",
+        data: null
+      }).status(500);
+    });
 };
 
 // Find a single data with an id
 exports.findOne = (req, res) => {
-    const user_id = req.params.id;
-    const conditions = {
-        // Example condition: Find all instances where the 'someField' equals 'someValue'
-        user_id: user_id
-    };
+  const user_id = req.params.id;
+  const conditions = {
+    // Example condition: Find all instances where the 'someField' equals 'someValue'
+    user_id: user_id
+  };
 
-    //address_users.findByPk(user_id)
-    address_users.findAll({ where: conditions })
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving data with id=" + id
-            });
-        });
+  //address_users.findByPk(user_id)
+  address_users.findAll({ where: conditions })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error retrieving data with id=" + id
+      });
+    });
 };
 
 // Create and Save a new Tutorial
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   try {
     //Validate request
     //const obj = objValidation(req.body);
     //res.send(obj);
+
+    const countEnd = await address_users.count({
+      where: {
+        user_id: req.body.user_id
+      }
+    });
+
+    if (countEnd > 0) {
+
+      await address_users.update({ ativo: 0 },
+        { where: { user_id: req.body.user_id } }
+      )
+
+    }
 
     const payload = {
       uuid: uuid(),
@@ -74,11 +88,11 @@ exports.create = (req, res) => {
       cidade: req.body.cidade,
       estado: req.body.estado,
       pais: "BR",
-      ativo: 0,
+      ativo: req.body.ativo,
     };
 
     // Save Tutorial in the database
-    address_users
+    await address_users
       .create(payload)
       .then((data) => {
         res.send(data);
