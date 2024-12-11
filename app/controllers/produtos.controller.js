@@ -194,7 +194,7 @@ exports.findAllSubGroup = async (req, res) => {
 
 
     const products = await sequelize.query(
-      `SELECT DISTINCT id, id_grupo, nome, descricao, preco, preco_pf, video, aplicacao, manual_tecnico, qrcode
+      `SELECT DISTINCT id, id_grupo, nome, descricao, preco, preco_pf, video, aplicacao, manual_tecnico, qrcode, comprimento, largura, altura, peso
        FROM produtos
        WHERE id_subgrupo = ? OR nome LIKE ?
        ORDER BY id_subgrupo, nome ASC
@@ -230,7 +230,7 @@ exports.findAllSubGroup = async (req, res) => {
 
     for (const product of products) {
       const productGrade = await sequelize.query(
-        "SELECT id, id_exsam, grade, hexadecimal, img, comprimento, largura, altura, peso FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        "SELECT id, id_exsam, grade, hexadecimal, img  FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
           replacements: [product.id],
           type: sequelize.QueryTypes.SELECT,

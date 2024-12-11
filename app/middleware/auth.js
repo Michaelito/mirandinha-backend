@@ -76,29 +76,29 @@ async function login(req, res) {
 }
 
 function logout(req, res) {
-    blacklist.push(req.headers['Authorization']);
-    console.log("lista" + blacklist);
-    res.json({ auth: false, token: null, blacklist: blacklist });
+  blacklist.push(req.headers['Authorization']);
+  console.log("lista" + blacklist);
+  res.json({ auth: false, token: null, blacklist: blacklist });
 }
 
 function verifyRoute(req, res, next) {
 
-    const token = req.headers['access-route'];
-    const secret_route = process.env.SECRET_ROUTE
-    console.log(token)
-    if (!token) return res.status(401).json({ status: false, message: 'No token provided.' });
+  const token = req.headers['access-route'];
+  const secret_route = process.env.SECRET_ROUTE
+  console.log(token)
+  if (!token) return res.status(401).json({ status: false, message: 'No token provided.' });
 
-    if (token != secret_route)
-        return res.status(403).json({ status: false, message: 'Failed to authenticate.' })
+  if (token != secret_route)
+    return res.status(403).json({ status: false, message: 'Failed to authenticate.' })
 
-    next();
+  next();
 }
 
 module.exports = {
-    verifyJWT,
-    login,
-    logout,
-    verifyRoute
+  verifyJWT,
+  login,
+  logout,
+  verifyRoute
 };
 
 
