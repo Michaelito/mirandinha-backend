@@ -63,6 +63,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL(19, 4),
         allowNull: true,
       },
+      comprimento: {
+        type: DataTypes.DECIMAL(10, 4),
+      },
+      largura: {
+        type: DataTypes.DECIMAL(10, 4),
+      },
+      altura: {
+        type: DataTypes.DECIMAL(10, 4),
+      },
+      peso: {
+        type: DataTypes.DECIMAL(10, 4),
+      }
     },
     {
       // Other model options go here
