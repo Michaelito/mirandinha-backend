@@ -179,7 +179,7 @@ exports.findAllSubGroup = async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-
+    // Consulta para contar o total de produtos
     const totalProductsResult = await sequelize.query(
       `SELECT COUNT(DISTINCT id) AS total
        FROM produtos
@@ -192,14 +192,17 @@ exports.findAllSubGroup = async (req, res) => {
 
     const totalProducts = totalProductsResult[0].total;
 
+    // Consulta para buscar os produtos
     const products = await sequelize.query(
-      `SELECT DISTINCT id, id_grupo, nome, descricao, preco, preco_pf, video, aplicacao, manual_tecnico, qrcode, unimed, comprimento, largura, altura, peso
-       FROM produtos
-       WHERE id_subgrupo = ? OR nome LIKE ?
-       ORDER BY id_subgrupo, nome ASC
+      `SELECT DISTINCT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
+       p.comprimento, p.largura, p.altura, p.peso
+       FROM produtos p
+       JOIN produtos_grades pg ON p.id = pg.id_produto
+       WHERE p.id_subgrupo = ? OR p.nome LIKE ? OR pg.id_exsam = ?
+       ORDER BY p.id_subgrupo, p.nome ASC
        LIMIT ? OFFSET ?`,
       {
-        replacements: [search, `%${search}%`, limit, offset],
+        replacements: [search, `%${search}%`, search, limit, offset],
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -208,6 +211,7 @@ exports.findAllSubGroup = async (req, res) => {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
+    // Buscar o nome do grupo
     const grupo = await sequelize.query(
       `SELECT name FROM grupo_formats WHERE id = ${products[0].id_grupo}`,
       {
@@ -217,6 +221,7 @@ exports.findAllSubGroup = async (req, res) => {
 
     const nomeGrupo = grupo.length > 0 ? grupo[0].name.toUpperCase() : '';
 
+    // Buscar o nome do subgrupo
     const subgrupo = await sequelize.query(
       `SELECT nome FROM grupos WHERE id = ?`,
       {
@@ -227,9 +232,10 @@ exports.findAllSubGroup = async (req, res) => {
 
     const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : '';
 
+    // Buscar as grades dos produtos
     for (const product of products) {
       const productGrade = await sequelize.query(
-        "SELECT id, id_exsam, grade, hexadecimal, img  FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        "SELECT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
           replacements: [product.id],
           type: sequelize.QueryTypes.SELECT,
@@ -237,9 +243,9 @@ exports.findAllSubGroup = async (req, res) => {
       );
 
       product.produtos_grades = productGrade;
-
     }
 
+    // Retornar os dados com a paginação
     res.status(200).send({
       status: true,
       message: "The request has succeeded",
@@ -261,6 +267,7 @@ exports.findAllSubGroup = async (req, res) => {
     });
   }
 };
+
 
 
 // Find a single Data with an id
