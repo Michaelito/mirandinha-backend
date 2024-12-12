@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     produto: { type: DataTypes.STRING },
+    img: { type: DataTypes.STRING },
     grade: { type: DataTypes.STRING },
     preco: { type: DataTypes.DECIMAL(10, 4) },
     qtde: { type: DataTypes.DECIMAL(10, 4) },
