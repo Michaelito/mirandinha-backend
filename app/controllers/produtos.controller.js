@@ -192,7 +192,6 @@ exports.findAllSubGroup = async (req, res) => {
 
     const totalProducts = totalProductsResult[0].total;
 
-
     const products = await sequelize.query(
       `SELECT DISTINCT id, id_grupo, nome, descricao, preco, preco_pf, video, aplicacao, manual_tecnico, qrcode, comprimento, largura, altura, peso
        FROM produtos
@@ -238,6 +237,7 @@ exports.findAllSubGroup = async (req, res) => {
       );
 
       product.produtos_grades = productGrade;
+
     }
 
     res.status(200).send({
