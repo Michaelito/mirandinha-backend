@@ -10,10 +10,10 @@ exports.findAll = async (req, res) => {
   const id = req.query.id;
   var condition = id
     ? {
-        id: {
-          [Op.like]: `%${id}%`,
-        },
-      }
+      id: {
+        [Op.like]: `%${id}%`,
+      },
+    }
     : null;
 
   const pageAsNumber = Number.parseInt(req.query.page);
@@ -126,9 +126,7 @@ exports.create = (req, res) => {
   pedidos
     .create(payload)
     .then((data) => {
-      const pedido_id = data.id;
-
-      console.log(pedido_id);
+      const id_pedido = data.id;
 
       const itensArray = req.body.pedido_itens;
 
@@ -137,7 +135,7 @@ exports.create = (req, res) => {
         // Create a promise for each item insertion
         let insertionPromise = pedidosItens.create({
           ...pedido_item, // Spread the properties of pedido_item
-          pedido_id: pedido_id, // Assign the pedido_id to the item
+          id_pedido: id_pedido, // Assign the pedido_id to the item
         });
 
         // Push the promise into the array
@@ -177,8 +175,8 @@ exports.findAllUser = async (req, res) => {
   const pedidosWithCount = await pedidos.findAndCountAll({
     where: { user_id: id },
     order: [
-            ["id", "DESC"], 
-          ],
+      ["id", "DESC"],
+    ],
     limit: size,
     offset: page * size,
     order: [

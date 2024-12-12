@@ -5,13 +5,16 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    produto_id: {
+    id_pedido: {
       type: DataTypes.INTEGER,
       foreignKey: true,
     },
-    pedido_id: {
+    id_produto: {
       type: DataTypes.INTEGER,
       foreignKey: true,
+    },
+    id_exsam: {
+      type: DataTypes.INTEGER,
     },
     produto: { type: DataTypes.STRING },
     grade: { type: DataTypes.STRING },
