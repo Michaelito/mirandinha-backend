@@ -1,5 +1,4 @@
-const auth = require('../../../middleware/auth.js');
-require("dotenv-safe").config();
+
 
 module.exports = app => {
 
@@ -9,7 +8,7 @@ module.exports = app => {
     var router = require("express").Router();
 
     // Create a new Tutorial
-    router.post("/", auth.verifyJWT, controller.create);
+    router.post("/", controller.create);
 
     // Retrieve all controller
     router.get("/", controller.findAll);

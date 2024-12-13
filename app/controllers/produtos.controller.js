@@ -2,10 +2,11 @@ const { or } = require("sequelize");
 const db = require("../models");
 const Products = db.produtos;
 const grupos = db.grupo_format;
-const grupo_geral = db.grupo;
 const GradeProdutos = db.produtos_grade;
 const sequelize = require("../config/database");
 const Op = db.Sequelize.Op;
+
+const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
 exports.findAll = async (req, res) => {
 
@@ -175,8 +176,11 @@ exports.findAllGroup = async (req, res) => {
 exports.findAllSubGroup = async (req, res) => {
   const { search } = req.params;
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit) || 5;
   const offset = (page - 1) * limit;
+  const decodedToken = decodeTokenFromHeader(req);
+
+  console.log("Nome completo:", decodedToken.fullname);
 
   try {
     // Consulta para contar o total de produtos
