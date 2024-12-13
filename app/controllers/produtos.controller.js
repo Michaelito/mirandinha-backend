@@ -180,8 +180,6 @@ exports.findAllSubGroup = async (req, res) => {
   const offset = (page - 1) * limit;
   const decodedToken = decodeTokenFromHeader(req);
 
-  console.log("Nome completo:", decodedToken.fullname);
-
   try {
     // Consulta para contar o total de produtos
     const totalProductsResult = await sequelize.query(
@@ -211,13 +209,36 @@ exports.findAllSubGroup = async (req, res) => {
       }
     );
 
-    if (products.length === 0) {
+    const id_empresa = decodedToken.id_empresa;
+
+    // Consulta valor por tabpreco
+    const tabpreco = await sequelize.query(
+      `SELECT tp.fator  
+      FROM clientes c 
+      JOIN tabpreco tp on tp.id = c.id_tabpre 
+      WHERE c.id = ? LIMIT 1`,
+      {
+        replacements: [id_empresa],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // Calculando o preço por tabpreco para cada produto
+    const updatedProducts = products.map(product => {
+      const calcPrecoTab = parseFloat(product.preco) * parseFloat(tabpreco[0].fator);
+      return {
+        ...product,
+        preco_tab: calcPrecoTab.toFixed(2)
+      };
+    });
+
+    if (updatedProducts.length === 0) {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
     // Buscar o nome do grupo
     const grupo = await sequelize.query(
-      `SELECT name FROM grupo_formats WHERE id = ${products[0].id_grupo}`,
+      `SELECT name FROM grupo_formats WHERE id = ${updatedProducts[0].id_grupo}`,
       {
         type: sequelize.QueryTypes.SELECT,
       }
@@ -236,8 +257,8 @@ exports.findAllSubGroup = async (req, res) => {
 
     const nomeSubGrupo = subgrupo.length > 0 ? subgrupo[0].nome.toUpperCase() : '';
 
-    // Buscar as grades dos produtos
-    for (const product of products) {
+    // Consultas paralelizadas para as grades dos produtos
+    const productGradesPromises = updatedProducts.map(async (product) => {
       const productGrade = await sequelize.query(
         "SELECT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
@@ -246,8 +267,12 @@ exports.findAllSubGroup = async (req, res) => {
         }
       );
 
+      // Adiciona a propriedade 'produtos_grades' ao produto
       product.produtos_grades = productGrade;
-    }
+    });
+
+    // Espera todas as promessas de consulta de grades serem resolvidas
+    await Promise.all(productGradesPromises);
 
     // Retornar os dados com a paginação
     res.status(200).send({
@@ -256,7 +281,7 @@ exports.findAllSubGroup = async (req, res) => {
       data: {
         grupo: nomeGrupo,
         subgrupo: nomeSubGrupo,
-        products: products,
+        products: updatedProducts,
         pagination: {
           currentPage: page,
           itemsPerPage: limit,
@@ -271,6 +296,7 @@ exports.findAllSubGroup = async (req, res) => {
     });
   }
 };
+
 
 
 
