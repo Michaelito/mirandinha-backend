@@ -301,38 +301,87 @@ exports.findAllSubGroup = async (req, res) => {
 
 
 // Find a single Data with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
-  Products.hasMany(GradeProdutos, {
-    foreignKey: "id_produto",
-  });
+  const decodedToken = decodeTokenFromHeader(req);
+  const id_empresa = decodedToken.id_empresa;
 
-  Products.findByPk(id, {
-    include: [
+  try {
+    // Consulta para buscar o produto específico
+    const products = await sequelize.query(
+      `SELECT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
+       p.comprimento, p.largura, p.altura, p.peso
+       FROM produtos p      
+       WHERE p.id = ?`,
       {
-        model: GradeProdutos,
-        required: false,
-        attributes: ["id", "id_exsam", "grade", "hexadecimal", "img", "quantidade"],
-      },
-    ],
-  })
-    .then((data) => {
-      res.send({
-        status: true,
-        message: "The request has succeeded",
-        data: {
-          product: data,
-        },
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
+        replacements: [id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // Garantir que estamos pegando um único produto (não um array)
+    const product = products[0];  // Pega o primeiro produto (único)
+
+    if (!product) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    // Consulta para buscar o fator de tabpreco
+    const tabpreco = await sequelize.query(
+      `SELECT tp.fator  
+      FROM clientes c 
+      JOIN tabpreco tp on tp.id = c.id_tabpre 
+      WHERE c.id = ? LIMIT 1`,
+      {
+        replacements: [id_empresa],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // Garantir que temos um fator de tabpreco válido
+    if (!tabpreco || tabpreco.length === 0) {
+      return res.status(400).send({
         status: false,
-        message: "Error retrieving Data with id=" + id,
+        message: "Fator de tabpreço não encontrado para esta empresa.",
       });
+    }
+
+    const fatorTabPreco = tabpreco[0].fator;
+
+    // Calculando o preço por tabpreco
+    const calcPrecoTab = parseFloat(product.preco) * parseFloat(fatorTabPreco);
+    product.preco_tab = calcPrecoTab.toFixed(2); // Adiciona o preço calculado ao produto
+
+    // Consultar as grades do produto
+    const productGrade = await sequelize.query(
+      "SELECT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+      {
+        replacements: [product.id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // Adiciona a propriedade 'produtos_grades' ao produto
+    product.produtos_grades = productGrade;
+
+    // Retornar o produto com a grade e o preço calculado
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        product: product, // Retorna o produto único
+      },
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
 };
+
 
 // Update a Data by the id in the request
 exports.update = (req, res) => {

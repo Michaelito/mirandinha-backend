@@ -15,7 +15,7 @@ module.exports = (app) => {
   router.get("/subgroup/:search", auth.authenticateToken, controller.findAllSubGroup);
 
   // Retrieve a single Data with id
-  router.get("/:id", controller.findOne);
+  router.get("/:id", auth.authenticateToken, controller.findOne);
 
   // Update a Data with id
   router.put("/:id", controller.update);
