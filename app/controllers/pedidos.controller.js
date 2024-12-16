@@ -3,6 +3,7 @@ const pedidos = db.pedidos;
 const pedidosItens = db.pedidos_itens;
 const { uuid } = require('uuidv4');
 const Op = db.Sequelize.Op;
+const sequelize = require("../config/database");
 
 
 // Retrieve all from the database.
@@ -53,42 +54,58 @@ exports.findAll = async (req, res) => {
 };
 
 // Find a single Data with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
-  pedidos.hasMany(pedidosItens, {
-    foreignKey: "pedido_id",
-  });
+  try {
+    // Consulta para buscar o pedido específico
+    const orders = await sequelize.query(
+      `SELECT * FROM pedidos p WHERE p.id = ?`,
+      {
+        replacements: [id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
-  pedidos
-    .findByPk(id, {
-      //attributes: { exclude: ['password', 'token', 'refresh_token'] },
-      include: [
-        {
-          model: pedidosItens,
-          required: false,
-          //attributes: ['fullname', 'document', 'type', 'rg_ie', 'birthdate', 'createdAt']
-        },
-      ],
-    })
-    .then((data) => {
-      res
-        .send({
-          status: true,
-          message: "The request has succeeded",
-          data: {
-            pedido: data,
-          },
-        })
-        .status(200);
-    })
-    .catch((err) => {
-      res.status(500).send({
+    // Verifica se o pedido foi encontrado
+    if (orders.length === 0) {
+      return res.status(404).send({
         status: false,
-        message: "Error retrieving Data with id=" + id,
+        message: "Order not found",
       });
+    }
+
+    const order = orders[0]; // Obtém o primeiro (e único) pedido
+
+    // Consultar os itens do pedido
+    const pedidoItens = await sequelize.query(
+      "SELECT * FROM pedidos_itens WHERE id_pedido = ? ORDER BY id ASC",
+      {
+        replacements: [order.id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // Adiciona a propriedade 'produtos_grades' ao pedido
+    order.pedido_itens = pedidoItens;
+
+    // Retornar o pedido com os itens
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        order: order, // Retorna o pedido único
+      },
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
 };
+
 
 // Create and Save a new User
 exports.create = (req, res) => {

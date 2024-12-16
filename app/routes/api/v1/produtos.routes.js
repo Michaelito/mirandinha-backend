@@ -7,10 +7,10 @@ module.exports = (app) => {
   var router = require("express").Router();
 
   // Retrieve all controller
-  router.get("/", controller.findAll);
+  router.get("/", auth.authenticateToken, controller.findAll);
 
   // Retrieve all controller
-  router.get("/group/:id", controller.findAllGroup);
+  router.get("/group/:id", auth.authenticateToken, controller.findAllGroup);
 
   router.get("/subgroup/:search", auth.authenticateToken, controller.findAllSubGroup);
 
@@ -18,7 +18,7 @@ module.exports = (app) => {
   router.get("/:id", auth.authenticateToken, controller.findOne);
 
   // Update a Data with id
-  router.put("/:id", controller.update);
+  router.put("/:id", auth.authenticateToken, controller.update);
 
   app.use("/api/v1/produtos", router);
 };
