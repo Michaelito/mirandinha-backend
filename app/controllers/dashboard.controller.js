@@ -2,12 +2,15 @@ const sequelize = require("../config/database");
 const db = require("../models");
 const Pedidos = db.pedidos;
 const { fn, col, Op } = require("sequelize");
-
+const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
 // Retrieve all GrupoFormats from the database.
 exports.findOne = async (req, res) => {
   const user_id = req.params.id;
   const currentYear = new Date().getFullYear();
+  const decodedToken = decodeTokenFromHeader(req);
+  const id_empresa = decodedToken.id_empresa;
+
 
   try {
 
@@ -20,15 +23,15 @@ exports.findOne = async (req, res) => {
        FROM 
          pedidos
        WHERE 
-         user_id = :user_id AND DATE_FORMAT(createdAt, '%Y') = :currentYear
+         id_empresa = :id_empresa AND DATE_FORMAT(createdAt, '%Y') = :currentYear
        GROUP BY 
-         user_id,
+         id_empresa,
          DATE_FORMAT(createdAt, '%Y'),
          DATE_FORMAT(createdAt, '%m')
        ORDER BY 
          DATE_FORMAT(createdAt, '%Y-%m') ASC;`,
       {
-        replacements: { user_id: user_id, currentYear: currentYear },
+        replacements: { id_empresa: id_empresa, currentYear: currentYear },
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -40,9 +43,9 @@ exports.findOne = async (req, res) => {
        FROM 
          pedidos
        WHERE 
-         user_id = :user_id AND DATE_FORMAT(createdAt, '%Y') = :currentYear;`,
+         id_empresa = :id_empresa AND DATE_FORMAT(createdAt, '%Y') = :currentYear;`,
       {
-        replacements: { user_id: user_id, currentYear: currentYear },
+        replacements: { id_empresa: id_empresa, currentYear: currentYear },
         type: sequelize.QueryTypes.SELECT,
       }
     );
