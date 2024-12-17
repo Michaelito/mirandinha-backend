@@ -29,6 +29,7 @@
         "jsonwebtoken": "^9.0.2",
         "jsonxml": "^1.0.0",
         "mysql2": "^2.0.2",
+        "node-cache": "^5.1.2",
         "sequelize": "^5.21.2",
         "uuidv4": "^6.2.13",
         "xml-js": "^1.6.11",
