@@ -124,12 +124,40 @@ exports.create = (req, res) => {
 
   const decodedToken = decodeTokenFromHeader(req);
 
-  req.body.id_user = decodedToken.id;
-  req.body.id_empresa = decodedToken.id_empresa;
+  const payload = {
+    cnpjf: req.body.cnpjf,
+    id_user: decodedToken.id,
+    id_empresa: decodedToken.id_empresa,
+    nome: req.body.nome,
+    cep: req.body.cep,
+    endereco: req.body.endereco,
+    endnum: req.body.endnum,
+    endcpl: req.body.endcpl,
+    bairro: req.body.bairro,
+    id_cidade: req.body.id_cidade,
+    cidade: req.body.cidade,
+    uf: req.body.uf,
+    email: req.body.email,
+    ddd1: req.body.ddd1,
+    fone1: req.body.fone1,
+    dh_mov: req.body.dh_mov,
+    id_fpagto: req.body.id_fpagto,
+    id_pagto: req.body.id_pagto,
+    id_vended1: req.body.id_vended1,
+    id_transp: req.body.id_transp,
+    id_frete: req.body.id_frete,
+    prazo: req.body.prazo,
+    peso_bru: req.body.peso_bru,
+    peso_liq: req.body.peso_liq,
+    total: req.body.total,
+    frete: req.body.frete,
+    desconto: req.body.desconto,
+    total_geral: req.body.total_geral,
+  };
 
   // Save Tutorial in the database
   pedidos
-    .create(req.body)
+    .create(payload)
     .then((data) => {
       const id_pedido = data.id;
 
