@@ -4,35 +4,26 @@ const cors = require("cors");
 const http = require('http');
 const debug = require('debug')('nodestr:server');
 const db = require("./app/models");
-const NodeCache = require("node-cache");
 
-// Função para limpar o cache na inicialização
-const clearCacheOnStart = () => {
-    cache.flushAll();
-    console.log("Cache limpo na inicialização");
-};
-
-// Chamar a função ao iniciar a aplicação
-clearCacheOnStart();
 
 const app = express();
 
-// var corsOptions = {
-//     origin: "http://mirandinha-portal.doxotech.com.br:3003",
-//     optionsSuccessStatus: 200
-// };
+var corsOptions = {
+    origin: "http://mirandinha-portal.doxotech.com.br:3003",
+    optionsSuccessStatus: 200
+};
 
-// app.use(cors({ origin: '*' }));
+app.use(cors({ origin: '*' }));
 
-// //request methods
-// app.use(function (req, res, next) {
-//     res.setHeader("Access-Control-Allow-Origin", "*");
-//     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-//     res.setHeader("Access-Control-Allow-Headers", "content-type");
-//     res.setHeader("Content-Type", "application/json");
-//     res.setHeader("Access-Control-Allow-Credentials", true);
-//     next();
-// });
+//request methods
+app.use(function (req, res, next) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    next();
+});
 
 
 // parse requests of content-type - application/json
