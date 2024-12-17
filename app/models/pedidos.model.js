@@ -6,7 +6,11 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    user_id: {
+    id_user: {
+      type: DataTypes.INTEGER,
+      foreignKey: true,
+    },
+    id_empresa: {
       type: DataTypes.INTEGER,
       foreignKey: true,
     },
@@ -55,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(2),
       comment: '0:Inativo, 1:Registrado/Ativo, 2:Em Análise, 3:Fechando, 4:Aprovado, 5:Reprovado, 6:Retido',
     },
-    
+
   });
 
   return pedidos;

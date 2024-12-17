@@ -4,53 +4,65 @@ const pedidosItens = db.pedidos_itens;
 const { uuid } = require('uuidv4');
 const Op = db.Sequelize.Op;
 const sequelize = require("../config/database");
+const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
 
 // Retrieve all from the database.
 exports.findAll = async (req, res) => {
-  const id = req.query.id;
-  var condition = id
-    ? {
-      id: {
-        [Op.like]: `%${id}%`,
-      },
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+  const decodedToken = decodeTokenFromHeader(req);
+  const id_empresa = decodedToken.id_empresa;
+
+  try {
+    // Query to get the total count of products for pagination
+    const totalProductsResult = await sequelize.query(
+      `SELECT COUNT(*) as total FROM pedidos p WHERE p.id_empresa = ?`,
+      {
+        replacements: [id_user],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const totalProducts = totalProductsResult[0]?.total || 0;
+
+    // Query to fetch the paginated products
+    const pedidos = await sequelize.query(
+      `SELECT * FROM pedidos p
+       WHERE p.id_empresa = ?
+       ORDER BY p.id DESC
+       LIMIT ? OFFSET ?`,
+      {
+        replacements: [id_empresa, limit, offset],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (pedidos.length === 0) {
+      return res.status(404).send({ message: "Produto não encontrado" });
     }
-    : null;
 
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.size);
-
-  let page = 0;
-  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-    page = pageAsNumber;
+    // Return data with pagination
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        pedidos: pedidos,
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: totalProducts,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+      error: error.message, // Included error message for debugging
+    });
   }
-
-  let size = 20;
-  if (
-    !Number.isNaN(sizeAsNumber) &&
-    !(sizeAsNumber > 50) &&
-    !(sizeAsNumber < 1)
-  ) {
-    size = sizeAsNumber;
-  }
-  const pedidosWithCount = await pedidos.findAndCountAll({
-    where: condition,
-    limit: size,
-    offset: page * size,
-    order: [
-      ["id", "DESC"], // Order by age descending
-    ],
-  });
-  res.send({
-    status: true,
-    message: "The request has succeeded",
-    limit: size,
-    page: page,
-    totalPages: Math.ceil(pedidosWithCount.count / Number.parseInt(size)),
-    data: {
-      pedidos: pedidosWithCount.rows,
-    },
-  });
 };
 
 // Find a single Data with an id
@@ -109,39 +121,16 @@ exports.findOne = async (req, res) => {
 
 // Create and Save a new User
 exports.create = (req, res) => {
-  const payload = {
-    cnpjf: req.body.cnpjf,
-    user_id: req.body.user_id,
-    nome: req.body.nome,
-    cep: req.body.cep,
-    endereco: req.body.endereco,
-    endnum: req.body.endnum,
-    endcpl: req.body.endcpl,
-    bairro: req.body.bairro,
-    id_cidade: req.body.id_cidade,
-    cidade: req.body.cidade,
-    uf: req.body.uf,
-    email: req.body.email,
-    ddd1: req.body.ddd1,
-    fone1: req.body.fone1,
-    dh_mov: req.body.dh_mov,
-    id_fpagto: req.body.id_fpagto,
-    id_pagto: req.body.id_pagto,
-    id_vended1: req.body.id_vended1,
-    id_transp: req.body.id_transp,
-    id_frete: req.body.id_frete,
-    prazo: req.body.prazo,
-    peso_bru: req.body.peso_bru,
-    peso_liq: req.body.peso_liq,
-    total: req.body.total,
-    frete: req.body.frete,
-    desconto: req.body.desconto,
-    total_geral: req.body.total_geral,
-  };
+
+  const decodedToken = decodeTokenFromHeader(req);
+  const id_empresa = decodedToken.id_empresa;
+
+  req.body.id_user = decodedToken.id;
+  req.body.id_empresa = decodedToken.id_empresa;
 
   // Save Tutorial in the database
   pedidos
-    .create(payload)
+    .create(req.body)
     .then((data) => {
       const id_pedido = data.id;
 
@@ -170,68 +159,58 @@ exports.create = (req, res) => {
 };
 
 exports.findAllUser = async (req, res) => {
-  const id = req.params.id;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+  const decodedToken = decodeTokenFromHeader(req);
+  const id_user = decodedToken.id;
 
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.size);
+  try {
+    // Query to get the total count of products for pagination
+    const totalProductsResult = await sequelize.query(
+      `SELECT COUNT(*) as total FROM pedidos p WHERE p.id_user = ?`,
+      {
+        replacements: [id_user],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
-  let page = 0;
-  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-    page = pageAsNumber;
+    const totalProducts = totalProductsResult[0]?.total || 0;
+
+    // Query to fetch the paginated products
+    const pedidos = await sequelize.query(
+      `SELECT * FROM pedidos p
+       WHERE p.id_user = ?
+       ORDER BY p.id DESC
+       LIMIT ? OFFSET ?`,
+      {
+        replacements: [id_user, limit, offset],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (pedidos.length === 0) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    // Return data with pagination
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        pedidos: pedidos,
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: totalProducts,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+      error: error.message, // Included error message for debugging
+    });
   }
-
-  let size = 20;
-  if (
-    !Number.isNaN(sizeAsNumber) &&
-    !(sizeAsNumber > 50) &&
-    !(sizeAsNumber < 1)
-  ) {
-    size = sizeAsNumber;
-  }
-
-  const pedidosWithCount = await pedidos.findAndCountAll({
-    where: { user_id: id },
-    order: [
-      ["id", "DESC"],
-    ],
-    limit: size,
-    offset: page * size,
-    order: [
-      ["id", "DESC"], // Order by age descending
-    ],
-  });
-  res.send({
-    status: true,
-    message: "The request has succeeded",
-    limit: size,
-    page: page,
-    totalPages: Math.ceil(pedidosWithCount.count / Number.parseInt(size)),
-    data: {
-      pedidos: pedidosWithCount.rows,
-    },
-  });
-
-
-  // pedidos
-  //   .findAll({
-  //     where: { user_id: id },
-  //     order: [
-  //       ["id", "DESC"], // Order by age descending
-  //     ],
-  //   })
-  //   .then((data) => {
-  //     res.send({
-  //       status: true,
-  //       message: "The request has succeeded",
-  //       data: {
-  //         pedidos: data,
-  //       },
-  //     });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).send({
-  //       status: false,
-  //       message: err.message || "Some error occurred while retrieving Data.",
-  //     });
-  //   });
 };
