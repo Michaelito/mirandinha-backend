@@ -50,6 +50,7 @@ app.get("/jwt", (req, res) => {
     });
 });
 
+
 // Load Routes
 require("./app/routes/api/v1/tutorial.routes")(app);
 require("./app/routes/api/v1/user.routes")(app);
@@ -82,9 +83,6 @@ require("./app/routes/api/v1/michaelcustomers_address.routes")(app);
 require("./app/routes/api/v1/motoboy.routes")(app);
 require("./app/routes/api/v1/payment.routes")(app);
 require("./app/routes/api/v1/deliveryArea.routes")(app);
-
-
-
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;

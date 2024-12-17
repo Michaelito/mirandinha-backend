@@ -11,7 +11,6 @@ module.exports = (app) => {
 
   router.post("/cliente", controller.createClient);
 
-
   router.get("/updateData", controller.updateData);
 
   app.use("/api/v1/exsam", router);
