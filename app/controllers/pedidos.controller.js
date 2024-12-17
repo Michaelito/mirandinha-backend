@@ -20,7 +20,7 @@ exports.findAll = async (req, res) => {
     const totalProductsResult = await sequelize.query(
       `SELECT COUNT(*) as total FROM pedidos p WHERE p.id_empresa = ?`,
       {
-        replacements: [id_user],
+        replacements: [id_empresa],
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -123,7 +123,6 @@ exports.findOne = async (req, res) => {
 exports.create = (req, res) => {
 
   const decodedToken = decodeTokenFromHeader(req);
-  const id_empresa = decodedToken.id_empresa;
 
   req.body.id_user = decodedToken.id;
   req.body.id_empresa = decodedToken.id_empresa;
