@@ -357,6 +357,8 @@ exports.findAllSubGroup = async (req, res) => {
 exports.findOne = async (req, res) => {
   const id = req.params.id;
 
+  console.log("-----------", id)
+
   const decodedToken = decodeTokenFromHeader(req);
   const id_empresa = decodedToken.id_empresa;
 

@@ -7,7 +7,7 @@ module.exports = (app) => {
   var router = require("express").Router();
 
   // Retrieve all controller
-  router.get("/:search", auth.authenticateToken, controller.findAll);
+  router.get("/search/:search", auth.authenticateToken, controller.findAll);
 
   // Retrieve all controller
   router.get("/group/:id", auth.authenticateToken, controller.findAllGroup);
