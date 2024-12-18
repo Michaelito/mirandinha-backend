@@ -126,7 +126,7 @@ exports.findAll = async (req, res) => {
 
     // Consulta para buscar os produtos
     const products = await sequelize.query(
-      `SELECT DISTINCT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
+      `SELECT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
        p.comprimento, p.largura, p.altura, p.peso
        FROM produtos p
        JOIN produtos_grades pg ON p.id = pg.id_produto
@@ -190,7 +190,7 @@ exports.findAll = async (req, res) => {
     // Consultas paralelizadas para as grades dos produtos
     const productGradesPromises = updatedProducts.map(async (product) => {
       const productGrade = await sequelize.query(
-        "SELECT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        "SELECT DISTINCT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
           replacements: [product.id],
           type: sequelize.QueryTypes.SELECT,
@@ -313,7 +313,7 @@ exports.findAllSubGroup = async (req, res) => {
     // Consultas paralelizadas para as grades dos produtos
     const productGradesPromises = updatedProducts.map(async (product) => {
       const productGrade = await sequelize.query(
-        "SELECT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        "SELECT DISTINCT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
           replacements: [product.id],
           type: sequelize.QueryTypes.SELECT,
@@ -356,8 +356,6 @@ exports.findAllSubGroup = async (req, res) => {
 // Find a single Data with an id
 exports.findOne = async (req, res) => {
   const id = req.params.id;
-
-  console.log("-----------", id)
 
   const decodedToken = decodeTokenFromHeader(req);
   const id_empresa = decodedToken.id_empresa;
@@ -410,7 +408,7 @@ exports.findOne = async (req, res) => {
 
     // Consultar as grades do produto
     const productGrade = await sequelize.query(
-      "SELECT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+      "SELECT DISTINCT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
       {
         replacements: [product.id],
         type: sequelize.QueryTypes.SELECT,
