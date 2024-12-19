@@ -7,6 +7,59 @@ const sequelize = require("../config/database");
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
 
+exports.findAllErp = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+
+  try {
+    // Query to get the total count of products for pagination
+    const totalProductsResult = await sequelize.query(
+      `SELECT COUNT(*) as total FROM pedidos p`,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const totalProducts = totalProductsResult[0]?.total || 0;
+
+    // Query to fetch the paginated products
+    const pedidos = await sequelize.query(
+      `SELECT * FROM pedidos p
+       ORDER BY p.id DESC
+       LIMIT ? OFFSET ?`,
+      {
+        replacements: [limit, offset],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (pedidos.length === 0) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    // Return data with pagination
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        pedidos: pedidos,
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: totalProducts,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+      error: error.message, // Included error message for debugging
+    });
+  }
+};
+
 // Retrieve all from the database.
 exports.findAll = async (req, res) => {
   const page = parseInt(req.query.page) || 1;

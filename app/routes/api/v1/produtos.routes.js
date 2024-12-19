@@ -12,7 +12,7 @@ module.exports = (app) => {
   // Retrieve all controller
   router.get("/group/:id", auth.authenticateToken, controller.findAllGroup);
 
-  router.get("/subgroup/:id", auth.authenticateToken, controller.findAllSubGroup);
+  router.get("/subgroup/:id_grupo/:id", auth.authenticateToken, controller.findAllSubGroup);
 
   // Retrieve a single Data with id
   router.get("/:id", auth.authenticateToken, controller.findOne);

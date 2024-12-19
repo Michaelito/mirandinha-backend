@@ -30,7 +30,7 @@ exports.findAllGroup = async (req, res) => {
   const sizeAsNumber = Number.parseInt(req.query.size);
 
   Products.hasMany(GradeProdutos, {
-    foreignKey: "produto_id",
+    foreignKey: "id_produto",
   });
 
   let page = 0;
@@ -229,6 +229,7 @@ exports.findAll = async (req, res) => {
 
 exports.findAllSubGroup = async (req, res) => {
   const id = req.params.id;
+  const id_grupo = req.params.id_grupo;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
   const offset = (page - 1) * limit;
@@ -239,9 +240,9 @@ exports.findAllSubGroup = async (req, res) => {
     const totalProductsResult = await sequelize.query(
       `SELECT COUNT(DISTINCT id) AS total
        FROM produtos
-       WHERE id_subgrupo = ? `,
+       WHERE id_grupo = ? AND id_subgrupo = ? `,
       {
-        replacements: [id],
+        replacements: [id_grupo, id],
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -250,14 +251,14 @@ exports.findAllSubGroup = async (req, res) => {
 
     // Consulta para buscar os produtos
     const products = await sequelize.query(
-      `SELECT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
+      `SELECT DISTINCT p.id, p.id_grupo, p.nome, p.descricao, p.preco AS preco_base, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
        p.comprimento, p.largura, p.altura, p.peso
        FROM produtos p
-       WHERE p.id_subgrupo = ? 
+       WHERE p.id_grupo = ? and p.id_subgrupo = ?
        ORDER BY p.id_subgrupo, p.nome ASC
        LIMIT ? OFFSET ?`,
       {
-        replacements: [id, limit, offset],
+        replacements: [id_grupo, id, limit, offset],
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -278,10 +279,10 @@ exports.findAllSubGroup = async (req, res) => {
 
     // Calculando o preço por tabpreco para cada produto
     const updatedProducts = products.map(product => {
-      const calcPrecoTab = parseFloat(product.preco) * parseFloat(tabpreco[0].fator);
+      const calcPrecoTab = parseFloat(product.preco_base) * parseFloat(tabpreco[0].fator);
       return {
         ...product,
-        preco_tab: calcPrecoTab.toFixed(2)
+        preco: calcPrecoTab.toFixed(2)
       };
     });
 
@@ -313,7 +314,7 @@ exports.findAllSubGroup = async (req, res) => {
     // Consultas paralelizadas para as grades dos produtos
     const productGradesPromises = updatedProducts.map(async (product) => {
       const productGrade = await sequelize.query(
-        "SELECT DISTINCT id, id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
+        "SELECT DISTINCT id_exsam, grade, hexadecimal, img FROM produtos_grades WHERE id_produto = ? ORDER BY grade ASC",
         {
           replacements: [product.id],
           type: sequelize.QueryTypes.SELECT,
@@ -349,9 +350,6 @@ exports.findAllSubGroup = async (req, res) => {
     });
   }
 };
-
-
-
 
 // Find a single Data with an id
 exports.findOne = async (req, res) => {
