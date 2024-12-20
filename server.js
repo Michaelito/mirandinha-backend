@@ -1,30 +1,35 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const http = require('http');
-const debug = require('debug')('nodestr:server');
 const db = require("./app/models");
-
 
 const app = express();
 
 var corsOptions = {
-    origin: "http://mirandinha-portal.doxotech.com.br:3003",
+    origin: ["http://mirandinha-portal.doxotech.com.br:3003", "http://localhost:80"],
     optionsSuccessStatus: 200
 };
 
-app.use(cors({ origin: '*' }));
+app.use(cors(corsOptions));
 
-//request methods
-app.use(function (req, res, next) {
+// Middleware para configurar os cabeçalhos de controle de cache
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    next();
+});
+
+// Middleware para permitir requisições de métodos e headers específicos
+app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT");
     res.setHeader("Access-Control-Allow-Headers", "content-type");
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Access-Control-Allow-Credentials", true);
     next();
 });
-
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
@@ -32,15 +37,9 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 const { Console } = require('console');
 
 db.sequelize.sync();
-
-// // drop the table if it already exists
-// db.sequelize.sync({ force: true }).then(() => {
-//     console.log("Drop and re-sync db.");
-// });
 
 // Load Routes
 require("./app/routes/api/v1/tutorial.routes")(app);
@@ -63,9 +62,6 @@ require("./app/routes/api/v1/produtos_grade.routes")(app);
 require("./app/routes/api/v1/dashboard.routes")(app);
 require("./app/routes/api/v1/subgrupo.routes")(app);
 require("./app/routes/api/v1/newsletter.routes")(app);
-
-
-
 require("./app/routes/api/v1/michaelgrupo.routes")(app);
 require("./app/routes/api/v1/michaelproduto.routes")(app);
 require("./app/routes/api/v1/michaelpedido.routes")(app);
@@ -84,7 +80,6 @@ app.listen(PORT, () => {
 
 // simple route index || status
 app.get(["/", "/status"], (req, res) => {
-
     res.status(200).send({
         title: 'Welcome to API',
         version: '1.0.0',
