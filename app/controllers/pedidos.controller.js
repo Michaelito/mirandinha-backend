@@ -25,7 +25,11 @@ exports.findAllErp = async (req, res) => {
 
     // Query to fetch the paginated products
     const pedidos = await sequelize.query(
-      `SELECT * FROM pedidos p
+      `SELECT p.id, p.createdAt, c.razao_social, du.fullname, p.total, p.status
+       FROM pedidos p
+       JOIN clientes c ON c.id = p.id_empresa 
+       JOIN users u ON u.id = p.id_user 
+       JOIN data_users du ON du.user_id = u.id
        ORDER BY p.id DESC
        LIMIT ? OFFSET ?`,
       {
