@@ -1,64 +1,60 @@
 const db = require("../models");
-const clienteService = require("../services/cliente.service");
 const Clientes = db.clientes;
+const Users = db.users;
 const Op = db.Sequelize.Op;
 const jsonxml = require('jsonxml');
+const clienteSchema = require('../validation/clienteValidator');
+const crypto = require("crypto");
+const { uuid } = require("uuidv4");
 
-exports.create = (req, res) => {
-  // Create a Ciente
-  const cliente = {
-    lj: req.body.lj,
-    nome: req.body.nome,
-    guerra: req.body.guerra,
-    id_pessoa: req.body.id_pessoa,
-    id_tipo: req.body.id_tipo,
-    id_vended1: req.body.id_vended1,
-    id_vended2: req.body.id_vended2,
-    id_vended3: req.body.id_vended3,
-    id_tabpre: req.body.id_tabpre,
-    id_pagto: req.body.id_pagto,
-    id_fpagto: req.body.id_fpagto,
-    id_transp: req.body.id_transp,
-    lj_transp: req.body.lj_transp,
-    id_frete: req.body.id_frete,
-    cnpj: req.body.cnpj,
-    ie: req.body.ie,
-    email: req.body.email,
-    ddd1: req.body.ddd1,
-    fone1: req.body.fone1,
-    ddd2: req.body.ddd2,
-    fone2: req.body.fone2,
-    cep: req.body.cep,
-    endereco: req.body.endereco,
-    endnum: req.body.endnum,
-    endcpl: req.body.endcpl,
-    bairro: req.body.bairro,
-    id_cidade: req.body.id_cidade,
-    cidade: req.body.cidade,
-    uf: req.body.uf,
-    id_pais: req.body.id_pais
-  };
- 
-  // Save Tutorial in the database
-  Clientes.create(cliente)
-    .then(data => {
-      res.send({
-        status: true,
-        message: "The request has succeeded",
-        data: {
-            cliente: data
-        }
-    }).status(200);
-      //clienteService.createClienteExsam(req, res, xmlData);
+exports.create = async (req, res) => {
 
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while creating the Cliente."
-      });
+  const { error, value } = clienteSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).send({ error: error.details[0].message });
+  }
+
+  try {
+
+    const cnpjExists = await Clientes.findOne({ where: { cnpj: value.cnpj } });
+
+    const emailExists = await Users.findOne({ where: { login: value.email } });
+
+    if (emailExists) {
+      return res.status(400).send({ error: 'E-MAIL already exists' });
+    }
+
+    if (cnpjExists) {
+      return res.status(400).send({ error: 'CNPJ already exists' });
+    }
+
+    const novoCliente = await Clientes.create(req.body);
+    const md5Hash = crypto.createHash("md5");
+    md5Hash.update(value.password);
+    const password_md5 = md5Hash.digest("hex");
+
+    const payload = {
+      uuid: uuid(),
+      login: value.email,
+      empresa_id: novoCliente.id,
+      password: password_md5,
+      profile: 2,
+    };
+
+    await Users.create(payload);
+
+    res.send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        clientes: novoCliente,
+      },
     });
 
-
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 
 };
 
@@ -130,22 +126,22 @@ exports.update = (req, res) => {
   const id = req.params.id;
 
   Clientes.update(req.body, {
-          where: { id: id }
-      })
-      .then(num => {
-          if (num == 1) {
-              res.send({
-                  message: "Data was updated successfully."
-              });
-          } else {
-              res.send({
-                  message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`
-              });
-          }
-      })
-      .catch(err => {
-          res.status(500).send({
-              message: "Error updating Data with id=" + id
-          });
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "Data was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update Data with id=${id}. Maybe Data was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Data with id=" + id
       });
+    });
 };

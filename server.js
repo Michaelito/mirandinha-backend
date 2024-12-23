@@ -6,7 +6,7 @@ const db = require("./app/models");
 const app = express();
 
 var corsOptions = {
-    origin: ["http://mirandinha-portal.doxotech.com.br:3003", "http://localhost:80"],
+    origin: ["http://portalmirandinha.com.br", "http://localhost"],
     optionsSuccessStatus: 200
 };
 
