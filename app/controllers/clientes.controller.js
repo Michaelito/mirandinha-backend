@@ -34,7 +34,7 @@ exports.create = async (req, res) => {
     md5Hash.update(value.password);
     const password_md5 = md5Hash.digest("hex");
 
-    const cnpjLimpo = req.body.cnpj.replace(/\D/g, "");
+    const cnpjLimpo = value.cnpj.replace(/\D/g, "");
 
     const payload = {
       uuid: uuid(),
