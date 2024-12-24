@@ -38,8 +38,7 @@ async function login(req, res) {
           profile: user.profile
         },
         JWT_SECRET,
-        //{ expiresIn: process.env.JWT_EXPIRES_IN } // Token expira em 6 horas
-        { expiresIn: '10m' } // Token expira em 6 horas
+        { expiresIn: process.env.JWT_EXPIRES_IN } // Token expira em 6 horas
       );
 
       const expirationDate = new Date();
