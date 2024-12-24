@@ -34,12 +34,14 @@ exports.create = async (req, res) => {
     md5Hash.update(value.password);
     const password_md5 = md5Hash.digest("hex");
 
+    const cnpjLimpo = req.body.cnpj.replace(/[\.\-\/]/g, "");
+
     const payload = {
       uuid: uuid(),
       login: value.email,
       empresa_id: novoCliente.id,
       password: password_md5,
-      profile: 2,
+      profile: cnpjLimpo.length > 11 ? 2 : 1
     };
 
     await Users.create(payload);
