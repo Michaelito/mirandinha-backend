@@ -5,6 +5,7 @@ const { uuid } = require('uuidv4');
 const Op = db.Sequelize.Op;
 const sequelize = require("../config/database");
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
+const axios = require('axios');
 
 
 exports.findAllErp = async (req, res) => {
@@ -177,69 +178,109 @@ exports.findOne = async (req, res) => {
 
 
 // Create and Save a new User
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
 
   const decodedToken = decodeTokenFromHeader(req);
 
-  const payload = {
-    cnpjf: req.body.cnpjf,
-    id_user: decodedToken.id,
-    id_empresa: decodedToken.id_empresa,
-    nome: req.body.nome,
-    cep: req.body.cep,
-    endereco: req.body.endereco,
-    endnum: req.body.endnum,
-    endcpl: req.body.endcpl,
-    bairro: req.body.bairro,
-    id_cidade: req.body.id_cidade,
-    cidade: req.body.cidade,
-    uf: req.body.uf,
-    email: req.body.email,
-    ddd1: req.body.ddd1,
-    fone1: req.body.fone1,
-    dh_mov: req.body.dh_mov,
-    id_fpagto: req.body.id_fpagto,
-    id_pagto: req.body.id_pagto,
-    id_vended1: req.body.id_vended1,
-    id_transp: req.body.id_transp,
-    id_frete: req.body.id_frete,
-    prazo: req.body.prazo,
-    peso_bru: req.body.peso_bru,
-    peso_liq: req.body.peso_liq,
-    total: req.body.total,
-    frete: req.body.frete,
-    desconto: req.body.desconto,
-    total_geral: req.body.total_geral,
-  };
+  try {
+    // Create the payload with additional attributes
+    const payload = {
+      ...req.body, // Spread the properties of req.body
+      id_user: decodedToken.id,
+      id_empresa: decodedToken.id_empresa,
+    };
 
-  // Save Tutorial in the database
-  pedidos
-    .create(payload)
-    .then((data) => {
-      const id_pedido = data.id;
+    // Save the order in the database
+    const data = await pedidos.create(payload);
+    const id_pedido = data.id;
 
-      const itensArray = req.body.pedido_itens;
+    const itensArray = req.body.pedido_itens;
 
-      // Use map() to iterate over itensArray and create promises for each item insertion
-      itensArray.forEach((pedido_item) => {
-        // Create a promise for each item insertion
-        let insertionPromise = pedidosItens.create({
-          ...pedido_item, // Spread the properties of pedido_item
-          id_pedido: id_pedido, // Assign the pedido_id to the item
-        });
-
-        // Push the promise into the array
-        itensArray.push(insertionPromise);
-      });
-
-      res.send(data);
-    })
-
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while creating data.",
+    // Create promises for each item insertion
+    const insertionPromises = itensArray.map(pedido_item => {
+      return pedidosItens.create({
+        ...pedido_item, // Spread the properties of pedido_item
+        id_pedido: id_pedido, // Assign the pedido_id to the item
       });
     });
+
+    // Await all promises to ensure all items are inserted
+    await Promise.all(insertionPromises);
+
+    // Insert exsam logic here
+    // ...
+
+    const clientes = await sequelize.query(
+      `SELECT * FROM clientes WHERE id = ${decodedToken.id_empresa}`,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const exsam = clientes[0];
+
+    const ordersItens = await sequelize.query(
+      `SELECT id_exsam, qtde, preco FROM pedidos_itens p WHERE p.id_pedido = ${id_pedido}`,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const ordersArray = ordersItens.map(item => ({
+      id_produto: item.id_exsam,
+      qtde: parseInt(item.qtde, 10),  // Convert qtde to integer
+      preco: parseInt(item.preco, 10), // Convert preco to integer
+      age_doc: "",
+      age_pro: ""
+    }));
+
+    const orderHeader = {
+      "id_agente": exsam['id_exsam'],
+      "lj_agente": "01",
+      "id_tipcli": "R",
+      "id_pagto": exsam['id_pagamento'],
+      "id_fpagto": 0,
+      "id_tabpre": exsam['id_tabpre'],
+      "id_vended1": exsam['id_vendedor'],
+      "comissao1": 3,
+      "id_frete": 0,
+      "id_transp": exsam['id_trasnportador'],
+      "lj_transp": "01",
+      "itens": ordersArray
+    }
+
+    const dataOrderExsam = JSON.stringify(orderHeader, null, 2)
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'http://exsammirandinha.ddns.com.br:7780/api/pedidos',
+      headers: {
+        'Authorization': 'Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7',
+        'Content-Type': 'application/json'
+      },
+      data: dataOrderExsam
+    };
+
+    const response = await axios.request(config);
+
+    const exsamId = response.data.success.id;
+
+    await sequelize.query(
+      `UPDATE pedidos SET pedido_id_exsam = :exsamId, status = 11 WHERE id = :id_pedido`,
+      {
+        replacements: { exsamId, id_pedido },
+        type: sequelize.QueryTypes.UPDATE
+      }
+    );
+
+    res.send(data);
+
+  } catch (err) {
+    res.status(500).send({
+      message: err.message || "Some error occurred while creating data.",
+    });
+  }
 };
 
 exports.findAllUser = async (req, res) => {

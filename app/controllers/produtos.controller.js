@@ -8,6 +8,62 @@ const Op = db.Sequelize.Op;
 
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
+exports.findAllERP = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+
+
+  try {
+
+    // Consulta para contar o total de produtos
+    const totalProductsResult = await sequelize.query(
+      `SELECT COUNT(DISTINCT id) AS total
+       FROM produtos`,
+      {
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const totalProducts = totalProductsResult[0].total;
+
+    // Consulta para buscar os produtos
+    const products = await sequelize.query(
+      `SELECT DISTINCT p.id, p.id_grupo, gf.name as nome_grupo, p.id_subgrupo, g.nome as nome_subgrupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, 
+       p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, p.comprimento, p.largura, p.altura, p.peso
+       FROM produtos p
+       JOIN grupo_formats gf ON gf.id = p.id_grupo 
+       JOIN grupos g ON g.id = p.id_subgrupo 
+       ORDER BY p.id_subgrupo, p.nome ASC
+       LIMIT ? OFFSET ?`,
+      {
+        replacements: [limit, offset],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    // Retornar os dados com a paginação
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+
+        products: products,
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: totalProducts,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+};
+
 
 exports.findAllGroup = async (req, res) => {
   console.log("products all group/id");
@@ -111,6 +167,7 @@ exports.findAll = async (req, res) => {
   const decodedToken = decodeTokenFromHeader(req);
 
   try {
+
     // Consulta para contar o total de produtos
     const totalProductsResult = await sequelize.query(
       `SELECT COUNT(DISTINCT id) AS total
