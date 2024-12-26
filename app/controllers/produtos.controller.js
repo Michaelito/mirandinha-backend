@@ -183,7 +183,7 @@ exports.findAll = async (req, res) => {
 
     // Consulta para buscar os produtos
     const products = await sequelize.query(
-      `SELECT DISTINCT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
+      `SELECT DISTINCT p.id, p.id_grupo, p.nome, p.descricao, p.preco as preco_base, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
        p.comprimento, p.largura, p.altura, p.peso
        FROM produtos p
        JOIN produtos_grades pg ON p.id = pg.id_produto
@@ -198,24 +198,29 @@ exports.findAll = async (req, res) => {
 
     const id_empresa = decodedToken.id_empresa;
 
-    // Consulta valor por tabpreco
-    const tabpreco = await sequelize.query(
-      `SELECT tp.fator  
+    console.log("----------", id_empresa)
+
+
+    if (id_empresa > 0) {
+      // Consulta valor por tabpreco
+      const tabpreco = await sequelize.query(
+        `SELECT tp.fator  
       FROM clientes c 
       JOIN tabpreco tp on tp.id = c.id_tabpre 
       WHERE c.id = ? LIMIT 1`,
-      {
-        replacements: [id_empresa],
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
+        {
+          replacements: [id_empresa],
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+    }
 
     // Calculando o preço por tabpreco para cada produto
     const updatedProducts = products.map(product => {
-      const calcPrecoTab = parseFloat(product.preco) * parseFloat(tabpreco[0].fator);
+      const calcPrecoTab = id_empresa > 0 ? parseFloat(product.preco_base) * parseFloat(tabpreco[0].fator) : parseFloat(product.preco_base)
       return {
         ...product,
-        preco_tab: calcPrecoTab.toFixed(2)
+        preco: calcPrecoTab.toFixed(2)
       };
     });
 
@@ -415,10 +420,11 @@ exports.findOne = async (req, res) => {
   const decodedToken = decodeTokenFromHeader(req);
   const id_empresa = decodedToken.id_empresa;
 
+
   try {
     // Consulta para buscar o produto específico
     const products = await sequelize.query(
-      `SELECT p.id, p.id_grupo, p.nome, p.descricao, p.preco, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
+      `SELECT p.id, p.id_grupo, p.nome, p.descricao, p.preco as preco_base, p.preco_pf, p.video, p.aplicacao, p.manual_tecnico, p.qrcode, p.unimed, 
        p.comprimento, p.largura, p.altura, p.peso
        FROM produtos p      
        WHERE p.id = ?`,
@@ -435,31 +441,38 @@ exports.findOne = async (req, res) => {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
-    // Consulta para buscar o fator de tabpreco
-    const tabpreco = await sequelize.query(
-      `SELECT tp.fator  
+    if (id_empresa > 0) {
+      // Consulta para buscar o fator de tabpreco
+      const tabpreco = await sequelize.query(
+        `SELECT tp.fator  
       FROM clientes c 
       JOIN tabpreco tp on tp.id = c.id_tabpre 
       WHERE c.id = ? LIMIT 1`,
-      {
-        replacements: [id_empresa],
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
+        {
+          replacements: [id_empresa],
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
 
-    // Garantir que temos um fator de tabpreco válido
-    if (!tabpreco || tabpreco.length === 0) {
-      return res.status(400).send({
-        status: false,
-        message: "Fator de tabpreço não encontrado para esta empresa.",
-      });
+      // Garantir que temos um fator de tabpreco válido
+      if (!tabpreco || tabpreco.length === 0) {
+        return res.status(400).send({
+          status: false,
+          message: "Fator de tabpreço não encontrado para esta empresa.",
+        });
+      }
+
+      const fatorTabPreco = tabpreco[0].fator;
+
+      // Calculando o preço por tabpreco
+      const calcPrecoTab = parseFloat(product.preco_base) * parseFloat(fatorTabPreco);
+
     }
 
-    const fatorTabPreco = tabpreco[0].fator;
+    product.preco = id_empresa > 0 ? calcPrecoTab.toFixed(2) : product.preco_base; // Adiciona o preço calculado ao produto
 
-    // Calculando o preço por tabpreco
-    const calcPrecoTab = parseFloat(product.preco) * parseFloat(fatorTabPreco);
-    product.preco_tab = calcPrecoTab.toFixed(2); // Adiciona o preço calculado ao produto
+
+
 
     // Consultar as grades do produto
     const productGrade = await sequelize.query(
