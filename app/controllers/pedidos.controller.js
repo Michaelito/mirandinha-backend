@@ -264,6 +264,8 @@ exports.create = async (req, res) => {
 
     const response = await axios.request(config);
 
+    console.log("-------exsam--------", response.data);
+
     const exsamId = response.data.success.id;
 
     await sequelize.query(

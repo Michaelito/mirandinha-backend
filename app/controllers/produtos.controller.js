@@ -198,26 +198,25 @@ exports.findAll = async (req, res) => {
 
     const id_empresa = decodedToken.id_empresa;
 
-    console.log("----------", id_empresa)
-
-
-    if (id_empresa > 0) {
-      // Consulta valor por tabpreco
-      const tabpreco = await sequelize.query(
-        `SELECT tp.fator  
+    // Consulta valor por tabpreco
+    const tabpreco = await sequelize.query(
+      `SELECT tp.fator  
       FROM clientes c 
       JOIN tabpreco tp on tp.id = c.id_tabpre 
       WHERE c.id = ? LIMIT 1`,
-        {
-          replacements: [id_empresa],
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-    }
+      {
+        replacements: [id_empresa],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const fatorTabPreco = tabpreco.length === 0 ? 1 : parseFloat(tabpreco[0].fator);
 
     // Calculando o preço por tabpreco para cada produto
     const updatedProducts = products.map(product => {
-      const calcPrecoTab = id_empresa > 0 ? parseFloat(product.preco_base) * parseFloat(tabpreco[0].fator) : parseFloat(product.preco_base)
+
+      const calcPrecoTab = parseFloat(product.preco_base) * parseFloat(fatorTabPreco)
+
       return {
         ...product,
         preco: calcPrecoTab.toFixed(2)
@@ -441,38 +440,31 @@ exports.findOne = async (req, res) => {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
-    if (id_empresa > 0) {
-      // Consulta para buscar o fator de tabpreco
-      const tabpreco = await sequelize.query(
-        `SELECT tp.fator  
+    // Consulta para buscar o fator de tabpreco
+    const tabpreco = await sequelize.query(
+      `SELECT tp.fator  
       FROM clientes c 
       JOIN tabpreco tp on tp.id = c.id_tabpre 
       WHERE c.id = ? LIMIT 1`,
-        {
-          replacements: [id_empresa],
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-
-      // Garantir que temos um fator de tabpreco válido
-      if (!tabpreco || tabpreco.length === 0) {
-        return res.status(400).send({
-          status: false,
-          message: "Fator de tabpreço não encontrado para esta empresa.",
-        });
+      {
+        replacements: [id_empresa],
+        type: sequelize.QueryTypes.SELECT,
       }
+    );
 
-      const fatorTabPreco = tabpreco[0].fator;
+    // Garantir que temos um fator de tabpreco válido
+    // if (!tabpreco || tabpreco.length === 0) {
+    //   return res.status(400).send({
+    //     status: false,
+    //     message: "Fator de tabpreço não encontrado para esta empresa.",
+    //   });
+    // }
 
-      // Calculando o preço por tabpreco
-      const calcPrecoTab = parseFloat(product.preco_base) * parseFloat(fatorTabPreco);
+    const fatorTabPreco = tabpreco.length === 0 ? 1 : parseFloat(tabpreco[0].fator);
 
-    }
+    const calcPrecoTab = parseFloat(product.preco_base) * parseFloat(fatorTabPreco);
 
-    product.preco = id_empresa > 0 ? calcPrecoTab.toFixed(2) : product.preco_base; // Adiciona o preço calculado ao produto
-
-
-
+    product.preco = calcPrecoTab.toFixed(2)
 
     // Consultar as grades do produto
     const productGrade = await sequelize.query(
