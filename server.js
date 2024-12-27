@@ -62,6 +62,11 @@ require("./app/routes/api/v1/produtos_grade.routes")(app);
 require("./app/routes/api/v1/dashboard.routes")(app);
 require("./app/routes/api/v1/subgrupo.routes")(app);
 require("./app/routes/api/v1/newsletter.routes")(app);
+require("./app/routes/api/v1/transportadoras.routes")(app);
+
+
+
+
 require("./app/routes/api/v1/michaelgrupo.routes")(app);
 require("./app/routes/api/v1/michaelproduto.routes")(app);
 require("./app/routes/api/v1/michaelpedido.routes")(app);
