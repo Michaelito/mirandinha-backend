@@ -239,7 +239,7 @@ exports.create = async (req, res) => {
       "lj_agente": "01",
       "id_tipcli": "R",
       "id_pagto": exsam['id_pagamento'],
-      "id_fpagto": 0,
+      "id_fpagto": exsam['id_forma_pagamento'],
       "id_tabpre": exsam['id_tabpre'],
       "id_vended1": exsam['id_vendedor'],
       "comissao1": 3,
