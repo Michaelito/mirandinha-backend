@@ -4,12 +4,24 @@ exports.findAll = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const offset = (page - 1) * limit;
+    const search = req.params.search || ""; // Get the search parameter
 
     try {
+        // Build WHERE clause based on the search parameter
+        let whereClause = "";
+        let replacements = [limit, offset];
+
+        if (search) {
+            whereClause = `WHERE name LIKE ? OR trade_name LIKE ? OR document LIKE ?`;
+            const searchParam = `%${search}%`;
+            replacements = [searchParam, searchParam, searchParam, limit, offset];
+        }
+
         // Query to get the total count of products for pagination
         const totalQuery = await sequelize.query(
-            `SELECT COUNT(*) as total FROM carriers`,
+            `SELECT COUNT(*) as total FROM carriers ${whereClause}`,
             {
+                replacements: search ? [replacements[0], replacements[1], replacements[2]] : [],
                 type: sequelize.QueryTypes.SELECT,
             }
         );
@@ -19,10 +31,11 @@ exports.findAll = async (req, res) => {
         // Query to fetch the paginated products
         const query = await sequelize.query(
             `SELECT id, id_exsam, name, trade_name, document, phone FROM carriers
-         ORDER BY id DESC
-         LIMIT ? OFFSET ?`,
+             ${whereClause}
+             ORDER BY id DESC
+             LIMIT ? OFFSET ?`,
             {
-                replacements: [limit, offset],
+                replacements,
                 type: sequelize.QueryTypes.SELECT,
             }
         );
@@ -52,6 +65,8 @@ exports.findAll = async (req, res) => {
         });
     }
 };
+
+
 
 
 
