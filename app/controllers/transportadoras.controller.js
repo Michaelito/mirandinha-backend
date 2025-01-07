@@ -12,16 +12,16 @@ exports.findAll = async (req, res) => {
         let replacements = [limit, offset];
 
         if (search) {
-            whereClause = `WHERE name LIKE ? OR trade_name LIKE ? OR document LIKE ?`;
+            whereClause = `WHERE name LIKE ? OR trade_name LIKE ?`;
             const searchParam = `%${search}%`;
-            replacements = [searchParam, searchParam, searchParam, limit, offset];
+            replacements = [searchParam, searchParam, limit, offset];
         }
 
         // Query to get the total count of products for pagination
         const totalQuery = await sequelize.query(
             `SELECT COUNT(*) as total FROM carriers ${whereClause}`,
             {
-                replacements: search ? [replacements[0], replacements[1], replacements[2]] : [],
+                replacements: search ? [replacements[0], replacements[1]] : [],
                 type: sequelize.QueryTypes.SELECT,
             }
         );
