@@ -48,6 +48,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       foreignKey: true,
     },
+    pedido_id_exsam: {
+      type: DataTypes.INTEGER,
+    },
+    obs: {
+      type: DataTypes.STRING,
+    },
     prazo: { type: DataTypes.INTEGER },
     peso_bru: { type: DataTypes.DECIMAL(10, 4) },
     peso_liq: { type: DataTypes.DECIMAL(10, 4) },

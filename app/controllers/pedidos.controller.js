@@ -269,14 +269,19 @@ exports.create = async (req, res) => {
     const exsamId = response.data.success.id;
 
     await sequelize.query(
-      `UPDATE pedidos SET pedido_id_exsam = :exsamId, status = 11 WHERE id = :id_pedido`,
+      `UPDATE pedidos SET pedido_id_exsam = :exsamId WHERE id = :id_pedido`,
       {
         replacements: { exsamId, id_pedido },
         type: sequelize.QueryTypes.UPDATE
       }
     );
 
-    res.send(data);
+    const idata = {
+      ...(data.get ? data.get() : data),
+      pedido_id_exsam: parseInt(exsamId),
+    };
+
+    res.send(idata);
 
   } catch (err) {
     res.status(500).send({
