@@ -6,22 +6,24 @@ exports.findAll = async (req, res) => {
     const offset = (page - 1) * limit;
     const search = req.params.search || ""; // Get the search parameter
 
+    console.log("Search parameter:", search);
+
     try {
         // Build WHERE clause based on the search parameter
         let whereClause = "";
         let replacements = [limit, offset];
 
         if (search) {
-            whereClause = `WHERE name LIKE ? OR trade_name LIKE ?`;
+            whereClause = `WHERE name LIKE ? OR trade_name LIKE ? OR document LIKE ?`;
             const searchParam = `%${search}%`;
-            replacements = [searchParam, searchParam, limit, offset];
+            replacements = [searchParam, searchParam, searchParam, limit, offset];
         }
 
         // Query to get the total count of products for pagination
         const totalQuery = await sequelize.query(
             `SELECT COUNT(*) as total FROM carriers ${whereClause}`,
             {
-                replacements: search ? [replacements[0], replacements[1]] : [],
+                replacements: search ? [replacements[0], replacements[1], replacements[2]] : [],
                 type: sequelize.QueryTypes.SELECT,
             }
         );
@@ -65,6 +67,7 @@ exports.findAll = async (req, res) => {
         });
     }
 };
+
 
 
 
