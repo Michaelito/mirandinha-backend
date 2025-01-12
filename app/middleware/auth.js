@@ -47,12 +47,6 @@ async function login(req, res) {
       return res.json({
         status: true,
         user: {
-          id: user.id,
-          login: user.login,
-          fullname: datauser.fullname,
-          profile: user.profile,
-          status: user.status,
-          createdAt: user.createdAt,
           token: token,
           dt_expired: expirationDate.toISOString()
         },
