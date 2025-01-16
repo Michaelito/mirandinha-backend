@@ -6,7 +6,6 @@ const address_users = db.address_users;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 const { console } = require("inspector");
 
 
@@ -332,60 +331,7 @@ exports.delete = (req, res) => {
 
 
 exports.forgot_password = async (req, res) => {
-
-  try {
-    const login = req.body.login;
-
-    if (!login || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login)) {
-      return res.status(400).send({ status: false, message: "Invalid email address" });
-    }
-
-    // Generate a token
-    const password = crypto.randomBytes(8).toString("hex");
-
-    const htmlContent = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-      <h1 style="color: #4CAF50;">Portal Mirandinha - Temporary Password</h1>
-      <p>Hello,</p>
-      <p>Your temporary password is:</p>
-      <blockquote style="border-left: 4px solid #4CAF50; padding-left: 10px; color: #555;">
-        ${password}
-      </blockquote>
-      <p>Please reset your password after logging in.</p>
-      <footer style="margin-top: 20px; font-size: 0.9em; color: #777;">
-        <p>Best regards,</p>
-        <p>Portal Mirandinha Team</p>
-      </footer>
-    </div>
-  `;
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: '"Portal Mirandinha" <suporte@portalmirandinha.com.br>',
-      to: login,
-      subject: "Portal Mirandinha - Reset Password",
-      text: htmlContent,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-
-  } catch (error) {
-    console.error("Error sending email:", error.message, error.stack);
-    res.status(500).send({
-      status: false,
-      message: "Failed to send email",
-    });
-  }
+  console.log("teste")
 
 
 };
