@@ -54,6 +54,9 @@ module.exports = (sequelize, DataTypes) => {
     obs: {
       type: DataTypes.STRING,
     },
+    response_exsam: {
+      type: DataTypes.STRING,
+    },
     prazo: { type: DataTypes.INTEGER },
     peso_bru: { type: DataTypes.DECIMAL(10, 4) },
     peso_liq: { type: DataTypes.DECIMAL(10, 4) },
@@ -61,10 +64,7 @@ module.exports = (sequelize, DataTypes) => {
     frete: { type: DataTypes.DECIMAL(10, 4) },
     desconto: { type: DataTypes.DECIMAL(10, 4) },
     total_geral: { type: DataTypes.DECIMAL(10, 4) },
-    status: {
-      type: DataTypes.STRING(2),
-      comment: '0:Inativo, 1:Registrado/Ativo, 2:Em Análise, 3:Fechando, 4:Aprovado, 5:Reprovado, 6:Retido',
-    },
+    status: { type: DataTypes.STRING(2) },
 
   });
 

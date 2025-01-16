@@ -1,9 +1,14 @@
+require("dotenv").config(); // Para gerenciar variáveis de ambiente
 const db = require("../models");
 const users = db.users;
 const datausers = db.data_users;
 const address_users = db.address_users;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const { console } = require("inspector");
+
 
 // Create and Save a new Tutorial
 
@@ -12,10 +17,10 @@ exports.findAll = (req, res) => {
   const name = req.query.name;
   var condition = name
     ? {
-        name: {
-          [Op.like]: `%${name}%`,
-        },
-      }
+      name: {
+        [Op.like]: `%${name}%`,
+      },
+    }
     : null;
 
   users.hasOne(datausers, {
@@ -166,7 +171,7 @@ exports.create = (req, res) => {
     return;
   }
 
-  const crypto = require("crypto");
+
 
   // Create an MD5 hash object
   const md5Hash = crypto.createHash("md5");
@@ -218,61 +223,55 @@ exports.create = (req, res) => {
 };
 
 exports.update_password = async (req, res) => {
-  
-  res.send({
-    message: "Data was updated successfully.",
-  });
+  try {
+    const userId = req.params.id; // Obter o ID do usuário da URL
+    const { pass_old, pass_new } = req.body; // Obter as senhas do corpo da requisição
 
-  // const crypto = require("crypto");
+    // Validar se os campos necessários estão presentes
+    if (!pass_old || !pass_new) {
+      return res.status(400).send({ message: "As senhas antiga e nova são obrigatórias." });
+    }
 
-  // // Create an MD5 hash object
-  // const md5Hash = crypto.createHash("md5");
+    // Gerar o hash da senha antiga fornecida
+    const hashOldPassword = crypto.createHash("md5").update(pass_old).digest("hex");
 
-  // // Update the hash object with the password
-  // md5Hash.update(req.body.pass_old);
+    // Buscar o usuário no banco de dados
+    const user = await users.findOne({ where: { id: userId } });
 
-  // // Get the hexadecimal representation of the hash
-  // const password_old = md5Hash.digest("hex");
+    if (!user) {
+      res.status(400).send({
+        status: true,
+        message: "Data not found",
+      });
+    }
 
-  // const verify_user = await users.findOne({
-  //   where: { uuid: req.body.uuid, password: password_old },
-  // });
+    // Validar se a senha antiga fornecida confere com a armazenada
+    if (user.password !== hashOldPassword) {
+      res.status(401).send({
+        status: false,
+        message: "the current password does not match",
+      });
+    }
 
-  // if (!verify_user) {
-  //   res.status(500).send({
-  //     message: err.message || "Data not found.",
-  //   });
-  // }
+    // Gerar o hash da nova senha
+    const hashNewPassword = crypto.createHash("md5").update(pass_new).digest("hex");
 
-  // // Update the hash object with the password
-  // md5Hash.update(req.body.pass_new);
+    // Atualizar a senha do usuário no banco de dados
+    await user.update({ password: hashNewPassword });
 
-  // // Get the hexadecimal representation of the hash
-  // const password_new = md5Hash.digest("hex");
+    // Retornar sucesso
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+    });
 
-  // const payload = {
-  //   uuid: uuid(),
-  //   login: req.body.login,
-  //   password: password_new,
-  //   profile: req.body.profile,
-  // };
-
-  // // Save Tutorial in the database
-  // users
-  //   .create(payload)
-  //   .then((data) => {
-  //     res.send({
-  //       message: "Data was updated successfully.",
-  //     });
-  //   })
-
-  //   .catch((err) => {
-  //     res.status(500).send({
-  //       message: err.message || "Some error occurred while creating data.",
-  //     });
-  //   });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
 };
-
 // Update User in database
 exports.update = (req, res) => {
   const id = req.params.id;
@@ -325,8 +324,68 @@ exports.delete = (req, res) => {
       });
     }
   } catch (err) {
-    return res.status(500).send({
+    res.status(500).send({
       message: "Could not delete Data with id=" + id,
     });
   }
+};
+
+
+exports.forgot_password = async (req, res) => {
+
+  try {
+    const login = req.body.login;
+
+    if (!login || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login)) {
+      return res.status(400).send({ status: false, message: "Invalid email address" });
+    }
+
+    // Generate a token
+    const password = crypto.randomBytes(8).toString("hex");
+
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <h1 style="color: #4CAF50;">Portal Mirandinha - Temporary Password</h1>
+      <p>Hello,</p>
+      <p>Your temporary password is:</p>
+      <blockquote style="border-left: 4px solid #4CAF50; padding-left: 10px; color: #555;">
+        ${password}
+      </blockquote>
+      <p>Please reset your password after logging in.</p>
+      <footer style="margin-top: 20px; font-size: 0.9em; color: #777;">
+        <p>Best regards,</p>
+        <p>Portal Mirandinha Team</p>
+      </footer>
+    </div>
+  `;
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Portal Mirandinha" <suporte@portalmirandinha.com.br>',
+      to: login,
+      subject: "Portal Mirandinha - Reset Password",
+      text: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+
+  } catch (error) {
+    console.error("Error sending email:", error.message, error.stack);
+    res.status(500).send({
+      status: false,
+      message: "Failed to send email",
+    });
+  }
+
+
 };

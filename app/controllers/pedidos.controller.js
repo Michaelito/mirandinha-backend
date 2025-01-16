@@ -179,116 +179,137 @@ exports.findOne = async (req, res) => {
 
 // Create and Save a new User
 exports.create = async (req, res) => {
-
   const decodedToken = decodeTokenFromHeader(req);
 
   try {
-    // Create the payload with additional attributes
+    // Criação do payload com atributos adicionais
     const payload = {
-      ...req.body, // Spread the properties of req.body
+      ...req.body,
       id_user: decodedToken.id,
       id_empresa: decodedToken.id_empresa,
     };
 
-    // Save the order in the database
+    // Salva o pedido no banco de dados
     const data = await pedidos.create(payload);
     const id_pedido = data.id;
 
     const itensArray = req.body.pedido_itens;
 
-    // Create promises for each item insertion
-    const insertionPromises = itensArray.map(pedido_item => {
+    // Promises para inserção de itens
+    const insertionPromises = itensArray.map((pedido_item) => {
       return pedidosItens.create({
-        ...pedido_item, // Spread the properties of pedido_item
-        id_pedido: id_pedido, // Assign the pedido_id to the item
+        ...pedido_item,
+        id_pedido: id_pedido,
       });
     });
 
-    // Await all promises to ensure all items are inserted
     await Promise.all(insertionPromises);
-
-    // Insert exsam logic here
-    // ...
 
     const clientes = await sequelize.query(
       `SELECT * FROM clientes WHERE id = ${decodedToken.id_empresa}`,
-      {
-        type: sequelize.QueryTypes.SELECT,
-      }
+      { type: sequelize.QueryTypes.SELECT }
     );
 
     const exsam = clientes[0];
 
     const ordersItens = await sequelize.query(
       `SELECT id_exsam, qtde, preco FROM pedidos_itens p WHERE p.id_pedido = ${id_pedido}`,
-      {
-        type: sequelize.QueryTypes.SELECT,
-      }
+      { type: sequelize.QueryTypes.SELECT }
     );
 
-    const ordersArray = ordersItens.map(item => ({
+    const ordersArray = ordersItens.map((item) => ({
       id_produto: item.id_exsam,
-      qtde: parseInt(item.qtde, 10),  // Convert qtde to integer
-      preco: parseInt(item.preco, 10), // Convert preco to integer
+      qtde: parseInt(item.qtde, 10),
+      preco: parseInt(item.preco, 10),
       age_doc: "",
-      age_pro: ""
+      age_pro: "",
     }));
 
     const orderHeader = {
-      "id_agente": exsam['id_exsam'],
-      "lj_agente": "01",
-      "id_tipcli": "R",
-      "id_pagto": exsam['id_pagamento'],
-      "id_fpagto": exsam['id_forma_pagamento'],
-      "id_tabpre": exsam['id_tabpre'],
-      "id_vended1": exsam['id_vendedor'],
-      "comissao1": 3,
-      "id_frete": 0,
-      "id_transp": exsam['id_trasnportador'],
-      "lj_transp": "01",
-      "itens": ordersArray
-    }
+      id_agente: exsam["id_exsam"],
+      lj_agente: "01",
+      id_tipcli: "R",
+      id_pagto: exsam["id_pagamento"],
+      id_fpagto: exsam["id_forma_pagamento"],
+      id_tabpre: exsam["id_tabpre"],
+      id_vended1: exsam["id_vendedor"],
+      comissao1: 3,
+      id_frete: 0,
+      id_transp: exsam["id_trasnportador"],
+      lj_transp: "01",
+      itens: ordersArray,
+    };
 
-    const dataOrderExsam = JSON.stringify(orderHeader, null, 2)
+    const dataOrderExsam = JSON.stringify(orderHeader, null, 2);
 
     let config = {
-      method: 'post',
+      method: "post",
       maxBodyLength: Infinity,
-      url: 'http://exsammirandinha.ddns.com.br:7780/api/pedidos',
+      url: "http://exsammirandinha.ddns.com.br:7780/api/pedidos",
       headers: {
-        'Authorization': 'Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7',
-        'Content-Type': 'application/json'
+        Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
+        "Content-Type": "application/json",
       },
-      data: dataOrderExsam
+      data: dataOrderExsam,
     };
 
-    const response = await axios.request(config);
+    let response = null;
+    let retries = 0;
+    const maxRetries = 3;
 
-    console.log("-------exsam--------", response.data);
+    while (retries < maxRetries) {
+      try {
+        response = await axios.request(config);
 
-    const exsamId = response.data.success.id;
+        if (response.status === 200) {
+          console.log("-------exsam--------", response.data);
 
-    await sequelize.query(
-      `UPDATE pedidos SET pedido_id_exsam = :exsamId WHERE id = :id_pedido`,
-      {
-        replacements: { exsamId, id_pedido },
-        type: sequelize.QueryTypes.UPDATE
+          const exsamId = response.data.success.num;
+          const response_exsam = response.data;
+
+          await sequelize.query(
+            `UPDATE pedidos SET pedido_id_exsam = :exsamId, response_exsam = :response_exsam WHERE id = :id_pedido`,
+            {
+              replacements: {
+                exsamId,
+                response_exsam: JSON.stringify(response_exsam),
+                id_pedido,
+              },
+              type: sequelize.QueryTypes.UPDATE,
+            }
+          );
+
+          const idata = {
+            ...(data.get ? data.get() : data),
+            pedido_id_exsam: parseInt(exsamId),
+          };
+
+          res.send(idata);
+          return; // Encerra o fluxo em caso de sucesso
+        } else {
+          throw new Error(`Resposta inválida do servidor: ${response.status}`);
+        }
+      } catch (err) {
+        retries++;
+        console.error(`Tentativa ${retries} falhou:`, err.message);
+
+        if (retries === maxRetries) {
+          console.error("Máximo de tentativas alcançado. Desistindo.");
+          res.status(500).send({
+            message:
+              "Falha ao processar o pedido no Exsam após múltiplas tentativas.",
+          });
+          return; // Encerra o fluxo em caso de falha após retries
+        }
       }
-    );
-
-    const idata = {
-      ...(data.get ? data.get() : data),
-      pedido_id_exsam: parseInt(exsamId),
-    };
-
-    res.send(idata);
-
+    }
   } catch (err) {
     res.status(500).send({
-      message: err.message || "Some error occurred while creating data.",
+      message: err.message || "Ocorreu um erro ao criar o pedido.",
     });
   }
 };
+
 
 exports.findAllUser = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -322,7 +343,7 @@ exports.findAllUser = async (req, res) => {
     );
 
     if (pedidos.length === 0) {
-      return res.status(404).send({ message: "Produto não encontrado" });
+      return res.status(404).send({ message: "Data not found" });
     }
 
     // Return data with pagination

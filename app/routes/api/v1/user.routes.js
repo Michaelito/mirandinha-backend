@@ -17,8 +17,10 @@ module.exports = app => {
     // Create a new data
     router.post("/", auth.authenticateToken, controller.create);
 
+    router.post("/forgot_password", controller.forgot_password);
+
     // Create a new data
-    router.post("/update_password", auth.authenticateToken, controller.update_password);
+    router.put("/update_password/:id", auth.authenticateToken, controller.update_password);
 
     // Update a data with id
     router.put("/:id", auth.authenticateToken, controller.update);
