@@ -8,6 +8,9 @@ const { uuid } = require("uuidv4");
 const crypto = require("crypto");
 const { console } = require("inspector");
 
+const sequelize = require("../config/database");
+const { decodeTokenFromHeader } = require('../middleware/auth.js');
+
 
 // Create and Save a new Tutorial
 
@@ -90,74 +93,61 @@ exports.findAll = (req, res) => {
 };
 
 // Find a single Tutorial with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
-  const datauser = datausers.findOne({
-    where: { user_id: id },
-  });
+  try {
+    // Consulta para buscar o pedido específico
+    const users = await sequelize.query(
+      `SELECT u.login, u.empresa_id, u.profile, du.fullname, du.document, du.birthdate, du.cellphone  
+       FROM users u 
+       JOIN data_users du ON du.user_id = u.id
+       WHERE u.id = ?`,
+      {
+        replacements: [id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
-  users.hasOne(datausers, {
-    foreignKey: "user_id",
-  });
-
-  users.hasMany(address_users, {
-    foreignKey: "user_id",
-    order: [["ativo", "ASC"]],
-  });
-
-  users
-    .findByPk(id, {
-      attributes: { exclude: ["password", "token", "refresh_token"] },
-      include: [
-        {
-          model: datausers,
-          required: false,
-          attributes: [
-            "fullname",
-            "document",
-            "type",
-            "rg_ie",
-            "phone",
-            "cellphone",
-            "birthdate",
-            "createdAt",
-          ],
-        },
-        {
-          model: address_users,
-          required: false,
-          attributes: [
-            "id",
-            "cep",
-            "logradouro",
-            "numero",
-            "complemento",
-            "cidade",
-            "bairro",
-            "estado",
-            "ativo",
-            "createdAt",
-          ],
-        },
-      ],
-    })
-    .then((data) => {
-      res
-        .send({
-          status: true,
-          message: "The request has succeeded",
-          data: {
-            user: data,
-          },
-        })
-        .status(200);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error retrieving Data with id=" + id,
+    // Verifica se o pedido foi encontrado
+    if (users.length === 0) {
+      return res.status(404).send({
+        status: false,
+        message: "Order not found",
       });
+    }
+
+    const user = users[0];
+    // // Consultar os itens do pedido
+    const companies = await sequelize.query(
+      `SELECT id, id_exsam, lj, razao_social, nome_fantasia, cnpj, endereco, numero, complemento, cidade, uf, 
+      id_tabpre, id_forma_pagamento, id_pagamento, id_vendedor
+      FROM clientes 
+      WHERE id = ?`,
+      {
+        replacements: [user.empresa_id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+    // // Adiciona a propriedade 'produtos_grades' ao pedido
+    user.company = companies[0];
+
+    // Retornar o pedido com os itens
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        user: user, // Retorna o pedido único
+      },
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+
 };
 
 // Create and Save a new User
