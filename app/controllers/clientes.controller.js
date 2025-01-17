@@ -61,7 +61,7 @@ exports.findAll = async (req, res) => {
       status: true,
       message: "The request has succeeded",
       data: {
-        transportadoras: query,
+        customers: query,
         pagination: {
           currentPage: page,
           itemsPerPage: limit,
