@@ -42,10 +42,13 @@ exports.findAll = async (req, res) => {
 
     // Query to fetch the paginated products
     const query = await sequelize.query(
-      `SELECT id, id_exsam, razao_social, nome_fantasia, cnpj, id_tabpre, id_forma_pagamento, id_pagamento, id_trasnportador, id_vendedor FROM clientes
-             ${whereClause}
-             ORDER BY id DESC
-             LIMIT ? OFFSET ?`,
+      `SELECT id, id_exsam, razao_social, nome_fantasia, cnpj, 
+       endereco, numero, complemento, cidade, uf, 
+       id_tabpre, id_forma_pagamento, id_pagamento, id_trasnportador, id_vendedor 
+       FROM clientes
+       ${whereClause}
+       ORDER BY id DESC
+       LIMIT ? OFFSET ?`,
       {
         replacements,
         type: sequelize.QueryTypes.SELECT,
