@@ -7,6 +7,78 @@ const clienteSchema = require('../validation/clienteValidator');
 const crypto = require("crypto");
 const { uuid } = require("uuidv4");
 
+
+const sequelize = require("../config/database");
+
+exports.findAll = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = (page - 1) * limit;
+  const search = req.params.search || ""; // Get the search parameter
+
+  console.log("Search parameter:", search);
+
+  try {
+    // Build WHERE clause based on the search parameter
+    let whereClause = "";
+    let replacements = [limit, offset];
+
+    if (search) {
+      whereClause = `WHERE razao_social LIKE ? OR nome_fantasia LIKE ? OR cnpj LIKE ?`;
+      const searchParam = `%${search}%`;
+      replacements = [searchParam, searchParam, searchParam, limit, offset];
+    }
+
+    // Query to get the total count of products for pagination
+    const totalQuery = await sequelize.query(
+      `SELECT COUNT(*) as total FROM clientes ${whereClause}`,
+      {
+        replacements: search ? [replacements[0], replacements[1], replacements[2]] : [],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    const totalQueryQtde = totalQuery[0]?.total || 0;
+
+    // Query to fetch the paginated products
+    const query = await sequelize.query(
+      `SELECT id, id_exsam, razao_social, nome_fantasia, cnpj, id_tabpre, id_forma_pagamento, id_pagamento, id_trasnportador, id_vendedor FROM clientes
+             ${whereClause}
+             ORDER BY id DESC
+             LIMIT ? OFFSET ?`,
+      {
+        replacements,
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (query.length === 0) {
+      return res.status(404).send({ message: "DATA NOT FOUND" });
+    }
+
+    // Return data with pagination
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        transportadoras: query,
+        pagination: {
+          currentPage: page,
+          itemsPerPage: limit,
+          totalItems: totalQueryQtde,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+      error: error.message, // Included error message for debugging
+    });
+  }
+};
+
+
 exports.create = async (req, res) => {
 
   const { error, value } = clienteSchema.validate(req.body);
@@ -58,48 +130,6 @@ exports.create = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 
-};
-
-exports.findAll = async (req, res) => {
-  const nome = req.query.nome;
-  var condition = nome
-    ? {
-      nome: {
-        [Op.like]: `%${nome}%`,
-      },
-    }
-    : null;
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.size);
-
-  let page = 0;
-  if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
-    page = pageAsNumber;
-  }
-
-  let size = 20;
-  if (
-    !Number.isNaN(sizeAsNumber) &&
-    !(sizeAsNumber > 50) &&
-    !(sizeAsNumber < 1)
-  ) {
-    size = sizeAsNumber;
-  }
-  const clientWithCount = await Clientes.findAndCountAll({
-    where: condition,
-    limit: size,
-    offset: page * size,
-  });
-  res.send({
-    status: true,
-    message: "The request has succeeded",
-    limit: size,
-    page: page,
-    totalPages: Math.ceil(clientWithCount.count / Number.parseInt(size)),
-    data: {
-      clientes: clientWithCount.rows,
-    },
-  });
 };
 
 // Find a single Data with an id
