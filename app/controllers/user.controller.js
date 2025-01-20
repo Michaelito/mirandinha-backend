@@ -95,29 +95,33 @@ exports.findAll = (req, res) => {
 // Find a single Tutorial with an id
 exports.findOne = async (req, res) => {
   const id = req.params.id;
+  const decodedToken = decodeTokenFromHeader(req);
+
+  const userId = decodedToken.profile === 1 ? id : decodedToken.id;
 
   try {
     // Consulta para buscar o pedido específico
     const users = await sequelize.query(
-      `SELECT u.login, u.empresa_id, u.profile, du.fullname, du.document, du.birthdate, du.cellphone  
+      `SELECT u.id, u.login, u.empresa_id, u.profile, du.fullname, du.document, du.birthdate, du.cellphone  
        FROM users u 
        JOIN data_users du ON du.user_id = u.id
        WHERE u.id = ?`,
       {
-        replacements: [id],
+        replacements: [userId],
         type: sequelize.QueryTypes.SELECT,
       }
     );
 
-    // Verifica se o pedido foi encontrado
     if (users.length === 0) {
       return res.status(404).send({
         status: false,
-        message: "Order not found",
+        message: "Data not found",
       });
     }
 
     const user = users[0];
+
+    const customerId = decodedToken.profile === 1 ? user.empresa_id : decodedToken.id_empresa;
     // // Consultar os itens do pedido
     const companies = await sequelize.query(
       `SELECT id, id_exsam, lj, razao_social, nome_fantasia, cnpj, endereco, numero, complemento, cidade, uf, 
@@ -125,12 +129,32 @@ exports.findOne = async (req, res) => {
       FROM clientes 
       WHERE id = ?`,
       {
-        replacements: [user.empresa_id],
+        replacements: [customerId],
         type: sequelize.QueryTypes.SELECT,
       }
     );
     // // Adiciona a propriedade 'produtos_grades' ao pedido
     user.company = companies[0];
+
+    if (decodedToken.profile === 4) {
+
+      const companies_representantes = await sequelize.query(
+        `SELECT 
+        c.id, c.id_exsam, c.lj, c.razao_social, c.nome_fantasia, c.cnpj, c.endereco, c.numero, c.complemento, c.cidade, c.uf, 
+        c.id_tabpre, c.id_forma_pagamento, c.id_pagamento
+        FROM representantes_clientes rc
+        JOIN clientes c ON c.id = rc.id_clientes  
+        WHERE rc.id_users = ?`,
+        {
+          replacements: [decodedToken.id],
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      user.customers = companies_representantes
+    }
+
+
 
     // Retornar o pedido com os itens
     res.status(200).send({
