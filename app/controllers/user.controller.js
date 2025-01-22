@@ -125,7 +125,7 @@ exports.findOne = async (req, res) => {
     // // Consultar os itens do pedido
     const companies = await sequelize.query(
       `SELECT id, id_exsam, lj, razao_social, nome_fantasia, cnpj, endereco, numero, complemento, cidade, uf, 
-      id_tabpre, id_forma_pagamento, id_pagamento, id_vendedor
+      id_tabpre, id_forma_pagamento, id_pagamento, id_vendedor, tipo_entrega
       FROM clientes 
       WHERE id = ?`,
       {

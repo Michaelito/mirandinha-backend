@@ -19,6 +19,8 @@ module.exports = (app) => {
   // Retrieve a single Tutorial with id
   router.get("/:id", auth.authenticateToken, controller.findOne);
 
+  router.post("/reprocess", auth.authenticateToken, controller.reprocess);
+
   router.post("/", auth.authenticateToken, controller.create);
 
   app.use("/api/v1/pedidos", router);

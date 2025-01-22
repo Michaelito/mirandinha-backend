@@ -176,6 +176,62 @@ exports.findOne = async (req, res) => {
   }
 };
 
+exports.reprocess = async (req, res) => {
+
+  const id = req.body.id;
+
+  console.log("-------id--------", id);
+
+  const pedido = await sequelize.query(
+    `SELECT request_exsam FROM pedidos WHERE id = ${id}`,
+    { type: sequelize.QueryTypes.SELECT }
+  );
+
+  const obj = JSON.stringify(pedido[0].request_exsam);
+  const jsonObject = JSON.parse(obj)
+  console.log("--------------obj-------------", jsonObject);
+
+  return
+
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: "http://exsammirandinha.ddns.com.br:7780/api/pedidos",
+    headers: {
+      Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
+      "Content-Type": "application/json",
+    },
+    data: obj,
+  };
+
+  response = await axios.request(config);
+
+  if (response.status === 200) {
+    console.log("-------exsam--------", response.data);
+
+    const exsamId = response.data.success.num;
+    const request_exsam = dataOrderExsam;
+    const response_exsam = response.data;
+
+    await sequelize.query(
+      `UPDATE pedidos SET pedido_id_exsam = :exsamId, request_exsam = :request_exsam, response_exsam = :response_exsam WHERE id = :id_pedido`,
+      {
+        replacements: {
+          exsamId,
+          request_exsam: request_exsam,
+          response_exsam: JSON.stringify(response_exsam),
+          id_pedido,
+        },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+  }
+  else {
+    throw new Error(`Resposta inválida do servidor: ${response.status}`);
+  }
+
+}
+
 
 // Create and Save a new User
 exports.create = async (req, res) => {
@@ -242,6 +298,7 @@ exports.create = async (req, res) => {
 
     const dataOrderExsam = JSON.stringify(orderHeader, null, 2);
 
+
     let config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -253,6 +310,11 @@ exports.create = async (req, res) => {
       data: dataOrderExsam,
     };
 
+    console.log("-------request exsam--------", dataOrderExsam);
+
+
+
+    let exsamId = null;
     let response = null;
     let retries = 0;
     const maxRetries = 3;
@@ -264,14 +326,16 @@ exports.create = async (req, res) => {
         if (response.status === 200) {
           console.log("-------exsam--------", response.data);
 
-          const exsamId = response.data.success.num;
+          let exsamId = response.data.success.num;
+          const request_exsam = dataOrderExsam;
           const response_exsam = response.data;
 
           await sequelize.query(
-            `UPDATE pedidos SET pedido_id_exsam = :exsamId, response_exsam = :response_exsam WHERE id = :id_pedido`,
+            `UPDATE pedidos SET pedido_id_exsam = :exsamId, request_exsam = :request_exsam, response_exsam = :response_exsam WHERE id = :id_pedido`,
             {
               replacements: {
                 exsamId,
+                request_exsam: request_exsam,
                 response_exsam: JSON.stringify(response_exsam),
                 id_pedido,
               },
@@ -290,15 +354,32 @@ exports.create = async (req, res) => {
           throw new Error(`Resposta inválida do servidor: ${response.status}`);
         }
       } catch (err) {
+
+
+        await sequelize.query(
+          `UPDATE pedidos SET pedido_id_exsam = :exsamId, response_exsam = :response_exsam_error WHERE id = :id_pedido`,
+          {
+            replacements: {
+              exsamId,
+              response_exsam: JSON.stringify(err),
+              id_pedido,
+            },
+            type: sequelize.QueryTypes.UPDATE,
+          }
+        );
+
         retries++;
         console.error(`Tentativa ${retries} falhou:`, err.message);
 
         if (retries === maxRetries) {
+
           console.error("Máximo de tentativas alcançado. Desistindo.");
+
           res.status(500).send({
             message:
               "Falha ao processar o pedido no Exsam após múltiplas tentativas.",
           });
+
           return; // Encerra o fluxo em caso de falha após retries
         }
       }
