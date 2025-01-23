@@ -1,7 +1,22 @@
 const db = require("../models");
 const Banners = db.banners;
+const { decodeTokenFromHeader } = require('../middleware/auth.js');
+
+
+
+
 
 exports.findAll = async (req, res) => {
+
+  const decodedToken = decodeTokenFromHeader(req);
+
+  if (decodedToken.profile !== 1) {
+    return res.status(401).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+
   try {
     // Busca todos os banners com status = 1
     const banners = await Banners.findAll({ where: { status: 1 } });
@@ -26,6 +41,16 @@ exports.findAll = async (req, res) => {
 
 
 exports.create = async (req, res) => {
+
+  const decodedToken = decodeTokenFromHeader(req);
+
+  if (decodedToken.profile !== 1) {
+    return res.status(401).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+
   try {
     // Obter os dados do corpo da requisição
     const { title, description, url, img, dt_validate, status } = req.body;
@@ -65,6 +90,16 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
+
+  const decodedToken = decodeTokenFromHeader(req);
+
+  if (decodedToken.profile !== 1) {
+    return res.status(401).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+
   const id = req.params.id;
 
   try {
@@ -94,4 +129,6 @@ exports.update = async (req, res) => {
     });
   }
 };
+
+
 
