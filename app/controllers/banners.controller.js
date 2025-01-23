@@ -1,26 +1,29 @@
 const db = require("../models");
 const Banners = db.banners;
 
-exports.findAll = (req, res) => {
+exports.findAll = async (req, res) => {
+  try {
+    // Busca todos os banners com status = 1
+    const banners = await Banners.findAll({ where: { status: 1 } });
 
-  Banners.findAll()
-    .then(data => {
-      res.send({
-        status: true,
-        message: "The request has succeeded",
-        data: {
-          Banners: data
-        }
-      }).status(200);
-    })
-    .catch(err => {
-      res.send({
-        status: false,
-        message: "The request has not succeeded",
-        data: null
-      }).status(500);
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        banners: banners, // Dados retornados
+      },
     });
+  } catch (err) {
+    // Tratamento de erros
+    console.error("Erro ao buscar banners:", err);
+
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
 };
+
 
 exports.create = async (req, res) => {
   try {
@@ -41,22 +44,54 @@ exports.create = async (req, res) => {
       description,
       url,
       img,
-      dt_validate,
+      dt_validate: dt_validate ?? Null,
       status: status ?? true, // Se `status` for undefined, define como `true`
     });
 
     // Resposta de sucesso
     res.status(201).send({
       status: true,
-      message: "Banner criado com sucesso.",
+      message: "The request has succeeded",
       data: newBanner,
     });
   } catch (error) {
     // Captura e retorna erros
     res.status(500).send({
       status: false,
-      message: "Erro ao criar o banner.",
+      message: "The request has not succeeded",
       error: error.message,
     });
   }
 };
+
+exports.update = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Atualiza o registro com base no ID
+    const [updatedRows] = await Banners.update(req.body, {
+      where: { id: id },
+    });
+
+    if (updatedRows === 0) {
+      // Verifica se nenhum registro foi atualizado
+      return res.status(404).send({
+        status: false,
+        message: "Data not found",
+      });
+    }
+
+    res.send({
+      status: true,
+      message: "The request has succeeded",
+    });
+  } catch (err) {
+    // Trata erros inesperados
+    console.error("Erro ao atualizar registro:", err);
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+};
+

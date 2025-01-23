@@ -9,8 +9,11 @@ module.exports = app => {
 
     var router = require("express").Router();
 
+    router.get("/", auth.authenticateToken, controller.findAll);
+
     router.post("/", auth.authenticateToken, controller.create);
 
+    router.put("/:id", auth.authenticateToken, controller.update);
 
     app.use('/api/v1/banners', router);
 
