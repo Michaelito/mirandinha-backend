@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require("../models");
 const Users = db.users;
 const DataUsers = db.data_users;
+const sequelize = require("../config/database");
 let blacklist = [];
 
 require("dotenv-safe").config();
@@ -24,9 +25,22 @@ async function login(req, res) {
     });
 
     if (user) {
+
       const datauser = await DataUsers.findOne({
         where: { user_id: user.id },
       });
+
+      const id_empresa = user.empresa_id;
+
+      const clientes = await sequelize.query(
+        `SELECT * FROM clientes c WHERE c.id = ?`,
+        {
+          replacements: [id_empresa],
+          type: sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      const cliente = clientes[0]
 
       const token = jwt.sign(
         {
@@ -35,7 +49,9 @@ async function login(req, res) {
           id_empresa: user.empresa_id,
           login: user.login,
           fullname: datauser.fullname,
-          profile: parseInt(user.profile)
+          profile: parseInt(user.profile),
+          tipo_entrega: parseInt(cliente.tipo_entrega)
+
         },
         JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN } // Token expira em 6 horas

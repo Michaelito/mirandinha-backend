@@ -96,6 +96,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         },
+        tipo_entrega: {
+            type: DataTypes.INTEGER
+        },
         status: {
             type: DataTypes.INTEGER,
             allowNull: true,
