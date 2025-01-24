@@ -10,9 +10,10 @@ const { console } = require("inspector");
 
 const sequelize = require("../config/database");
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
+const nodemailer = require('nodemailer');
 
-
-// Create and Save a new Tutorial
+const path = require('path');
+const fs = require('fs');
 
 // Retrieve all from the database.
 exports.findAll = (req, res) => {
@@ -343,9 +344,104 @@ exports.delete = (req, res) => {
   }
 };
 
+const generateRandomPassword = (length = 10) => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+  return Array.from({ length }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+};
+
+
 
 exports.forgot_password = async (req, res) => {
-  console.log("teste")
+  const login = req.body.login;
+
+  try {
+    // Consulta para buscar o pedido específico
+    const users = await sequelize.query(
+      `SELECT u.id, du.fullname, u.login 
+      FROM users u 
+      JOIN data_users du ON du.user_id = u.id 
+      WHERE u.login = ?`,
+      {
+        replacements: [login],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (users.length === 0) {
+      return res.status(404).send({
+        status: false,
+        message: "Data not found",
+      });
+    }
+
+    const user = users[0];
+
+    const htmlFilePath = path.join(__dirname, '../views/index.html');
+    let htmlContent = fs.readFileSync(htmlFilePath, 'utf8');
+
+    const pass_new = generateRandomPassword(8);
+    const hashNewPassword = crypto.createHash("md5").update(pass_new).digest("hex");
 
 
+    await sequelize.query(
+      `UPDATE users 
+       SET password = ? 
+       WHERE id = ?`,
+      {
+        replacements: [hashNewPassword, user.id],
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    // Substituir placeholder no HTML
+    htmlContent = htmlContent
+      .replace('{{USERNAME}}', user.fullname)
+      .replace('{{PASSWORD}}', pass_new);
+
+    // Configuração do transporte SMTP
+    const transporter = nodemailer.createTransport({
+      host: "mail.portalmirandinha.com.br", // Substitua pelo seu domínio
+      port: 465, // Porta padrão para SMTP com SSL
+      secure: true, // Usar SSL
+      auth: {
+        user: "suporte@portalmirandinha.com.br", // Substitua pelo seu e-mail
+        pass: "A5sQ[cWO?X!=", // Substitua pela senha do e-mail
+      },
+    });
+
+    // Corpo do e-mail
+    const mailOptions = {
+      from: '"Grupo Mirandinha" <suporte@portalmirandinha.com.br>', // Substitua pelo nome da empresa e e-mail
+      //to: user.email, // Enviar para o e-mail do usuário
+      to: "michaelito.regis@gmail.com", // Enviar para o e-mail do usuário
+      subject: "Recuperação de Senha", // Assunto
+      text: `Olá ${user.login},\n\nVocê solicitou a recuperação de sua senha.`, // Texto do e-mail
+      // html: `<p>Olá <strong>${user.login}</strong>,</p>
+      //        <p>Você solicitou a recuperação de sua senha.</p>`, // Corpo em HTML
+
+      html: htmlContent
+    };
+
+    // Enviar o e-mail
+    await transporter.sendMail(mailOptions);
+
+    // Retornar o pedido com os itens
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        user: user, // Retorna o pedido único
+      },
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+
+  }
 };
