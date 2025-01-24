@@ -412,8 +412,8 @@ exports.forgot_password = async (req, res) => {
     // Corpo do e-mail
     const mailOptions = {
       from: '"Grupo Mirandinha" <suporte@portalmirandinha.com.br>', // Substitua pelo nome da empresa e e-mail
-      //to: user.email, // Enviar para o e-mail do usuário
-      to: "michaelito.regis@gmail.com", // Enviar para o e-mail do usuário
+      to: user.login, // Enviar para o e-mail do usuário
+      //to: "michaelito.regis@gmail.com", // Enviar para o e-mail do usuário
       subject: "Recuperação de Senha", // Assunto
       text: `Olá ${user.login},\n\nVocê solicitou a recuperação de sua senha.`, // Texto do e-mail
       // html: `<p>Olá <strong>${user.login}</strong>,</p>
