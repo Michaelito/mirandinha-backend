@@ -359,7 +359,7 @@ exports.forgot_password = async (req, res) => {
     const users = await sequelize.query(
       `SELECT u.id, du.fullname, u.login 
       FROM users u 
-      JOIN data_users du ON du.user_id = u.id 
+      LEFT JOIN data_users du ON du.user_id = u.id 
       WHERE u.login = ?`,
       {
         replacements: [login],
