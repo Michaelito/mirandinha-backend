@@ -136,24 +136,43 @@ exports.create = async (req, res) => {
 };
 
 // Find a single Data with an id
-exports.findOne = (req, res) => {
+exports.findOne = async (req, res) => {
   const id = req.params.id;
 
-  Clientes.findByPk(id)
-    .then((data) => {
-      res.send({
-        status: true,
-        message: "The request has succeeded",
-        data: {
-          cliente: data,
-        },
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: "Error retrieving Data with id=" + id,
-      });
+  try {
+
+    // Query to fetch the paginated products
+    const query = await sequelize.query(
+      `SELECT id, id_exsam, razao_social, nome_fantasia, cnpj, 
+       endereco, numero, complemento, cidade, uf, 
+       id_tabpre, id_forma_pagamento, id_pagamento, id_trasnportador, id_vendedor 
+       FROM clientes
+       WHERE id = ?`,
+      {
+        replacements: [id],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (query.length === 0) {
+      return res.status(404).send({ message: "DATA NOT FOUND" });
+    }
+
+    // Return data with pagination
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+      data: {
+        customer: query[0],
+      },
     });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+      error: error.message, // Included error message for debugging
+    });
+  }
 };
 
 // Update a Data by the id in the request
