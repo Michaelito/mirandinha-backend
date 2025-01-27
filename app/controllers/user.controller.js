@@ -103,9 +103,8 @@ exports.findOne = async (req, res) => {
   try {
     // Consulta para buscar o pedido específico
     const users = await sequelize.query(
-      `SELECT u.id, u.login, u.empresa_id, u.profile, du.fullname, du.document, du.birthdate, du.cellphone  
+      `SELECT u.id, u.login, u.empresa_id, u.profile, u.fullname, u.document, u.ddi, u.ddd, u.phone, u.phone, u.status, u.createdAt
        FROM users u 
-       JOIN data_users du ON du.user_id = u.id
        WHERE u.id = ?`,
       {
         replacements: [userId],
