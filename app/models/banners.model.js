@@ -26,6 +26,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATEONLY, // date
       allowNull: true, // Permite NULL
     },
+    path: {
+      type: DataTypes.TEXT, // text
+      allowNull: true, // Permite NULL
+    },
+    itype: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // Permite NULL
+    },
     status: {
       type: DataTypes.BOOLEAN, // tinyint(1)
       allowNull: false,
