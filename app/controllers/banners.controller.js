@@ -8,14 +8,7 @@ const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
 exports.findAll = async (req, res) => {
 
-  const decodedToken = decodeTokenFromHeader(req);
 
-  if (decodedToken.profile !== 1) {
-    return res.status(401).send({
-      status: false,
-      message: "The request has not succeeded",
-    });
-  }
 
   try {
     // Busca todos os banners com status = 1
