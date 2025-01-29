@@ -2,13 +2,7 @@ const db = require("../models");
 const Banners = db.banners;
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
 
-
-
-
-
 exports.findAll = async (req, res) => {
-
-
 
   try {
     // Busca todos os banners com status = 1
