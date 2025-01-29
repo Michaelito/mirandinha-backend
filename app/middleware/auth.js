@@ -48,9 +48,10 @@ async function login(req, res) {
           uuid: user.uuid,
           id_empresa: user.empresa_id,
           login: user.login,
-          fullname: user.fullname,
+          fullname: datauser.fullname,
           profile: parseInt(user.profile),
           tipo_entrega: parseInt(cliente.tipo_entrega)
+
         },
         JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN } // Token expira em 6 horas
