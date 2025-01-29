@@ -10,11 +10,26 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING(36),
       allowNull: false,
     },
-    empresa_id: {
+    id_empresa: {
       type: Sequelize.INTEGER
     },
     login: {
-      type: Sequelize.STRING(50),
+      type: Sequelize.STRING(255),
+    },
+    fullname: {
+      type: Sequelize.STRING(255),
+    },
+    document: {
+      type: Sequelize.INTEGER
+    },
+    ddi: {
+      type: Sequelize.STRING(3),
+    },
+    ddd: {
+      type: Sequelize.INTEGER
+    },
+    phone: {
+      type: Sequelize.INTEGER
     },
     password: {
       type: Sequelize.STRING(50),

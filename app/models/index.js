@@ -23,7 +23,6 @@ db.sequelize = sequelize;
 db.tutorials = require("./tutorial.model.js")(sequelize, Sequelize);
 db.users = require("./user.model.js")(sequelize, Sequelize);
 db.address_users = require("./address_users.model.js")(sequelize, Sequelize);
-db.data_users = require("./data_user.model.js")(sequelize, Sequelize);
 db.grupo = require("./grupo.model.js")(sequelize, Sequelize);
 db.grupo_format = require("./grupo_format.model.js")(sequelize, Sequelize);
 db.estoque = require("./estoque.model.js")(sequelize, Sequelize);

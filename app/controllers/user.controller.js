@@ -1,7 +1,6 @@
 require("dotenv").config(); // Para gerenciar variáveis de ambiente
 const db = require("../models");
 const users = db.users;
-const datausers = db.data_users;
 const address_users = db.address_users;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
@@ -26,9 +25,6 @@ exports.findAll = (req, res) => {
     }
     : null;
 
-  users.hasOne(datausers, {
-    foreignKey: "user_id",
-  });
 
   users.hasOne(address_users, {
     foreignKey: "user_id",
@@ -39,20 +35,6 @@ exports.findAll = (req, res) => {
       where: condition,
       attributes: { exclude: ["password", "token", "refresh_token"] },
       include: [
-        {
-          model: datausers,
-          required: false,
-          attributes: [
-            "fullname",
-            "document",
-            "type",
-            "rg_ie",
-            "phone",
-            "cellphone",
-            "birthdate",
-            "createdAt",
-          ],
-        },
         {
           model: address_users,
           required: false,
@@ -103,7 +85,7 @@ exports.findOne = async (req, res) => {
   try {
     // Consulta para buscar o pedido específico
     const users = await sequelize.query(
-      `SELECT u.id, u.login, u.empresa_id, u.profile, u.fullname, u.document, u.ddi, u.ddd, u.phone, u.phone, u.status, u.createdAt
+      `SELECT u.id, u.login, u.id_empresa, u.profile, u.fullname, u.document, u.ddi, u.ddd, u.phone, u.phone, u.status, u.createdAt
        FROM users u 
        WHERE u.id = ?`,
       {
@@ -121,7 +103,7 @@ exports.findOne = async (req, res) => {
 
     const user = users[0];
 
-    const customerId = decodedToken.profile === 1 ? user.empresa_id : decodedToken.id_empresa;
+    const customerId = decodedToken.profile === 1 ? user.id_empresa : decodedToken.id_empresa;
     // // Consultar os itens do pedido
     const companies = await sequelize.query(
       `SELECT id, id_exsam, lj, razao_social, nome_fantasia, cnpj, endereco, numero, complemento, cidade, uf, 
@@ -198,7 +180,7 @@ exports.create = (req, res) => {
   const payload = {
     uuid: uuid(),
     login: req.body.login,
-    empresa_id: req.body.empresa_id,
+    id_empresa: req.body.id_empresa,
     password: req.body.password
       ? password_md5
       : "25d55ad283aa400af464c76d713c07ad",
@@ -356,9 +338,8 @@ exports.forgot_password = async (req, res) => {
   try {
     // Consulta para buscar o pedido específico
     const users = await sequelize.query(
-      `SELECT u.id, du.fullname, u.login 
+      `SELECT u.id, u.fullname, u.login 
       FROM users u 
-      LEFT JOIN data_users du ON du.user_id = u.id 
       WHERE u.login = ?`,
       {
         replacements: [login],

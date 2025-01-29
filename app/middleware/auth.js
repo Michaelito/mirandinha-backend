@@ -2,7 +2,6 @@ const crypto = require("crypto");
 const jwt = require('jsonwebtoken');
 const db = require("../models");
 const Users = db.users;
-const DataUsers = db.data_users;
 const sequelize = require("../config/database");
 let blacklist = [];
 
@@ -26,11 +25,7 @@ async function login(req, res) {
 
     if (user) {
 
-      const datauser = await DataUsers.findOne({
-        where: { user_id: user.id },
-      });
-
-      const id_empresa = user.empresa_id;
+      const id_empresa = user.id_empresa;
 
       const clientes = await sequelize.query(
         `SELECT * FROM clientes c WHERE c.id = ?`,
@@ -46,9 +41,9 @@ async function login(req, res) {
         {
           id: user.id,
           uuid: user.uuid,
-          id_empresa: user.empresa_id,
+          id_empresa: user.id_empresa,
           login: user.login,
-          fullname: datauser.fullname,
+          fullname: user.fullname,
           profile: parseInt(user.profile),
           tipo_entrega: parseInt(cliente.tipo_entrega)
 

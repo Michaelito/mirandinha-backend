@@ -114,7 +114,7 @@ exports.create = async (req, res) => {
     const payload = {
       uuid: uuid(),
       login: value.email,
-      empresa_id: novoCliente.id,
+      id_empresa: novoCliente.id,
       password: password_md5,
       profile: cnpjLimpo.length > 11 ? 2 : 1
     };

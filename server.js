@@ -42,7 +42,6 @@ db.sequelize.sync();
 require("./app/routes/api/v1/tutorial.routes")(app);
 require("./app/routes/api/v1/user.routes")(app);
 require("./app/routes/api/v1/address_users.routes")(app);
-require("./app/routes/api/v1/dataUser.routes")(app);
 require("./app/routes/api/v1/auth.routes")(app);
 require("./app/routes/api/v1/produtos.routes")(app);
 require("./app/routes/api/v1/grupo.routes")(app);
