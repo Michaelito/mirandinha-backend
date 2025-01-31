@@ -272,28 +272,15 @@ exports.update = (req, res) => {
   const id = req.params.id;
 
   try {
-    // users.update(req.body, {
-    //   where: { id: id },
-    // });
 
-    // Update records with a specific condition
-    datausers.update(req.body, {
-      where: { user_id: id },
+    users.update(req.body, {
+      where: { id: id },
     });
 
     res.send({
       message: "Data was updated successfully.",
     });
 
-    // if (num == 1) {
-    //     res.send({
-    //         message: "Data was updated successfully."
-    //     });
-    // } else {
-    //     res.send({
-    //         message: `Cannot update Data with id=${id}. Maybe DataUser was not found or req.body is empty!`
-    //     });
-    // }
   } catch (err) {
     console.error(err);
     res.status(500).send({

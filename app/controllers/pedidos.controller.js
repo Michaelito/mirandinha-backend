@@ -398,6 +398,8 @@ exports.findAllUser = async (req, res) => {
   const decodedToken = decodeTokenFromHeader(req);
   const id_user = decodedToken.id;
 
+  console.log("id_user", id_user)
+
   try {
     // Query to get the total count of products for pagination
     const totalProductsResult = await sequelize.query(
@@ -445,6 +447,58 @@ exports.findAllUser = async (req, res) => {
       status: false,
       message: "The request has not succeeded",
       error: error.message, // Included error message for debugging
+    });
+  }
+};
+
+
+exports.updateById = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const decodedToken = decodeTokenFromHeader(req);
+  const id_user = decodedToken.id;
+  const profile = decodedToken.profile;
+
+  // Se o profile não for 1 ou 4, não pode alterar o status
+  // amdmin
+  // representante
+
+  if (![1, 4].includes(profile)) {
+    return res.status(401).send({ status: true, message: "UNAUTHORIZED" });
+  }
+
+  try {
+    // Verifica se o pedido existe e pertence ao usuário
+    const orders = await sequelize.query(
+      `SELECT * FROM pedidos WHERE id = ? AND id_user = ?`,
+      {
+        replacements: [id, id_user],
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (orders.length === 0) {
+      return res.status(404).send({ status: true, message: "DATA NOT FOUND" });
+    }
+
+    // Atualiza o pedido
+    await sequelize.query(
+      `UPDATE pedidos SET status = ?  WHERE id = ? AND id_user = ?`,
+      {
+        replacements: [status, id, id_user],
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    res.status(200).send({
+      status: true,
+      message: "The request has succeeded",
+    });
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not succeeded",
+      error: error.message, // Inclui a mensagem de erro para depuração
     });
   }
 };
