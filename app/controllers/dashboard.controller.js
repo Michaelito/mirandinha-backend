@@ -9,7 +9,7 @@ exports.findOne = async (req, res) => {
   const user_id = req.params.id;
   const currentYear = new Date().getFullYear();
   const decodedToken = decodeTokenFromHeader(req);
-  const id_empresa = decodedToken.id_empresa;
+  const id_user = decodedToken.id;
 
 
   try {
@@ -23,15 +23,15 @@ exports.findOne = async (req, res) => {
        FROM 
          pedidos
        WHERE 
-         id_empresa = :id_empresa AND DATE_FORMAT(createdAt, '%Y') = :currentYear
+         id_user = :id_user AND DATE_FORMAT(createdAt, '%Y') = :currentYear
        GROUP BY 
-         id_empresa,
+         id_user,
          DATE_FORMAT(createdAt, '%Y'),
          DATE_FORMAT(createdAt, '%m')
        ORDER BY 
          DATE_FORMAT(createdAt, '%Y-%m') ASC;`,
       {
-        replacements: { id_empresa: id_empresa, currentYear: currentYear },
+        replacements: { id_user: id_user, currentYear: currentYear },
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -43,9 +43,9 @@ exports.findOne = async (req, res) => {
        FROM 
          pedidos
        WHERE 
-         id_empresa = :id_empresa AND DATE_FORMAT(createdAt, '%Y') = :currentYear;`,
+         id_user = :id_user AND DATE_FORMAT(createdAt, '%Y') = :currentYear;`,
       {
-        replacements: { id_empresa: id_empresa, currentYear: currentYear },
+        replacements: { id_user: id_user, currentYear: currentYear },
         type: sequelize.QueryTypes.SELECT,
       }
     );
