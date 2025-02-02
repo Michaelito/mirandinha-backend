@@ -460,19 +460,17 @@ exports.updateById = async (req, res) => {
   const profile = decodedToken.profile;
 
   // Se o profile não for 1 ou 4, não pode alterar o status
-  // amdmin
-  // representante
-
   if (![1, 4].includes(profile)) {
     return res.status(401).send({ status: true, message: "UNAUTHORIZED" });
   }
 
   try {
-    // Verifica se o pedido existe e pertence ao usuário
+    const isAdmin = profile === 1;
+
     const orders = await sequelize.query(
-      `SELECT * FROM pedidos WHERE id = ? AND id_user = ?`,
+      `SELECT * FROM pedidos WHERE id = ?${isAdmin ? '' : ' AND id_user = ?'}`,
       {
-        replacements: [id, id_user],
+        replacements: isAdmin ? [id] : [id, id_user],
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -481,11 +479,10 @@ exports.updateById = async (req, res) => {
       return res.status(404).send({ status: true, message: "DATA NOT FOUND" });
     }
 
-    // Atualiza o pedido
     await sequelize.query(
-      `UPDATE pedidos SET status = ?  WHERE id = ? AND id_user = ?`,
+      `UPDATE pedidos SET status = ? WHERE id = ?${isAdmin ? '' : ' AND id_user = ?'}`,
       {
-        replacements: [status, id, id_user],
+        replacements: isAdmin ? [status, id] : [status, id, id_user],
         type: sequelize.QueryTypes.UPDATE,
       }
     );
