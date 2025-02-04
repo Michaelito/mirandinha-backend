@@ -260,6 +260,18 @@ exports.create = async (req, res) => {
 
     await Promise.all(insertionPromises);
 
+    if (req.body.status === 0) {
+
+      return res.status(200).send({
+        status: true,
+        message: "The request has succeeded",
+        data: {
+          pedido: data,
+        },
+      });
+
+    }
+
     const clientes = await sequelize.query(
       `SELECT * FROM clientes WHERE id = ${decodedToken.id_empresa}`,
       { type: sequelize.QueryTypes.SELECT }
