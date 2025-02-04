@@ -479,8 +479,9 @@ exports.updateById = async (req, res) => {
       return res.status(404).send({ status: true, message: "DATA NOT FOUND" });
     }
 
+
     await sequelize.query(
-      `UPDATE pedidos SET status = ? WHERE id = ?${isAdmin ? '' : ' AND id_user = ?'}`,
+      `UPDATE pedidos SET status = ?, status_convert = 1 WHERE id = ?${isAdmin ? '' : ' AND id_user = ?'}`,
       {
         replacements: isAdmin ? [status, id] : [status, id, id_user],
         type: sequelize.QueryTypes.UPDATE,

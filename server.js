@@ -60,6 +60,7 @@ require("./app/routes/api/v1/subgrupo.routes")(app);
 require("./app/routes/api/v1/newsletter.routes")(app);
 require("./app/routes/api/v1/transportadoras.routes")(app);
 require("./app/routes/api/v1/banners.routes")(app);
+require("./app/routes/api/v1/admin/dashboard.routes")(app);
 
 
 
