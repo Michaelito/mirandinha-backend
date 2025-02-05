@@ -11,8 +11,8 @@ const allowedOrigins = [
     'http://localhost:80'
 ];
 
+const corsOptions = {
 
-app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -21,9 +21,11 @@ app.use(cors({
         }
     },
     optionsSuccessStatus: 200
-}));
+
+};
 
 app.use(cors(corsOptions));
+
 
 // Middleware para JSON
 app.use(express.json());
