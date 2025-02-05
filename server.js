@@ -90,7 +90,7 @@ require("./app/routes/api/v1/payment.routes")(app);
 require("./app/routes/api/v1/deliveryArea.routes")(app);
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8443;
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
