@@ -33,6 +33,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware para configurar os cabeçalhos de controle de cache
 app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Credentials", true);
+
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Cache-Control', 'private, no-store, max-age=0');
@@ -40,22 +46,9 @@ app.use((req, res, next) => {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(204);
-    }
-
     next();
 });
 
-// Middleware para permitir requisições de métodos e headers específicos
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
-    res.setHeader("Content-Type", "application/json");
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    next();
-});
 
 // parse requests of content-type - application/json
 app.use(express.json());
