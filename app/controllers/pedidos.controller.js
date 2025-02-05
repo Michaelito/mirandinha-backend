@@ -184,7 +184,7 @@ exports.reprocess = async (req, res) => {
   } catch (error) {
     res.status(500).send({
       status: false,
-      message: "The request has not 2 succeeded",
+      message: "The request has not succeeded",
       error: error.message, // Inclui a mensagem de erro para depuração
     });
   }
@@ -464,19 +464,12 @@ exports.updateById = async (req, res) => {
       }
     );
 
-
     createOrder(res, id);
-
-
-
-
-
-
 
   } catch (error) {
     res.status(500).send({
       status: false,
-      message: "The request has not 2 succeeded",
+      message: "The request has not succeeded",
       error: error.message, // Inclui a mensagem de erro para depuração
     });
   }
