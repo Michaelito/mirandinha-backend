@@ -39,7 +39,7 @@ exports.findAllErp = async (req, res) => {
     );
 
     if (pedidos.length === 0) {
-      return res.status(200).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     // Return data with pagination
@@ -97,7 +97,7 @@ exports.findAll = async (req, res) => {
     );
 
     if (pedidos.length === 0) {
-      return res.status(200).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     // Return data with pagination

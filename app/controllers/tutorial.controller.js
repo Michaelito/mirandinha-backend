@@ -96,7 +96,7 @@ exports.findAllSubGroup = async (req, res) => {
     );
 
     if (products.length === 0) {
-      return res.status(200).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     const grupo = await sequelize.query(
