@@ -66,7 +66,7 @@ exports.findOne = async (req, res) => {
   Payment.findByPk(id)
     .then((data) => {
       if (!data) {
-        return res.status(404).send({
+        return res.status(200).send({
           message: "Product not found with id=" + id,
         });
       }

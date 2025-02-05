@@ -56,7 +56,7 @@ exports.findAll = async (req, res) => {
     );
 
     if (query.length === 0) {
-      return res.status(404).send({ message: "DATA NOT FOUND" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     // Return data with pagination
@@ -155,7 +155,7 @@ exports.findOne = async (req, res) => {
     );
 
     if (query.length === 0) {
-      return res.status(404).send({ message: "DATA NOT FOUND" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     // Return data with pagination

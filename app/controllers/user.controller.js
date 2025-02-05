@@ -95,9 +95,9 @@ exports.findOne = async (req, res) => {
     );
 
     if (users.length === 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
-        message: "Data not found",
+        message: "DATA NOT FOUND",
       });
     }
 
@@ -236,7 +236,7 @@ exports.update_password = async (req, res) => {
     if (!user) {
       res.status(400).send({
         status: true,
-        message: "Data not found",
+        message: "DATA NOT FOUND",
       });
     }
 
@@ -335,9 +335,9 @@ exports.forgot_password = async (req, res) => {
     );
 
     if (users.length === 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
-        message: "Data not found",
+        message: "DATA NOT FOUND",
       });
     }
 

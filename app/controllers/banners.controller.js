@@ -97,9 +97,9 @@ exports.update = async (req, res) => {
 
     if (updatedRows === 0) {
       // Verifica se nenhum registro foi atualizado
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
-        message: "Data not found",
+        message: "DATA NOT FOUND",
       });
     }
 

@@ -63,10 +63,10 @@ exports.findAll = (req, res) => {
   const title = req.query.title;
   var condition = title
     ? {
-        title: {
-          [Op.like]: `%${title}%`,
-        },
-      }
+      title: {
+        [Op.like]: `%${title}%`,
+      },
+    }
     : null;
 
   Customers.hasMany(Customers_address, {
@@ -200,7 +200,7 @@ exports.customerPhone = async (req, res) => {
   });
 
   if (!customerAddress) {
-    res.status(404).send({
+    res.status(200).send({
       status: false,
       message: "Customer not found",
     });

@@ -63,9 +63,9 @@ async function login(req, res) {
         },
       });
     } else {
-      return res.status(404).json({
+      return res.status(200).json({
         status: false,
-        message: "Data not found",
+        message: "DATA NOT FOUND",
       });
     }
   } catch (error) {

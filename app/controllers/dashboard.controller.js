@@ -51,7 +51,7 @@ exports.findOne = async (req, res) => {
     );
 
     if (dashboard.length === 0) {
-      return res.status(404).send({ message: "Data not found" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     const { qtde_total, total } = totalData[0];
@@ -101,7 +101,7 @@ exports.findOne = async (req, res) => {
 //   if (resultPedidos.length === 0) {
 //     // If no records were found, send a "No records" response
 //     return res
-//       .status(404)
+//       .status(200)
 //       .json({ message: "No orders found for this user." });
 //   } else {
 //     // Enviando resposta com os dados de pedidos

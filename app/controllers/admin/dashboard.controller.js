@@ -83,7 +83,7 @@ exports.findAll = async (req, res) => {
     );
 
     if (dashboard.length === 0) {
-      return res.status(404).send({ message: "Data not found" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     const { qtde_total, total } = totalData[0];

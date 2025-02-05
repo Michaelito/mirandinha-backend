@@ -224,7 +224,7 @@ exports.findAll = async (req, res) => {
     });
 
     if (updatedProducts.length === 0) {
-      return res.status(404).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "Produto não encontrado" });
     }
 
     // Buscar o nome do grupo
@@ -348,7 +348,7 @@ exports.findAllSubGroup = async (req, res) => {
     });
 
     if (updatedProducts.length === 0) {
-      return res.status(404).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "Produto não encontrado" });
     }
 
     // Buscar o nome do grupo
@@ -437,7 +437,7 @@ exports.findOne = async (req, res) => {
     const product = products[0];  // Pega o primeiro produto (único)
 
     if (!product) {
-      return res.status(404).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "Produto não encontrado" });
     }
 
     // Consulta para buscar o fator de tabpreco

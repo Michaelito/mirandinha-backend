@@ -115,7 +115,7 @@ exports.findOne = async (req, res) => {
     });
 
     if (!pedido) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
         message: "Pedido not found",
       });

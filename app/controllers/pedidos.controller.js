@@ -39,7 +39,7 @@ exports.findAllErp = async (req, res) => {
     );
 
     if (pedidos.length === 0) {
-      return res.status(404).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "Produto não encontrado" });
     }
 
     // Return data with pagination
@@ -97,7 +97,7 @@ exports.findAll = async (req, res) => {
     );
 
     if (pedidos.length === 0) {
-      return res.status(404).send({ message: "Produto não encontrado" });
+      return res.status(200).send({ message: "Produto não encontrado" });
     }
 
     // Return data with pagination
@@ -138,7 +138,7 @@ exports.findOne = async (req, res) => {
 
     // Verifica se o pedido foi encontrado
     if (orders.length === 0) {
-      return res.status(404).send({
+      return res.status(200).send({
         status: false,
         message: "Order not found",
       });
@@ -438,7 +438,7 @@ exports.findAllUser = async (req, res) => {
     );
 
     if (pedidos.length === 0) {
-      return res.status(404).send({ message: "Data not found" });
+      return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
     // Return data with pagination
@@ -488,7 +488,7 @@ exports.updateById = async (req, res) => {
     );
 
     if (orders.length === 0) {
-      return res.status(404).send({ status: true, message: "DATA NOT FOUND" });
+      return res.status(200).send({ status: true, message: "DATA NOT FOUND" });
     }
 
 
@@ -500,15 +500,160 @@ exports.updateById = async (req, res) => {
       }
     );
 
-    res.status(200).send({
-      status: true,
-      message: "The request has succeeded",
-    });
+
+    createOrder(res, id);
+
+
+
+
+
+
+
   } catch (error) {
     res.status(500).send({
       status: false,
-      message: "The request has not succeeded",
+      message: "The request has not 2 succeeded",
       error: error.message, // Inclui a mensagem de erro para depuração
     });
   }
 };
+
+
+const createOrder = async (res, id_pedido) => {
+  try {
+    const ordersItens = await sequelize.query(
+      `SELECT pi.id, pi.id_exsam, pi.qtde, pi.preco, p.id_empresa FROM pedidos_itens pi JOIN pedidos p ON p.id = pi.id_pedido WHERE pi.id_pedido = ${id_pedido}`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const id_empresa = ordersItens[0].id_empresa;
+
+    const clientes = await sequelize.query(
+      `SELECT * FROM clientes WHERE id = ${id_empresa}`,
+      { type: sequelize.QueryTypes.SELECT }
+    );
+
+    const exsam = clientes[0];
+
+    console.log("id pedido", id_pedido);
+
+    const ordersArray = ordersItens.map((item) => ({
+      id_produto: item.id_exsam,
+      qtde: parseInt(item.qtde, 10),
+      preco: parseInt(item.preco, 10),
+      age_doc: "",
+      age_pro: "",
+    }));
+
+    const orderHeader = {
+      id_agente: exsam["id_exsam"],
+      lj_agente: "01",
+      id_tipcli: "R",
+      id_pagto: exsam["id_pagamento"],
+      id_fpagto: exsam["id_forma_pagamento"],
+      id_tabpre: exsam["id_tabpre"],
+      id_vended1: exsam["id_vendedor"],
+      comissao1: 3,
+      id_frete: 0,
+      id_transp: exsam["id_trasnportador"],
+      lj_transp: "01",
+      itens: ordersArray,
+    };
+
+    const dataOrderExsam = JSON.stringify(orderHeader, null, 2);
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "http://exsammirandinha.ddns.com.br:7780/api/pedidos",
+      headers: {
+        Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
+        "Content-Type": "application/json",
+      },
+      data: dataOrderExsam,
+    };
+
+    console.log("-------request exsam--------", dataOrderExsam);
+
+    let exsamId = null;
+    let response = null;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries < maxRetries) {
+      try {
+        response = await axios.request(config);
+
+        if (response.status === 200) {
+          console.log("-------exsam--------", response.data);
+
+          exsamId = response.data.success.num;
+          const request_exsam = dataOrderExsam;
+          const response_exsam = response.data;
+
+          await sequelize.query(
+            `UPDATE pedidos SET pedido_id_exsam = :exsamId, request_exsam = :request_exsam, response_exsam = :response_exsam WHERE id = :id_pedido`,
+            {
+              replacements: {
+                exsamId,
+                request_exsam,
+                response_exsam: JSON.stringify(response_exsam),
+                id_pedido,
+              },
+              type: sequelize.QueryTypes.UPDATE,
+            }
+          );
+
+          const idata = {
+            ...(data.get ? data.get() : data),
+            pedido_id_exsam: parseInt(exsamId),
+          };
+
+          res.send(idata);
+          return; // End flow on success
+        } else {
+          throw new Error(`Invalid server response: ${response.status}`);
+        }
+      } catch (err) {
+        await sequelize.query(
+          `UPDATE pedidos SET pedido_id_exsam = :exsamId, response_exsam = :response_exasam_error WHERE id = :id_pedido`,
+          {
+            replacements: {
+              exsamId,
+              response_exasam: JSON.stringify(err),
+              id_pedido,
+            },
+            type: sequelize.QueryTypes.UPDATE,
+          }
+        );
+
+        retries++;
+        console.error(`Attempt ${retries} failed:`, err.message);
+
+        if (retries === maxRetries) {
+          console.error("Maximum attempts reached. Giving up.");
+
+          // Send error response only once
+          if (!res.headersSent) {
+            res.status(500).send({
+              message:
+                "Failed to process the order in Exsam after multiple attempts.",
+            });
+          }
+
+          return; // End flow on failure after retries
+        }
+      }
+    }
+  } catch (err) {
+    // Send error response only once
+    if (!res.headersSent) {
+      res.status(500).send({
+        message: err.message || "An error occurred while creating the order.",
+      });
+    }
+  }
+};
+
+// Usage example:
+// createOrder(somePedidoId);
