@@ -7,7 +7,8 @@ const app = express();
 
 const allowedOrigins = [
     'http://portalmirandinha.com.br',
-    'http://localhost:80'
+    'http://localhost:80',
+    'http://127.0.0.1:80',
 ];
 
 // CORS middleware
