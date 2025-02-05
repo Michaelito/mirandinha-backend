@@ -4,19 +4,34 @@ const db = require("./app/models");
 
 const app = express();
 
-var corsOptions = {
-    origin: ["https://portalmirandinha.com.br", "https://portalmirandinha.com.br", "https://www.portalmirandinha.com.br", "http://localhost"],
+const allowedOrigins = [
+    "https://portalmirandinha.com.br",
+    "https://www.portalmirandinha.com.br",
+    "http://localhost"
+];
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
 
+
 // Middleware para configurar os cabeçalhos de controle de cache
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Surrogate-Control', 'no-store');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    res.setHeader('Surrogate-Control', 'no-store');
     next();
 });
 
