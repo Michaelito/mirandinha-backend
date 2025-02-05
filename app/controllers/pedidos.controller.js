@@ -177,59 +177,22 @@ exports.findOne = async (req, res) => {
 
 exports.reprocess = async (req, res) => {
 
-  const id = req.body.id;
+  try {
+    createOrder(res, req.body.id);
 
-  console.log("-------id--------", id);
-
-  const pedido = await sequelize.query(
-    `SELECT request_exsam FROM pedidos WHERE id = ${id}`,
-    { type: sequelize.QueryTypes.SELECT }
-  );
-
-  const obj = JSON.stringify(pedido[0].request_exsam);
-  const jsonObject = JSON.parse(obj)
-  console.log("--------------obj-------------", jsonObject);
-
-  return
-
-  const config = {
-    method: "post",
-    maxBodyLength: Infinity,
-    url: "http://exsammirandinha.ddns.com.br:7780/api/pedidos",
-    headers: {
-      Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
-      "Content-Type": "application/json",
-    },
-    data: obj,
-  };
-
-  response = await axios.request(config);
-
-  if (response.status === 200) {
-    console.log("-------exsam--------", response.data);
-
-    const exsamId = response.data.success.num;
-    const request_exsam = dataOrderExsam;
-    const response_exsam = response.data;
-
-    await sequelize.query(
-      `UPDATE pedidos SET pedido_id_exsam = :exsamId, request_exsam = :request_exsam, response_exsam = :response_exsam WHERE id = :id_pedido`,
-      {
-        replacements: {
-          exsamId,
-          request_exsam: request_exsam,
-          response_exsam: JSON.stringify(response_exsam),
-          id_pedido,
-        },
-        type: sequelize.QueryTypes.UPDATE,
-      }
-    );
-  }
-  else {
-    throw new Error(`Resposta inválida do servidor: ${response.status}`);
+  } catch (error) {
+    res.status(500).send({
+      status: false,
+      message: "The request has not 2 succeeded",
+      error: error.message, // Inclui a mensagem de erro para depuração
+    });
   }
 
-}
+
+};
+
+// Example of createOrder function (you would implement this according to your needs)
+
 
 
 // Create and Save a new User
