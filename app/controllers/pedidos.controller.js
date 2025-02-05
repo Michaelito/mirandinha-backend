@@ -177,6 +177,7 @@ exports.findOne = async (req, res) => {
 
 exports.reprocess = async (req, res) => {
 
+
   try {
     createOrder(res, req.body.id);
 
@@ -483,6 +484,14 @@ exports.updateById = async (req, res) => {
 
 
 const createOrder = async (res, id_pedido) => {
+
+  if (!id_pedido) {
+    return res.status(400).send({
+      status: false,
+      message: "Parameter id is required",
+    });
+  }
+
   try {
     const ordersItens = await sequelize.query(
       `SELECT pi.id, pi.id_exsam, pi.qtde, pi.preco, p.id_empresa FROM pedidos_itens pi JOIN pedidos p ON p.id = pi.id_pedido WHERE pi.id_pedido = ${id_pedido}`,
