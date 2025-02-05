@@ -4,34 +4,49 @@ const db = require("./app/models");
 
 const app = express();
 
+
 const allowedOrigins = [
-    "https://portalmirandinha.com.br",
-    "https://www.portalmirandinha.com.br",
-    "http://localhost"
+    'http://portalmirandinha.com.br',
+    'http://localhost:80'
 ];
 
-const corsOptions = {
+// CORS middleware
+app.use(cors({
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error("Not allowed by CORS"));
+            callback(new Error('Not allowed by CORS'));
         }
     },
-    optionsSuccessStatus: 200
-};
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization'
+}));
 
-app.use(cors(corsOptions));
+
 
 
 // Middleware para configurar os cabeçalhos de controle de cache
 app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Allow all domains
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Cache-Control', 'private, no-store, max-age=0');
     res.setHeader('Surrogate-Control', 'no-store');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+
+
+
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+
+
+
     next();
 });
 
