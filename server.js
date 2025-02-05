@@ -5,7 +5,7 @@ const db = require("./app/models");
 const app = express();
 
 var corsOptions = {
-    origin: ["http://portalmirandinha.com.br", "http://localhost"],
+    origin: ["https://portalmirandinha.com.br", "https://portalmirandinha.com.br", "https://www.portalmirandinha.com.br", "http://localhost"],
     optionsSuccessStatus: 200
 };
 
