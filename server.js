@@ -5,15 +5,17 @@ const db = require("./app/models");
 const app = express();
 
 
+// Lista de origens permitidas
 const allowedOrigins = [
     'http://portalmirandinha.com.br',
     'http://localhost:80',
     'http://127.0.0.1:80',
 ];
 
-// CORS middleware
+// Configuração do middleware CORS
 app.use(cors({
     origin: function (origin, callback) {
+        // Permite requisições sem origem (ex.: Postman ou scripts locais)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -21,11 +23,13 @@ app.use(cors({
         }
     },
     methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type,Authorization'
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true // Se necessário para cookies/autenticação
 }));
 
-
-
+// Middleware para JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Middleware para configurar os cabeçalhos de controle de cache
 app.use((req, res, next) => {
@@ -40,14 +44,9 @@ app.use((req, res, next) => {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
 
-
-
     if (req.method === 'OPTIONS') {
         return res.sendStatus(204);
     }
-
-
-
     next();
 });
 
