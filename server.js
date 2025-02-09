@@ -20,15 +20,14 @@ const corsOptions = {
     credentials: true,
     maxAge: 1800,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
 };
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization");
     res.setHeader("Access-Control-Max-Age", "1800");
 
     next();
