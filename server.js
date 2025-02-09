@@ -25,6 +25,7 @@ const corsOptions = {
 
 // Mas se quiser explicitamente mencionar application/json no Accept (embora não seja estritamente necessário):
 app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
 
     next();
