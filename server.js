@@ -4,7 +4,6 @@ const db = require("./app/models");
 
 const app = express();
 
-
 const allowedOrigins = [
     'http://portalmirandinha.com.br',
     'http://portalmirandinha.com.br:3000',
@@ -28,6 +27,7 @@ app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization");
+    res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' blob:; connect-src 'self' blob:");
     res.setHeader("Access-Control-Max-Age", "1800");
 
     next();
