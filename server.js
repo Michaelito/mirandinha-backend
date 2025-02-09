@@ -11,24 +11,10 @@ const allowedOrigins = [
     'http://portalmirandinha.com.br:3000',
     'http://localhost',
     'http://localhost:80',
-    'https://portalmirandinha.com.br'
+    'https://portalmirandinha.com.br',
+    'http://api.portalmirandinha.com.br:3000', // Add this line!
+    'https://api.portalmirandinha.com.br:3000' // and this one for https if needed
 ];
-
-app.use((req, res, next) => {
-    if (allowedOrigins.includes(req.headers.origin)) {
-        res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
-    }
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
-    res.setHeader("Access-Control-Allow-Credentials", true);
-
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-
-    next();
-});
 
 const corsOptions = {
     origin: function (origin, callback) {
@@ -41,6 +27,17 @@ const corsOptions = {
     credentials: true,  // Adiciona esta linha para permitir cookies/autenticação
     optionsSuccessStatus: 200
 };
+
+
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    next();
+});
+
 
 app.use(cors(corsOptions));
 app.use(express.json());
