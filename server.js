@@ -4,29 +4,14 @@ const db = require("./app/models");
 
 const app = express();
 
-
-const allowedOrigins = [
-    'http://portalmirandinha.com.br',
-    'http://portalmirandinha.com.br:3000',
-    'http://localhost',
-    'http://localhost:80',
-    'https://portalmirandinha.com.br',
-    'http://api.portalmirandinha.com.br:3000',
-    'https://api.portalmirandinha.com.br:3000'
-];
-
-const corsOptions = {
-    origin: allowedOrigins,
-    credentials: true,
-    maxAge: 1800,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Adicione os métodos permitidos
-    allowedHeaders: ['Content-Type'] // Pode ser necessário adicionar outros headers aqui
-};
-
 // Mas se quiser explicitamente mencionar application/json no Accept (embora não seja estritamente necessário):
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Max-Age", "1800");
 
     next();
 });
