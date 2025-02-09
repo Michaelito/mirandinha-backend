@@ -8,7 +8,9 @@ const app = express();
 // Lista de origens permitidas
 const allowedOrigins = [
     'http://portalmirandinha.com.br',
+    'http://portalmirandinha.com.br:3000',
     'http://localhost',
+    'http://localhost:80',
     'https://portalmirandinha.com.br'
 ];
 
