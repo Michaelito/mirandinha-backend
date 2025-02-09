@@ -5,41 +5,33 @@ const db = require("./app/models");
 const app = express();
 
 
-// Lista de origens permitidas
 const allowedOrigins = [
     'http://portalmirandinha.com.br',
     'http://portalmirandinha.com.br:3000',
     'http://localhost',
     'http://localhost:80',
     'https://portalmirandinha.com.br',
-    'http://api.portalmirandinha.com.br:3000', // Add this line!
-    'https://api.portalmirandinha.com.br:3000' // and this one for https if needed
+    'http://api.portalmirandinha.com.br:3000',
+    'https://api.portalmirandinha.com.br:3000'
 ];
 
 const corsOptions = {
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true,  // Adiciona esta linha para permitir cookies/autenticação
-    optionsSuccessStatus: 200
+    origin: allowedOrigins,
+    credentials: true,
+    maxAge: 1800,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Adicione os métodos permitidos
+    allowedHeaders: ['Content-Type'] // Pode ser necessário adicionar outros headers aqui
 };
 
-
+// Mas se quiser explicitamente mencionar application/json no Accept (embora não seja estritamente necessário):
 app.use((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
 
     next();
 });
 
-
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
