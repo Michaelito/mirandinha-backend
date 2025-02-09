@@ -8,11 +8,12 @@ const app = express();
 // Lista de origens permitidas
 const allowedOrigins = [
     'http://portalmirandinha.com.br',
-    'http://www.portalmirandinha.com.br',
+    'http://localhost:80',
     'http://localhost'
 ];
 
 const corsOptions = {
+
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -20,20 +21,41 @@ const corsOptions = {
             callback(new Error("Not allowed by CORS"));
         }
     },
-    methods: "GET, PUT, POST, DELETE", // Adicione aqui todos os métodos necessários
-    optionsSuccessStatus: 200,
+    optionsSuccessStatus: 200
+
 };
 
 app.use(cors(corsOptions));
 
+
+// Middleware para JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware para configurar os cabeçalhos de controle de cache
 app.use((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Credentials", true);
+
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+    res.setHeader('Surrogate-Control', 'no-store');
     res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     next();
 });
 
+
+// parse requests of content-type - application/json
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const { Console } = require('console');
 
 db.sequelize.sync();
 
@@ -60,6 +82,8 @@ require("./app/routes/api/v1/newsletter.routes")(app);
 require("./app/routes/api/v1/transportadoras.routes")(app);
 require("./app/routes/api/v1/banners.routes")(app);
 require("./app/routes/api/v1/admin/dashboard.routes")(app);
+
+
 
 
 require("./app/routes/api/v1/michaelgrupo.routes")(app);
