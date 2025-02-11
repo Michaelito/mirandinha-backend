@@ -360,13 +360,13 @@ exports.forgot_password = async (req, res) => {
 
 
     const transporter = nodemailer.createTransport({
-      host: "mail.portalmirandinha.com.br",
+      host: process.env.EMAIL_HOST,
       //host: "_dc-mx.fd0126666913.portalmirandinha.com.br",
       port: 465,
       secure: true,
       auth: {
-        user: "suporte@portalmirandinha.com.br",
-        pass: "A5sQ[cWO?X!=",
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
