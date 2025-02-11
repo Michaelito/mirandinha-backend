@@ -359,14 +359,24 @@ exports.forgot_password = async (req, res) => {
       .replace('{{PASSWORD}}', pass_new);
 
 
+    // const transporter = nodemailer.createTransport({
+    //   host: process.env.EMAIL_HOST,
+    //   //host: "_dc-mx.fd0126666913.portalmirandinha.com.br",
+    //   port: 465,
+    //   secure: true,
+    //   auth: {
+    //     user: process.env.EMAIL_USER,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // });
+
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      //host: "_dc-mx.fd0126666913.portalmirandinha.com.br",
+      host: "mail.portalmirandinha.com.br",
       port: 465,
       secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: "suporte@portalmirandinha.com.br",
+        pass: "A5sQ[cWO?X!=",
       },
     });
 
@@ -382,7 +392,7 @@ exports.forgot_password = async (req, res) => {
 
     res.status(200).send({
       status: true,
-      message: "The request has succeeded 1111111",
+      message: "The request has succeeded",
     });
 
 

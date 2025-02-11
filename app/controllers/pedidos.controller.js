@@ -400,6 +400,8 @@ const createOrder = async (req, res, id_pedido) => {
 
     const dataOrderExsam = JSON.stringify(orderHeader, null, 2);
 
+    console.log("-------request exsam--------", dataOrderExsam);
+
     let config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -413,7 +415,7 @@ const createOrder = async (req, res, id_pedido) => {
 
     const response = await axios.request(config);
 
-    console.log("-------exsam--------", response.data);
+    console.log("-------response exsam--------", response.data);
 
     const exsamId = response.data.success.num;
     const request_exsam = dataOrderExsam;
