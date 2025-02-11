@@ -23,7 +23,7 @@ module.exports = (app) => {
 
   router.post("/", auth.authenticateToken, controller.create);
 
-  router.put("/:id", auth.authenticateToken, controller.updateById);
+  router.put("/:id_pedido", auth.authenticateToken, controller.updateById);
 
   app.use("/api/v1/pedidos", router);
 };

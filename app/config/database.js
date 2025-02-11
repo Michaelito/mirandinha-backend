@@ -7,6 +7,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     dialectOptions: {
         connectTimeout: 60000 // 60 segundos, pode ajustar conforme necessário
     },
+    //logging: false,
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,

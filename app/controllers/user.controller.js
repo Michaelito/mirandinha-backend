@@ -25,7 +25,6 @@ exports.findAll = (req, res) => {
     }
     : null;
 
-
   users.hasOne(address_users, {
     foreignKey: "user_id",
   });
@@ -115,7 +114,7 @@ exports.findOne = async (req, res) => {
         type: sequelize.QueryTypes.SELECT,
       }
     );
-    // // Adiciona a propriedade 'produtos_grades' ao pedido
+
     user.company = companies[0];
 
     if (decodedToken.profile === 4) {
@@ -135,8 +134,6 @@ exports.findOne = async (req, res) => {
 
       user.customers = companies_representantes
     }
-
-
 
     // Retornar o pedido com os itens
     res.status(200).send({
@@ -318,7 +315,6 @@ const generateRandomPassword = (length = 10) => {
 };
 
 
-
 exports.forgot_password = async (req, res) => {
   const login = req.body.login;
 
@@ -342,13 +338,8 @@ exports.forgot_password = async (req, res) => {
     }
 
     const user = users[0];
-
-    const htmlFilePath = path.join(__dirname, '../views/index.html');
-    let htmlContent = fs.readFileSync(htmlFilePath, 'utf8');
-
     const pass_new = generateRandomPassword(8);
     const hashNewPassword = crypto.createHash("md5").update(pass_new).digest("hex");
-
 
     await sequelize.query(
       `UPDATE users 
@@ -360,54 +351,48 @@ exports.forgot_password = async (req, res) => {
       }
     );
 
-    // Substituir placeholder no HTML
+    const htmlFilePath = path.join(__dirname, '../views/index.html');
+    let htmlContent = fs.readFileSync(htmlFilePath, 'utf8');
+
     htmlContent = htmlContent
       .replace('{{USERNAME}}', user.fullname)
       .replace('{{PASSWORD}}', pass_new);
 
-    // Configuração do transporte SMTP
+
     const transporter = nodemailer.createTransport({
-      host: "mail.portalmirandinha.com.br", // Substitua pelo seu domínio
-      port: 465, // Porta padrão para SMTP com SSL
-      secure: true, // Usar SSL
+      host: "mail.portalmirandinha.com.br",
+      //host: "_dc-mx.fd0126666913.portalmirandinha.com.br",
+      port: 465,
+      secure: true,
       auth: {
-        user: "suporte@portalmirandinha.com.br", // Substitua pelo seu e-mail
-        pass: "A5sQ[cWO?X!=", // Substitua pela senha do e-mail
+        user: "suporte@portalmirandinha.com.br",
+        pass: "A5sQ[cWO?X!=",
       },
     });
 
-    // Corpo do e-mail
     const mailOptions = {
-      from: '"Grupo Mirandinha" <suporte@portalmirandinha.com.br>', // Substitua pelo nome da empresa e e-mail
-      to: user.login, // Enviar para o e-mail do usuário
-      //to: "michaelito.regis@gmail.com", // Enviar para o e-mail do usuário
-      subject: "Recuperação de Senha", // Assunto
-      text: `Olá ${user.login},\n\nVocê solicitou a recuperação de sua senha.`, // Texto do e-mail
-      // html: `<p>Olá <strong>${user.login}</strong>,</p>
-      //        <p>Você solicitou a recuperação de sua senha.</p>`, // Corpo em HTML
-
+      from: '"Grupo Mirandinha" <suporte@portalmirandinha.com.br>',
+      to: user.login,
+      subject: "Recuperação de Senha",
+      text: `Olá ${user.login},\n\nVocê solicitou a recuperação de sua senha.`,
       html: htmlContent
     };
 
-    // Enviar o e-mail
     await transporter.sendMail(mailOptions);
 
-    // Retornar o pedido com os itens
     res.status(200).send({
       status: true,
-      message: "The request has succeeded",
-      data: {
-        user: user, // Retorna o pedido único
-      },
+      message: "The request has succeeded 1111111",
     });
+
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Erro ao processar requisição de recuperação de senha:", error);
 
     res.status(500).send({
       status: false,
-      message: "The request has not succeeded",
+      message: "The request has not succeeded" || error,
     });
 
   }
