@@ -405,7 +405,7 @@ const createOrder = async (req, res, id_pedido) => {
       maxBodyLength: Infinity,
       url: process.env.EXSAM_URL,
       headers: {
-        Authorization: process.env.EXSAM_KEY,
+        Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
         "Content-Type": "application/json",
       },
       data: dataOrderExsam,
@@ -413,7 +413,7 @@ const createOrder = async (req, res, id_pedido) => {
 
     const response = await axios.request(config);
 
-    //console.log("-------exsam--------", response.data);
+    console.log("-------exsam--------", response.data);
 
     const exsamId = response.data.success.num;
     const request_exsam = dataOrderExsam;
