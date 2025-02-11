@@ -5,12 +5,10 @@ const address_users = db.address_users;
 const Op = db.Sequelize.Op;
 const { uuid } = require("uuidv4");
 const crypto = require("crypto");
-const { console } = require("inspector");
-
 const sequelize = require("../config/database");
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
-const nodemailer = require('nodemailer');
 
+const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
 
@@ -316,6 +314,7 @@ const generateRandomPassword = (length = 10) => {
 
 
 exports.forgot_password = async (req, res) => {
+  console.log("")
   const login = req.body.login;
 
   try {
@@ -359,24 +358,14 @@ exports.forgot_password = async (req, res) => {
       .replace('{{PASSWORD}}', pass_new);
 
 
-    // const transporter = nodemailer.createTransport({
-    //   host: process.env.EMAIL_HOST,
-    //   //host: "_dc-mx.fd0126666913.portalmirandinha.com.br",
-    //   port: 465,
-    //   secure: true,
-    //   auth: {
-    //     user: process.env.EMAIL_USER,
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    // });
-
     const transporter = nodemailer.createTransport({
-      host: "mail.portalmirandinha.com.br",
+      host: process.env.EMAIL_HOST,
+      //host: "mail.portalmirandinha.com.br",
       port: 465,
       secure: true,
       auth: {
-        user: "suporte@portalmirandinha.com.br",
-        pass: "A5sQ[cWO?X!=",
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
@@ -390,7 +379,7 @@ exports.forgot_password = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).send({
+    return res.status(200).send({
       status: true,
       message: "The request has succeeded",
     });
@@ -398,11 +387,11 @@ exports.forgot_password = async (req, res) => {
 
   } catch (error) {
 
-    console.error("Erro ao processar requisição de recuperação de senha:", error);
+    console.log("Erro ao processar requisição de recuperação de senha:", error);
 
-    res.status(500).send({
+    return res.status(500).send({
       status: false,
-      message: "The request has not succeeded" || error,
+      message: error.message || "The request has not succeeded",
     });
 
   }
