@@ -25,7 +25,7 @@ exports.findAllErp = async (req, res) => {
 
     // Query to fetch the paginated products
     const pedidos = await sequelize.query(
-      `SELECT p.id, p.createdAt, c.razao_social, u.fullname, p.total, p.status
+      `SELECT p.id, p.createdAt, c.razao_social, u.fullname, p.total, p.status, p.pedido_id_exsam
        FROM pedidos p
        JOIN clientes c ON c.id = p.id_empresa 
        JOIN users u ON u.id = p.id_user 
@@ -402,7 +402,7 @@ const createOrder = async (req, res, id_pedido) => {
 
     console.log("-------request exsam--------", dataOrderExsam);
 
-    let config = {
+    const config = {
       method: "post",
       maxBodyLength: Infinity,
       url: "http://exsammirandinha.ddns.com.br:7780/api/pedidos",
