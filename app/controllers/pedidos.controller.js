@@ -405,7 +405,7 @@ const createOrder = async (req, res, id_pedido) => {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: process.env.EXSAM_URL,
+      url: "http://exsammirandinha.ddns.com.br:7780/api/pedidos",
       headers: {
         Authorization: "Key ZZ3qxtMGPQFXBFm8qtZbACiumpzhsjJ7",
         "Content-Type": "application/json",
