@@ -120,7 +120,7 @@ exports.findOne = async (req, res) => {
       const companies_representantes = await sequelize.query(
         `SELECT 
         c.id, c.id_exsam, c.lj, c.razao_social, c.nome_fantasia, c.cnpj, c.endereco, c.numero, c.complemento, c.cidade, c.uf, 
-        c.id_tabpre, c.id_forma_pagamento, c.id_pagamento
+        c.id_tabpre, c.id_forma_pagamento, c.id_pagamento, c.tipo_entrega
         FROM representantes_clientes rc
         JOIN clientes c ON c.id = rc.id_clientes  
         WHERE rc.id_users = ?`,
