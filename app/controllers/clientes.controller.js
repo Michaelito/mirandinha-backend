@@ -44,7 +44,7 @@ exports.findAll = async (req, res) => {
     const query = await sequelize.query(
       `SELECT id, id_exsam, razao_social, nome_fantasia, cnpj, 
        endereco, numero, complemento, cidade, uf, 
-       id_tabpre, id_forma_pagamento, id_pagamento, id_trasnportador, id_vendedor 
+       id_tabpre, id_forma_pagamento, id_pagamento, id_trasnportador, id_vendedor, tipo_entrega 
        FROM clientes
        ${whereClause}
        ORDER BY id DESC
