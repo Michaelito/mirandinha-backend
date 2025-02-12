@@ -202,7 +202,7 @@ exports.create = async (req, res) => {
     const payload = {
       ...req.body,
       id_user: decodedToken.id,
-      id_empresa: decodedToken.id_empresa,
+      id_empresa: req.body.profile == 2 ? decodedToken.id_empresa : req.body.id_empresa
     };
 
     // Salva o pedido no banco de dados
