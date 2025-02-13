@@ -12,27 +12,48 @@ exports.findAllErp = async (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
   const offset = (page - 1) * limit;
 
+  const { start_date, end_date, id_empresa, id_vendedor } = req.query;
+
   try {
-    // Query to get the total count of products for pagination
+    // Query to get the total count of products for pagination with filters
     const totalProductsResult = await sequelize.query(
-      `SELECT COUNT(*) as total FROM pedidos p`,
+      `SELECT COUNT(*) as total FROM pedidos p
+      WHERE DATE(p.createdAt) BETWEEN :start_date AND :end_date
+      AND (:id_empresa IS NULL OR p.id_empresa = :id_empresa)
+      AND (:id_vendedor IS NULL OR p.id_user = :id_vendedor)`,
       {
+        replacements: {
+          start_date: start_date || '1900-01-01', // Default to earliest date if not provided
+          end_date: end_date || '9999-12-31',    // Default to latest date if not provided
+          id_empresa: id_empresa || null,
+          id_vendedor: id_vendedor || null,
+        },
         type: sequelize.QueryTypes.SELECT,
       }
     );
 
     const totalProducts = totalProductsResult[0]?.total || 0;
 
-    // Query to fetch the paginated products
+    // Query to fetch the paginated products with filters
     const pedidos = await sequelize.query(
       `SELECT p.id, p.createdAt, c.razao_social, u.fullname, p.total, p.status, p.pedido_id_exsam
-       FROM pedidos p
-       JOIN clientes c ON c.id = p.id_empresa 
-       JOIN users u ON u.id = p.id_user 
-       ORDER BY p.id DESC
-       LIMIT ? OFFSET ?`,
+      FROM pedidos p
+      JOIN clientes c ON c.id = p.id_empresa 
+      JOIN users u ON u.id = p.id_user
+      WHERE DATE(p.createdAt) BETWEEN :start_date AND :end_date
+      AND (:id_empresa IS NULL OR p.id_empresa = :id_empresa)
+      AND (:id_vendedor IS NULL OR p.id_user = :id_vendedor)
+      ORDER BY p.id DESC
+      LIMIT :limit OFFSET :offset`,
       {
-        replacements: [limit, offset],
+        replacements: {
+          start_date: start_date || '1900-01-01',
+          end_date: end_date || '9999-12-31',
+          id_empresa: id_empresa || null,
+          id_vendedor: id_vendedor || null,
+          limit: limit,
+          offset: offset,
+        },
         type: sequelize.QueryTypes.SELECT,
       }
     );
@@ -58,10 +79,12 @@ exports.findAllErp = async (req, res) => {
     res.status(500).send({
       status: false,
       message: "The request has not succeeded",
-      error: error.message, // Included error message for debugging
+      error: error.message,
     });
   }
 };
+
+
 
 // Retrieve all from the database.
 exports.findAll = async (req, res) => {
