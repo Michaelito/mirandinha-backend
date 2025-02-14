@@ -15,8 +15,8 @@ exports.findAllErp = async (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
   const offset = (page - 1) * limit;
 
-  if (decodedToken.profile != 1) {
-    res.status(401).send({
+  if (decodedToken.profile !== 1) {
+    return res.status(401).send({
       status: false,
       message: "The request has not succeeded",
     });
@@ -68,8 +68,8 @@ exports.findAllErp = async (req, res) => {
     const pedidos = await sequelize.query(
       `SELECT p.id, p.createdAt, c.razao_social, u.fullname, p.total, p.status, p.pedido_id_exsam
       FROM pedidos p
-      JOIN clientes c ON c.id = p.id_empresa
-      JOIN users u ON u.id = p.id_user
+      left JOIN clientes c ON c.id = p.id_empresa
+      left JOIN users u ON u.id = p.id_user
       ${whereClause}
       ORDER BY p.id DESC
       LIMIT :limit OFFSET :offset`,

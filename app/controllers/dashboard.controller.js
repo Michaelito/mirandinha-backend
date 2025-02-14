@@ -54,10 +54,17 @@ exports.findAll = async (req, res) => {
         DATE_FORMAT(createdAt, '%Y-%m') ASC;
     `;
 
-    const [dashboardData, metadataDashboard] = await sequelize.query(dashboardQuery, {
+    const [dashboardData] = await sequelize.query(dashboardQuery, {
       replacements: replacements,
       type: sequelize.QueryTypes.SELECT,
     });
+
+    if (dashboardData.length === 0) {
+      return res.status(200).send({
+        status: false,
+        message: "DATA NOT FOUND",
+      });
+    }
 
     // 4. Construct the SQL Query for total data
     const sqlQuery = `

@@ -63,6 +63,13 @@ exports.findAll = async (req, res) => {
       type: sequelize.QueryTypes.SELECT,
     });
 
+    if (totalDashboard.length === 0) {
+      return res.status(200).send({
+        status: false,
+        message: "DATA NOT FOUND",
+      });
+    }
+
     // Construct the SQL Query for total data
     const sqlQuery = `
       SELECT 
@@ -88,15 +95,11 @@ exports.findAll = async (req, res) => {
       pedidos
     ${whereClause}`;
 
-    console.log("--------------sql-------------", sqlQueryConvert);
-
     // Execute the Query for total data
     const datasqlQueryConvert = await sequelize.query(sqlQueryConvert, {
       replacements: replacements,
       type: sequelize.QueryTypes.SELECT,
     });
-
-    console.log("--------------sql 222-------------", datasqlQueryConvert);
 
 
     // Extract and Send the Response
