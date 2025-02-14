@@ -3,140 +3,101 @@ const { decodeTokenFromHeader } = require('../../middleware/auth.js');
 
 // Retrieve all GrupoFormats from the database.
 exports.findAll = async (req, res) => {
-  console.log("-------endDate--------");
-
-  const { startDate, endDate, status, id_empresa, id_user } = req.query;
-
-  console.log('startDate:', startDate); // Deve imprimir "2025-01-01"
-  console.log('endDate:', endDate);     // Deve imprimir "2025-02-01"
-  console.log('status:', status);
 
   const decodedToken = decodeTokenFromHeader(req);
-  const profile = decodedToken.profile;
 
-  if (profile !== 1) {
-    return res.status(401).send({ status: true, message: "UNAUTHORIZED" });
-  }
-
-  if (!startDate || !endDate) {
-    return res.status(400).send({ status: false, message: "Start date and end date are required." });
+  if (decodedToken.profile != 1) {
+    res.status(401).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
   }
 
   try {
-    let baseQuery = `
-      SELECT 
-        DATE(createdAt) AS date,
-        COUNT(id) AS count_orders,
-        SUM(total_geral) AS sum_total_orders
-      FROM 
-        pedidos
-      WHERE 
-        CAST(createdAt AS DATE) BETWEEN :startDate AND :endDate`;
 
-    const replacements = { startDate, endDate };
+    // 1. Extract and Validate Parameters
+    const currentYear = req.query.year ? parseInt(req.query.year) : new Date().getFullYear();
+    const month = req.query.month ? parseInt(req.query.month) : null; // Use null for no month
+    const { id_empresa, id_vendedor } = req.query;
 
-    if (status) {
-      baseQuery += ` AND status = :status`;
-      replacements.status = status;
+    // 2. Build the WHERE Clause Dynamically
+    const whereClauses = [];
+    const replacements = { currentYear }; // Start with currentYear
+
+    if (month) {
+      whereClauses.push("DATE_FORMAT(createdAt, '%m') = :month");
+      replacements.month = month;
     }
 
     if (id_empresa) {
-      baseQuery += ` AND id_empresa = :id_empresa`;
+      whereClauses.push("id_empresa = :id_empresa");
       replacements.id_empresa = id_empresa;
     }
 
-    if (id_user) {
-      baseQuery += ` AND id_user = :id_user`;
-      replacements.id_user = id_user;
+    if (id_vendedor) {
+      whereClauses.push("id_user = :id_vendedor");
+      replacements.id_vendedor = id_vendedor;
     }
 
-    baseQuery += `
-      GROUP BY 
-        DATE(createdAt)
-      ORDER BY 
-        DATE(createdAt) ASC;`;
+    whereClauses.push("DATE_FORMAT(createdAt, '%Y') = :currentYear");
 
-    const dashboard = await sequelize.query(baseQuery, {
-      replacements,
+    const whereClause = whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : ""; // Construct the full WHERE clause
+
+    // 3. Construct the SQL Query
+    const dashboardQuery = `
+    SELECT
+      DATE_FORMAT(createdAt, '%Y') AS year,
+      DATE_FORMAT(createdAt, '%m') AS month,
+      COUNT(id) AS count_orders,
+      SUM(total_geral) AS sum_total_orders
+    FROM
+      pedidos
+    ${whereClause}
+    GROUP BY
+      DATE_FORMAT(createdAt, '%Y'),
+      DATE_FORMAT(createdAt, '%m')
+    ORDER BY
+      DATE_FORMAT(createdAt, '%Y-%m') ASC;`;
+
+    const totalDashboard = await sequelize.query(dashboardQuery, {
+      replacements: replacements,
       type: sequelize.QueryTypes.SELECT,
     });
 
-    const totalData = await sequelize.query(
-      `SELECT 
-         COUNT(id) AS qtde_total,
-         SUM(total_geral) AS total
-       FROM 
-         pedidos
-       WHERE 
-         CAST(createdAt AS DATE) BETWEEN :startDate AND :endDate` +
-      (status ? ' AND status = :status' : '') +
-      (id_empresa ? ' AND id_empresa = :id_empresa' : '') +
-      (id_user ? ' AND id_user = :id_user' : '') + ';',
-      {
-        replacements,
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
+    // 3. Construct the SQL Query
+    const sqlQuery = `
+      SELECT 
+        COUNT(id) AS total_pedidos,
+        SUM(total_geral) AS total_valor
+      FROM 
+        pedidos
+      ${whereClause};
+    `;
 
-    const statusCounts = await sequelize.query(
-      `SELECT 
-         status, 
-         COUNT(id) AS count_status
-       FROM 
-         pedidos
-       WHERE 
-         CAST(createdAt AS DATE) BETWEEN :startDate AND :endDate` +
-      (status ? ' AND status = :status' : '') +
-      (id_empresa ? ' AND id_empresa = :id_empresa' : '') +
-      (id_user ? ' AND id_user = :id_user' : '') + `
-       GROUP BY 
-         status;`,
-      {
-        replacements,
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
+    // 4. Execute the Query
+    const totalData = await sequelize.query(sqlQuery, {
+      replacements: replacements,
+      type: sequelize.QueryTypes.SELECT,
+    });
 
-    const statusConvertCounts = await sequelize.query(
-      `SELECT 
-        COUNT(id) AS count_status_convert
-       FROM 
-         pedidos
-       WHERE 
-         CAST(createdAt AS DATE) BETWEEN :startDate AND :endDate` +
-      (' AND status_convert = 1 ') +
-      (status ? ' AND status = :status' : '') +
-      (id_empresa ? ' AND id_empresa = :id_empresa' : '') +
-      (id_user ? ' AND id_user = :id_user' : '') + ';',
-      {
-        replacements,
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-
-    if (dashboard.length === 0) {
-      return res.status(200).send({ message: "DATA NOT FOUND" });
-    }
-
-    const { qtde_total, total } = totalData[0];
+    // 6. Extract and Send the Response
+    const { total_pedidos, total_valor } = totalData[0];
 
     res.status(200).send({
       status: true,
       message: "The request has succeeded",
       data: {
-        customer_since: "2024-01-01",
-        qtde_total,
-        total,
-        dashboard,
-        status_counts: statusCounts,
-        status_convert_counts: statusConvertCounts[0].count_status_convert,
+        total_pedidos: total_pedidos || 0,
+        total_valor: total_valor || 0,
+        dashboard: totalDashboard || 0
       },
     });
+
   } catch (error) {
+    console.error("Error fetching data:", error); // Log the error
     res.status(500).send({
       status: false,
       message: "The request has not succeeded",
-      error: error.message,
     });
   }
 };
