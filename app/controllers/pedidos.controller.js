@@ -6,6 +6,8 @@ const sequelize = require("../config/database");
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
 const axios = require('axios');
 const { format } = require('date-fns');
+const moment = require('moment');
+
 
 exports.findAllErp = async (req, res) => {
   const decodedToken = decodeTokenFromHeader(req);
@@ -20,7 +22,18 @@ exports.findAllErp = async (req, res) => {
     });
   }
 
-  const { start_date, end_date, id_empresa, id_vendedor } = req.query;
+  const { id_empresa, id_vendedor } = req.query;
+
+  const hoje = new Date();
+  const start_date_01 = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  const start_date_format = moment(start_date_01).format('YYYY-MM-DD');
+
+  const end_date_day = moment().endOf('month');
+  const end_date_format = end_date_day.format('YYYY-MM-DD');
+
+
+  const start_date = req.query.start_date ? req.query.start_date : start_date_format
+  const end_date = req.query.end_date ? req.query.end_date : end_date_format
 
   try {
     // 1. Construct the WHERE clause dynamically
