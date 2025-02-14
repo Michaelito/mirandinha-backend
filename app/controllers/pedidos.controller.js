@@ -5,52 +5,64 @@ const pedidosItens = db.pedidos_itens;
 const sequelize = require("../config/database");
 const { decodeTokenFromHeader } = require('../middleware/auth.js');
 const axios = require('axios');
-
+const { format } = require('date-fns');
 
 exports.findAllErp = async (req, res) => {
+  const decodedToken = decodeTokenFromHeader(req);
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 5;
   const offset = (page - 1) * limit;
 
+  if (decodedToken.profile != 1) {
+    res.status(401).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
+
   const { start_date, end_date, id_empresa, id_vendedor } = req.query;
 
   try {
-    // Query to get the total count of products for pagination with filters
+    // 1. Construct the WHERE clause dynamically
+    let whereClause = 'WHERE DATE(p.createdAt) BETWEEN :start_date AND :end_date';
+    const replacements = {
+      start_date: start_date || format(new Date(), 'yyyy-MM-dd'),
+      end_date: end_date || format(new Date(), 'yyyy-MM-dd'),
+    };
+
+    if (id_empresa) {
+      whereClause += ' AND p.id_empresa = :id_empresa';
+      replacements.id_empresa = id_empresa;
+    }
+
+    if (id_vendedor) {
+      whereClause += ' AND p.id_user = :id_vendedor';
+      replacements.id_vendedor = id_vendedor;
+    }
+
+    // 2. Query to get the total count of products with dynamic WHERE clause
     const totalProductsResult = await sequelize.query(
-      `SELECT COUNT(*) as total FROM pedidos p
-      WHERE DATE(p.createdAt) BETWEEN :start_date AND :end_date
-      AND (:id_empresa IS NULL OR p.id_empresa = :id_empresa)
-      AND (:id_vendedor IS NULL OR p.id_user = :id_vendedor)`,
+      `SELECT COUNT(*) as total FROM pedidos p ${whereClause}`,
       {
-        replacements: {
-          start_date: start_date || '1900-01-01', // Default to earliest date if not provided
-          end_date: end_date || '9999-12-31',    // Default to latest date if not provided
-          id_empresa: id_empresa || null,
-          id_vendedor: id_vendedor || null,
-        },
+        replacements: replacements,
         type: sequelize.QueryTypes.SELECT,
       }
     );
 
     const totalProducts = totalProductsResult[0]?.total || 0;
 
-    // Query to fetch the paginated products with filters
+    // 3. Query to fetch the paginated products with dynamic WHERE clause
     const pedidos = await sequelize.query(
       `SELECT p.id, p.createdAt, c.razao_social, u.fullname, p.total, p.status, p.pedido_id_exsam
       FROM pedidos p
-      JOIN clientes c ON c.id = p.id_empresa 
+      JOIN clientes c ON c.id = p.id_empresa
       JOIN users u ON u.id = p.id_user
-      WHERE DATE(p.createdAt) BETWEEN :start_date AND :end_date
-      AND (:id_empresa IS NULL OR p.id_empresa = :id_empresa)
-      AND (:id_vendedor IS NULL OR p.id_user = :id_vendedor)
+      ${whereClause}
       ORDER BY p.id DESC
       LIMIT :limit OFFSET :offset`,
       {
         replacements: {
-          start_date: start_date || '1900-01-01',
-          end_date: end_date || '9999-12-31',
-          id_empresa: id_empresa || null,
-          id_vendedor: id_vendedor || null,
+          ...replacements, // Spread the existing replacements
           limit: limit,
           offset: offset,
         },
@@ -62,7 +74,7 @@ exports.findAllErp = async (req, res) => {
       return res.status(200).send({ message: "DATA NOT FOUND" });
     }
 
-    // Return data with pagination
+    // 4. Return data with pagination
     res.status(200).send({
       status: true,
       message: "The request has succeeded",
@@ -76,6 +88,7 @@ exports.findAllErp = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error fetching ERP data:", error);
     res.status(500).send({
       status: false,
       message: "The request has not succeeded",

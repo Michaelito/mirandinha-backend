@@ -6,7 +6,7 @@ module.exports = (app) => {
   var router = require("express").Router();
 
   // Retrieve a single data with id
-  router.get("/", auth.authenticateToken, controller.findOne);
+  router.get("/", auth.authenticateToken, controller.findAll);
 
   app.use("/api/v1/dashboard", router);
 };
