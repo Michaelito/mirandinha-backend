@@ -10,12 +10,12 @@ exports.findAll = async (req, res) => {
   const id_empresa = decodedToken.id_empresa
 
   // Check user authorization
-  // if (decodedToken.profile != 1) {
-  //   return res.status(401).send({
-  //     status: false,
-  //     message: "The request has not succeeded",
-  //   });
-  // }
+  if (decodedToken.profile !== 2) {
+    return res.status(403).send({
+      status: false,
+      message: "The request has not succeeded",
+    });
+  }
 
   try {
     // Extract and Validate Parameters
